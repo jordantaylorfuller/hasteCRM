@@ -726,7 +726,7 @@ POST /v1/batch
 import requests
 
 class HasteCRMAPI:
-    def __init__(self, api_key, base_url="https://api.aicrm.com/v1"):
+    def __init__(self, api_key, base_url="https://api.hastecrm.com/v1"):
         self.api_key = api_key
         self.base_url = base_url
         self.headers = {
@@ -760,8 +760,8 @@ result = api.upload_file("document.pdf", "contact", "contact_123")
 const FormData = require('form-data');
 const fs = require('fs');
 
-class AICRMAPI {
-  constructor(apiKey, baseUrl = 'https://api.aicrm.com/v1') {
+class HasteCRMAPI {
+  constructor(apiKey, baseUrl = 'https://api.hastecrm.com/v1') {
     this.apiKey = apiKey;
     this.baseUrl = baseUrl;
   }

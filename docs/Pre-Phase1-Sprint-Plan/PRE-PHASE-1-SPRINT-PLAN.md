@@ -33,7 +33,7 @@
   - [ ] Slack/Discord for team communication
   - [ ] 1Password/Bitwarden for credential management
 - [ ] Purchase domains:
-  - [ ] Primary: aicrm.com (or available alternative)
+  - [ ] Primary: hastecrm.com (or available alternative)
   - [ ] Alternatives: .io, .app, .ai variants
   - [ ] Set up domain forwarding
 

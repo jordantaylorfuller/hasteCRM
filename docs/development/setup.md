@@ -1,6 +1,6 @@
 # Development Setup Guide
 
-This guide will help you set up your local development environment for the AI-CRM Platform.
+This guide will help you set up your local development environment for hasteCRM.
 
 ## 📋 Prerequisites
 
@@ -31,8 +31,8 @@ Before you begin, ensure you have the following installed:
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-org/ai-crm-platform.git
-cd ai-crm-platform
+git clone https://github.com/your-org/hastecrm.git
+cd hastecrm
 
 # 2. Run the setup script (NEW!)
 ./scripts/setup.sh
@@ -156,8 +156,8 @@ sudo apt-get update && sudo apt-get install google-cloud-cli
 gcloud init
 
 # Create project
-gcloud projects create ai-crm-dev-$USER --name="AI CRM Dev"
-gcloud config set project ai-crm-dev-$USER
+gcloud projects create hastecrm-dev-$USER --name="hasteCRM Dev"
+gcloud config set project hastecrm-dev-$USER
 
 # Enable APIs
 gcloud services enable \
@@ -171,13 +171,13 @@ gcloud services enable \
 #### 3.2 Create Service Account
 ```bash
 # Create service account
-gcloud iam service-accounts create ai-crm-dev \
-  --display-name="AI CRM Development"
+gcloud iam service-accounts create hastecrm-dev \
+  --display-name="hasteCRM Development"
 
 # Download credentials
 gcloud iam service-accounts keys create \
   ./credentials/google-service-account.json \
-  --iam-account=ai-crm-dev@ai-crm-dev-$USER.iam.gserviceaccount.com
+  --iam-account=hastecrm-dev@hastecrm-dev-$USER.iam.gserviceaccount.com
 
 # Set environment variable
 echo "GOOGLE_APPLICATION_CREDENTIALS=./credentials/google-service-account.json" >> .env.local
@@ -393,7 +393,7 @@ pnpm check:services
 ## 🏗️ Project Structure (Enhanced)
 
 ```
-ai-crm-platform/
+hastecrm/
 ├── apps/
 │   ├── web/                 # Next.js frontend
 │   │   ├── app/            # App router pages
@@ -791,7 +791,7 @@ MOCK_ALL_EXTERNAL=true pnpm dev
 ### Self-Service
 1. Run diagnostics: `./scripts/diagnose.sh`
 2. Check logs: `pnpm logs:all`
-3. Search issues: [GitHub Issues](https://github.com/your-org/ai-crm-platform/issues)
+3. Search issues: [GitHub Issues](https://github.com/your-org/hastecrm/issues)
 
 ### Team Support
 - **Slack**: #crm-development (fastest)

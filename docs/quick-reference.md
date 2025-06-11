@@ -1,7 +1,7 @@
-# AI-CRM Platform - Consolidated Quick Reference
+# hasteCRM - Consolidated Quick Reference
 
 ## 🎯 Project Overview
-**AI-powered CRM platform** with intelligent contact management, email integration, sales pipelines, and AI-driven insights.
+**hasteCRM** - AI-powered platform with intelligent contact management, email integration, sales pipelines, and AI-driven insights.
 
 > ⚠️ **Status**: Currently in planning phase - implementation not yet started
 
@@ -17,8 +17,8 @@
 ### Initial Setup
 ```bash
 # Clone repository
-git clone https://github.com/your-org/ai-crm-platform.git
-cd ai-crm-platform
+git clone https://github.com/your-org/hasteCRM.git
+cd hasteCRM
 
 # Initialize project structure
 ./scripts/initialize-project.sh
@@ -42,7 +42,7 @@ pnpm dev
 
 ## 📁 Project Structure
 ```
-ai-crm-platform/
+hasteCRM/
 ├── apps/
 │   ├── web/          # Next.js frontend application
 │   ├── api/          # NestJS backend API

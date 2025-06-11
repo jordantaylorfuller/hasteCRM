@@ -2,7 +2,7 @@
 
 ## Overview
 
-Phase 9 focuses on preparing the AI-CRM platform for production deployment, establishing operational procedures, and ensuring the system can handle enterprise-scale workloads reliably and securely.
+Phase 9 focuses on preparing the hasteCRM platform for production deployment, establishing operational procedures, and ensuring the system can handle enterprise-scale workloads reliably and securely.
 
 ## Table of Contents
 
@@ -86,7 +86,7 @@ module "vpc" {
   
   tags = {
     Environment = "production"
-    Project     = "ai-crm"
+    Project     = "hastecrm"
   }
 }
 
@@ -341,8 +341,8 @@ metadata:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: crm-api
-  namespace: crm-production
+  name: hastecrm-api
+  namespace: hastecrm-production
 spec:
   replicas: 3
   strategy:
@@ -401,8 +401,8 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: crm-api
-  namespace: crm-production
+  name: hastecrm-api
+  namespace: hastecrm-production
 spec:
   type: LoadBalancer
   ports:
@@ -416,13 +416,13 @@ spec:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: crm-api-hpa
-  namespace: crm-production
+  name: hastecrm-api-hpa
+  namespace: hastecrm-production
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: crm-api
+    name: hastecrm-api
   minReplicas: 3
   maxReplicas: 10
   metrics:
@@ -444,25 +444,25 @@ spec:
 
 ```sql
 -- Production database initialization
-CREATE DATABASE crm_production;
+CREATE DATABASE hastecrm_production;
 
 -- Enable required extensions
-\c crm_production;
+\c hastecrm_production;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pgvector";
 CREATE EXTENSION IF NOT EXISTS "pg_trgm";
 CREATE EXTENSION IF NOT EXISTS "pg_stat_statements";
 
 -- Create read-only user for analytics
-CREATE USER crm_analytics WITH PASSWORD 'secure_password';
-GRANT CONNECT ON DATABASE crm_production TO crm_analytics;
+CREATE USER hastecrm_analytics WITH PASSWORD 'secure_password';
+GRANT CONNECT ON DATABASE hastecrm_production TO hastecrm_analytics;
 GRANT USAGE ON SCHEMA public TO crm_analytics;
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO crm_analytics;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO crm_analytics;
 
 -- Create application user
-CREATE USER crm_app WITH PASSWORD 'secure_password';
-GRANT CONNECT ON DATABASE crm_production TO crm_app;
+CREATE USER hastecrm_app WITH PASSWORD 'secure_password';
+GRANT CONNECT ON DATABASE hastecrm_production TO hastecrm_app;
 GRANT USAGE ON SCHEMA public TO crm_app;
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO crm_app;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO crm_app;
@@ -470,13 +470,13 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO crm_app;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO crm_app;
 
 -- Configure connection limits
-ALTER DATABASE crm_production SET max_connections = 200;
-ALTER DATABASE crm_production SET shared_buffers = '4GB';
-ALTER DATABASE crm_production SET effective_cache_size = '12GB';
-ALTER DATABASE crm_production SET work_mem = '16MB';
-ALTER DATABASE crm_production SET maintenance_work_mem = '512MB';
-ALTER DATABASE crm_production SET random_page_cost = 1.1;
-ALTER DATABASE crm_production SET effective_io_concurrency = 200;
+ALTER DATABASE hastecrm_production SET max_connections = 200;
+ALTER DATABASE hastecrm_production SET shared_buffers = '4GB';
+ALTER DATABASE hastecrm_production SET effective_cache_size = '12GB';
+ALTER DATABASE hastecrm_production SET work_mem = '16MB';
+ALTER DATABASE hastecrm_production SET maintenance_work_mem = '512MB';
+ALTER DATABASE hastecrm_production SET random_page_cost = 1.1;
+ALTER DATABASE hastecrm_production SET effective_io_concurrency = 200;
 ```
 
 ## Deployment Pipeline
@@ -1031,7 +1031,7 @@ groups:
       
       - alert: DatabaseConnectionPoolExhausted
         expr: |
-          pg_stat_database_numbackends{datname="crm_production"} /
+          pg_stat_database_numbackends{datname="hastecrm_production"} /
           pg_settings_max_connections > 0.8
         for: 5m
         labels:
@@ -1533,7 +1533,7 @@ export function securityHeaders() {
           "'self'",
           "https://api.segment.io",
           "https://sentry.io",
-          "wss://crm.com"
+          "wss://hastecrm.com"
         ],
         frameSrc: ["'none'"],
         objectSrc: ["'none'"],
@@ -1873,7 +1873,7 @@ export class BackupManager {
   
   async createDatabaseBackup(): Promise<string> {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const snapshotId = `crm-backup-${timestamp}`;
+    const snapshotId = `hastecrm-backup-${timestamp}`;
     
     // Create RDS snapshot
     await this.rds.createDBSnapshot({
@@ -1955,7 +1955,7 @@ export class BackupManager {
   async testRestore(snapshotId: string): Promise<boolean> {
     try {
       // Create test instance from snapshot
-      const testInstanceId = `crm-restore-test-${Date.now()}`;
+      const testInstanceId = `hastecrm-restore-test-${Date.now()}`;
       
       await this.rds.restoreDBInstanceFromDBSnapshot({
         DBInstanceIdentifier: testInstanceId,
@@ -1991,7 +1991,7 @@ export class BackupManager {
     }).promise();
     
     const endpoint = instance.DBInstances![0].Endpoint!;
-    const connectionString = `postgres://crm_app:${process.env.DB_PASSWORD}@${endpoint.Address}:${endpoint.Port}/crm_production`;
+    const connectionString = `postgres://hastecrm_app:${process.env.DB_PASSWORD}@${endpoint.Address}:${endpoint.Port}/hastecrm_production`;
     
     // Run checks
     const { stdout } = await execAsync(`
@@ -2068,24 +2068,24 @@ export async function scheduleBackups(): Promise<void> {
 ### 1. Database Failure
 ```bash
 # Step 1: Assess the damage
-aws rds describe-db-instances --db-instance-identifier crm-production
+aws rds describe-db-instances --db-instance-identifier hastecrm-production
 
 # Step 2: Promote read replica if available
-aws rds promote-read-replica --db-instance-identifier crm-production-read-1
+aws rds promote-read-replica --db-instance-identifier hastecrm-production-read-1
 
 # Step 3: Or restore from snapshot
 aws rds restore-db-instance-from-db-snapshot \
-  --db-instance-identifier crm-production-restored \
+  --db-instance-identifier hastecrm-production-restored \
   --db-snapshot-identifier <latest-snapshot-id>
 
 # Step 4: Update application configuration
 kubectl set env deployment/crm-api \
-  DATABASE_URL=postgres://user:pass@new-endpoint/crm_production \
+  DATABASE_URL=postgres://user:pass@new-endpoint/hastecrm_production \
   -n crm-production
 
 # Step 5: Verify application health
 kubectl get pods -n crm-production
-curl https://api.crm.com/health
+curl https://api.hastecrm.com/health
 ```
 
 ### 2. Region Failure
@@ -2096,19 +2096,19 @@ aws route53 change-resource-record-sets \
   --change-batch file://failover-to-secondary.json
 
 # Step 2: Scale up secondary region
-kubectl scale deployment crm-api --replicas=10 \
-  -n crm-production \
+kubectl scale deployment hastecrm-api --replicas=10 \
+  -n hastecrm-production \
   --context=us-west-2
 
 # Step 3: Verify traffic routing
-dig api.crm.com
-curl -I https://api.crm.com/health
+dig api.hastecrm.com
+curl -I https://api.hastecrm.com/health
 ```
 
 ### 3. Data Corruption
 ```bash
 # Step 1: Stop write operations
-kubectl scale deployment crm-api --replicas=0 -n crm-production
+kubectl scale deployment hastecrm-api --replicas=0 -n hastecrm-production
 
 # Step 2: Identify corruption timeframe
 psql $DATABASE_URL -c "
@@ -2119,8 +2119,8 @@ psql $DATABASE_URL -c "
 
 # Step 3: Restore to point in time
 aws rds restore-db-instance-to-point-in-time \
-  --source-db-instance-identifier crm-production \
-  --target-db-instance-identifier crm-production-pitr \
+  --source-db-instance-identifier hastecrm-production \
+  --target-db-instance-identifier hastecrm-production-pitr \
   --restore-time "2024-01-15T12:00:00.000Z"
 
 # Step 4: Verify data integrity
@@ -2168,7 +2168,7 @@ kubectl apply -f security-enhanced-monitoring.yaml
 
 ### Communication Channels
 1. Internal: Slack #incident-response
-2. Status Page: https://status.crm.com
+2. Status Page: https://status.hastecrm.com
 3. Customer Email: Template in `/templates/incident-notification.html`
 4. Social Media: Twitter @CRMStatus
 
@@ -2469,13 +2469,13 @@ export async function generateCostDashboard(): Promise<void> {
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: crm-api-hpa
-  namespace: crm-production
+  name: hastecrm-api-hpa
+  namespace: hastecrm-production
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: crm-api
+    name: hastecrm-api
   minReplicas: 3
   maxReplicas: 20
   metrics:
@@ -2524,13 +2524,13 @@ spec:
 apiVersion: autoscaling/v2
 kind: VerticalPodAutoscaler
 metadata:
-  name: crm-api-vpa
-  namespace: crm-production
+  name: hastecrm-api-vpa
+  namespace: hastecrm-production
 spec:
   targetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: crm-api
+    name: hastecrm-api
   updatePolicy:
     updateMode: "Auto"
   resourcePolicy:

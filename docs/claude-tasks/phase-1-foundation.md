@@ -8,7 +8,7 @@
 **Success Criteria**: All tests passing, core infrastructure operational  
 **Team Size**: 1-2 developers  
 
-Phase 1 establishes the core infrastructure and basic functionality for the AI-CRM system. This phase focuses on setting up the essential components that all other features will build upon, with an emphasis on scalability, security, and developer experience.
+Phase 1 establishes the core infrastructure and basic functionality for the hasteCRM system. This phase focuses on setting up the essential components that all other features will build upon, with an emphasis on scalability, security, and developer experience.
 
 ## 📋 Goals
 
@@ -37,7 +37,7 @@ Before starting Phase 1, ensure you have:
 #### 1.1 Monorepo Initialization
 ```bash
 # Execute these commands for Claude Code
-mkdir ai-crm-platform && cd ai-crm-platform
+mkdir hastecrm-platform && cd hastecrm-platform
 npx create-turbo@latest
 ```
 
@@ -70,7 +70,7 @@ pnpm test  # Should run all tests
     postgres:
       image: postgres:15-alpine
       environment:
-        POSTGRES_DB: crm_dev
+        POSTGRES_DB: hastecrm_dev
         POSTGRES_USER: postgres
         POSTGRES_PASSWORD: change-me-in-production
       ports:

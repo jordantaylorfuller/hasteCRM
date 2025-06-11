@@ -2,13 +2,13 @@
 
 ## Introduction
 
-The AI-CRM Platform REST API provides a comprehensive set of endpoints for integrating with external systems and building custom applications. While our primary API is GraphQL-based, the REST API offers a familiar interface for developers who prefer RESTful conventions.
+The hasteCRM REST API provides a comprehensive set of endpoints for integrating with external systems and building custom applications. While our primary API is GraphQL-based, the REST API offers a familiar interface for developers who prefer RESTful conventions.
 
 ## Base URL
 
 ```
-Production: https://api.aicrm.com/v1
-Staging: https://api-staging.aicrm.com/v1
+Production: https://api.hastecrm.com/v1
+Staging: https://api-staging.hastecrm.com/v1
 Development: http://localhost:4000/v1
 ```
 

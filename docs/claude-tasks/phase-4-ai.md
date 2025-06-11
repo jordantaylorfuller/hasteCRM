@@ -1,7 +1,7 @@
 # Phase 4: AI Integration
 
 ## Overview
-Integrate advanced AI capabilities throughout the CRM to provide intelligent insights, automation, and predictive analytics for sales teams.
+Integrate advanced AI capabilities throughout hasteCRM to provide intelligent insights, automation, and predictive analytics for sales teams.
 
 ## Goals
 - Implement AI-powered lead scoring

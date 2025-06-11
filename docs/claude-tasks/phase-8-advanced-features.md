@@ -2,7 +2,7 @@
 
 ## Overview
 
-Phase 8 introduces enterprise-grade advanced features including workflow automation, custom objects, advanced reporting, integrations marketplace, mobile apps, and API platform. These features transform the CRM into a comprehensive business platform.
+Phase 8 introduces enterprise-grade advanced features including workflow automation, custom objects, advanced reporting, integrations marketplace, mobile apps, and API platform. These features transform hasteCRM into a comprehensive business platform.
 
 ## Core Features
 

@@ -1,6 +1,6 @@
 # Feature Documentation Guide
 
-This directory contains comprehensive documentation for all AI-CRM platform features. Each document follows a consistent structure to ensure clarity and ease of navigation.
+This directory contains comprehensive documentation for all hasteCRM features. Each document follows a consistent structure to ensure clarity and ease of navigation.
 
 ## Document Structure
 

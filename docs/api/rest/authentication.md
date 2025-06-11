@@ -55,7 +55,7 @@ GET /v1/auth/oauth/google
 Redirects to Google OAuth consent page. After authorization, redirects to:
 
 ```
-https://app.aicrm.com/auth/callback?token=ACCESS_TOKEN
+https://app.hastecrm.com/auth/callback?token=ACCESS_TOKEN
 ```
 
 ### Refresh Token
@@ -208,7 +208,7 @@ Authorization: Bearer YOUR_ACCESS_TOKEN
     "email": "user@example.com",
     "firstName": "John",
     "lastName": "Doe",
-    "avatar": "https://cdn.aicrm.com/avatars/usr_1234567890.jpg",
+    "avatar": "https://cdn.hastecrm.com/avatars/usr_1234567890.jpg",
     "role": "ADMIN",
     "workspace": {
       "id": "ws_1234567890",

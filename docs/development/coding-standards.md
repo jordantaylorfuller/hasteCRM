@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document defines the coding standards and best practices for the AI-CRM platform. Following these standards ensures code consistency, maintainability, and quality across the entire codebase.
+This document defines the coding standards and best practices for hasteCRM. Following these standards ensures code consistency, maintainability, and quality across the entire codebase.
 
 ## Table of Contents
 

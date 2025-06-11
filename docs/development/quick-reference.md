@@ -4,7 +4,7 @@
 ```bash
 # Clone and setup
 git clone <repo>
-cd ai-crm-platform
+cd hastecrm
 ./scripts/setup-dev.sh
 
 # Start development

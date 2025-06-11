@@ -66,7 +66,7 @@
 
 ## 1. Overview
 
-The AI-CRM Platform leverages multiple AI providers to deliver intelligent automation, content generation, and insights. This document covers the AI capabilities, integration patterns, and best practices for using AI features effectively.
+hasteCRM leverages multiple AI providers to deliver intelligent automation, content generation, and insights. This document covers the AI capabilities, integration patterns, and best practices for using AI features effectively.
 
 ## 2. AI Providers
 
@@ -2663,13 +2663,13 @@ interface RevenueIntelligence {
 - [Performance Monitor](/tools/ai-monitor) - Track AI performance
 
 ### 15.3 Support
-- **AI Help Center**: [help.aicrm.com/ai](https://help.aicrm.com/ai)
-- **Developer Forum**: [forum.aicrm.com/ai](https://forum.aicrm.com/ai)
-- **API Status**: [status.aicrm.com](https://status.aicrm.com)
-- **Support**: ai-support@aicrm.com
+- **AI Help Center**: [help.hastecrm.com/ai](https://help.hastecrm.com/ai)
+- **Developer Forum**: [forum.hastecrm.com/ai](https://forum.hastecrm.com/ai)
+- **API Status**: [status.hastecrm.com](https://status.hastecrm.com)
+- **Support**: ai-support@hastecrm.com
 
 ### 15.4 Training
-- **AI CRM Certification**: Learn to leverage AI effectively
+- **hasteCRM AI Certification**: Learn to leverage AI effectively
 - **Webinar Series**: Monthly AI feature deep-dives
 - **Best Practices Workshop**: Optimization techniques
 - **Custom Training**: Enterprise team training

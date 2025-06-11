@@ -17,7 +17,7 @@
 
 ## Overview
 
-The Contact Management system is the heart of the AI-CRM Platform, providing a comprehensive solution for managing relationships with individuals and companies. Unlike traditional CRMs, our system leverages AI at every touchpoint to provide intelligent insights, automated enrichment, and predictive analytics.
+The Contact Management system is the heart of hasteCRM, providing a comprehensive solution for managing relationships with individuals and companies. Unlike traditional CRMs, our system leverages AI at every touchpoint to provide intelligent insights, automated enrichment, and predictive analytics.
 
 ### Key Differentiators
 - **AI-Powered Enrichment**: Automatic data enrichment from multiple sources
