@@ -6,7 +6,7 @@
 
 ### 1. AI Service API Access (Day 1-2)
 **Blocker Level**: 🔴 CRITICAL  
-**Owner**: Technical Lead
+**Owner**: Jordan Taylor Fuller
 
 ```bash
 # Without these, no AI features can be developed
@@ -67,7 +67,7 @@ async function testOpenAI() {
 
 ### 2. Google OAuth Setup (Day 2-3)
 **Blocker Level**: 🔴 CRITICAL  
-**Owner**: Technical Lead
+**Owner**: Jordan Taylor Fuller
 
 ```bash
 # Required for Gmail integration and authentication
@@ -97,7 +97,7 @@ async function testOpenAI() {
 
 ### 3. Development Environment Script (Day 1)
 **Blocker Level**: 🟡 HIGH  
-**Owner**: Technical Lead
+**Owner**: Jordan Taylor Fuller
 
 ```bash
 #!/bin/bash
@@ -144,7 +144,7 @@ echo "2. Run 'pnpm dev' to start development"
 
 ### 4. Legal Entity & Banking (Day 1-3)
 **Blocker Level**: 🟡 HIGH  
-**Owner**: Business Lead
+**Owner**: Jordan Taylor Fuller
 
 ```bash
 # Required for contracts and payments
@@ -163,7 +163,7 @@ echo "2. Run 'pnpm dev' to start development"
 
 ### 5. Core Legal Documents (Day 2-4)
 **Blocker Level**: 🟡 HIGH  
-**Owner**: Legal Counsel
+**Owner**: Jordan Taylor Fuller
 
 ```markdown
 # Minimum viable legal framework
@@ -190,7 +190,7 @@ These can be done alongside critical path:
 
 ### Development Tools Setup
 ```yaml
-Can be done by: Any developer
+Can be done by: Jordan Taylor Fuller
 Timeline: Ongoing
 ```
 
@@ -218,7 +218,7 @@ pnpm lint-staged
 
 ### Cost Monitoring Setup
 ```yaml
-Can be done by: Business Lead
+Can be done by: Jordan Taylor Fuller
 Timeline: Week 1
 ```
 

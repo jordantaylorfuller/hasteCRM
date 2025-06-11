@@ -32,6 +32,8 @@ Before starting Phase 1, ensure you have:
 
 ## 📝 Detailed Tasks
 
+> **Important**: All version numbers and technical specifications must align with [MASTER-CONFIG.md](../MASTER-CONFIG.md)
+
 ### 1. Project Setup (Day 1-2)
 
 #### 1.1 Monorepo Initialization
@@ -224,7 +226,10 @@ Create comprehensive auth module in `apps/api/src/modules/auth`:
     JwtModule.registerAsync({
       useFactory: (config: ConfigService) => ({
         secret: config.get('JWT_SECRET'),
-        signOptions: { expiresIn: '15m' },
+        signOptions: { 
+          expiresIn: '15m', // Per MASTER-CONFIG.md
+          algorithm: 'RS256' 
+        },
       }),
       inject: [ConfigService],
     }),

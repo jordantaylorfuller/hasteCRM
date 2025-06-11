@@ -4,13 +4,15 @@
 **Status**: In Development  
 **Last Updated**: 2024-01-15
 
+> **Note**: For authoritative version numbers and technical specifications, see [MASTER-CONFIG.md](./MASTER-CONFIG.md)
+
 Welcome to the hasteCRM documentation. This next-generation CRM leverages AI at every level to create an intelligent, automated sales and relationship management system that surpasses traditional solutions.
 
 ## 🚀 Quick Start
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/hasteCRM.git
+git clone https://github.com/haste/hasteCRM.git
 cd hasteCRM
 
 # Install dependencies
@@ -228,10 +230,10 @@ See [Development Setup](development/setup.md) for more solutions.
 
 ## 👥 Team & Support
 
-- **Development Lead**: @username
-- **Product Manager**: @username
+- **Development Lead**: Jordan Taylor Fuller
+- **Product Manager**: Jordan Taylor Fuller
 - **Slack Channel**: #crm-development
-- **Email**: crm-team@company.com
+- **Email**: crm-team@haste.nyc
 
 ### Getting Help
 1. Check the documentation
@@ -245,7 +247,7 @@ Please see our [Git Workflow](development/git-workflow.md) and [Coding Standards
 
 ## 🔒 Security
 
-Please report security vulnerabilities to security@company.com.
+Please report security vulnerabilities to security@haste.nyc.
 
 ## 📄 License
 

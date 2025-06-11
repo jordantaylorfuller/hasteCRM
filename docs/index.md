@@ -5,6 +5,7 @@ This index provides a complete map of all documentation files in hasteCRM.
 ## 📚 Documentation Structure
 
 ### Main Documentation
+- **[MASTER CONFIG](./MASTER-CONFIG.md)** - 🔴 **AUTHORITATIVE** - Single source of truth for all versions and standards
 - **[Documentation Overview](./documentation-overview.md)** - Main documentation hub (previously README.md)
 - **[Quick Reference](./quick-reference.md)** - Essential commands and shortcuts
 - **[Version Standardization Summary](./version-standardization-summary.md)** - Dependency versions

@@ -9,7 +9,7 @@ GraphQL is the primary API interface for the hasteCRM platform, providing a flex
 ### Endpoint
 
 ```
-https://api.hastecrm.com/graphql
+https://api.haste.nyc/graphql
 ```
 
 ### Authentication

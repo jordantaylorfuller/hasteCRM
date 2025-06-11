@@ -63,14 +63,14 @@ GET /api/v1/auth/google/callback?code=xxx&state=yyy
 ```javascript
 // With Apollo Client
 const client = new ApolloClient({
-  uri: 'https://api.hastecrm.com/graphql',
+  uri: 'https://api.haste.nyc/graphql',
   headers: {
     authorization: `Bearer ${accessToken}`
   }
 });
 
 // With fetch
-const response = await fetch('https://api.hastecrm.com/graphql', {
+const response = await fetch('https://api.haste.nyc/graphql', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -85,14 +85,14 @@ const response = await fetch('https://api.hastecrm.com/graphql', {
 ```javascript
 // With axios
 const api = axios.create({
-  baseURL: 'https://api.hastecrm.com/v1',
+  baseURL: 'https://api.haste.nyc/v1',
   headers: {
     'Authorization': `Bearer ${accessToken}`
   }
 });
 
 // With fetch
-const response = await fetch('https://api.hastecrm.com/v1/contacts', {
+const response = await fetch('https://api.haste.nyc/v1/contacts', {
   headers: {
     'Authorization': `Bearer ${accessToken}`
   }
@@ -103,14 +103,14 @@ const response = await fetch('https://api.hastecrm.com/v1/contacts', {
 
 ```javascript
 // With Socket.IO
-const socket = io('wss://api.hastecrm.com', {
+const socket = io('wss://api.haste.nyc', {
   auth: {
     token: accessToken
   }
 });
 
 // Native WebSocket
-const ws = new WebSocket(`wss://api.hastecrm.com/ws?token=${accessToken}`);
+const ws = new WebSocket(`wss://api.haste.nyc/ws?token=${accessToken}`);
 ```
 
 ## Token Management
@@ -336,12 +336,12 @@ API Key: ak_test_xxxxxxxxxxxx
 
 ```bash
 # Test login
-curl -X POST https://api.hastecrm.com/v1/auth/login \
+curl -X POST https://api.haste.nyc/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","password":"test123"}'
 
 # Test authenticated request
-curl https://api.hastecrm.com/v1/me \
+curl https://api.haste.nyc/v1/me \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 

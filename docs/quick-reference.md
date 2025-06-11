@@ -17,7 +17,7 @@
 ### Initial Setup
 ```bash
 # Clone repository
-git clone https://github.com/your-org/hasteCRM.git
+git clone https://github.com/hasteNYC/hasteCRM.git
 cd hasteCRM
 
 # Initialize project structure

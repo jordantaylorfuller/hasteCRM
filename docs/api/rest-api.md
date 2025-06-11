@@ -29,7 +29,7 @@ X-Workspace-ID: workspace_uuid (optional, defaults to user's primary workspace)
 
 ### Example Request
 ```bash
-curl -X GET https://api.hastecrm.com/v1/contacts \
+curl -X GET https://api.haste.nyc/v1/contacts \
   -H "Authorization: Bearer your-jwt-token-here" \
   -H "Content-Type: application/json"
 ```
@@ -37,8 +37,8 @@ curl -X GET https://api.hastecrm.com/v1/contacts \
 ## Base URL & Versioning
 
 ```
-Production: https://api.hastecrm.com/v1
-Staging: https://staging-api.hastecrm.com/v1
+Production: https://api.haste.nyc/v1
+Staging: https://staging-api.haste.nyc/v1
 Development: http://localhost:4000/v1
 ```
 
@@ -143,7 +143,7 @@ POST /v1/files/upload
 
 **Request:**
 ```bash
-curl -X POST https://api.hastecrm.com/v1/files/upload \
+curl -X POST https://api.haste.nyc/v1/files/upload \
   -H "Content-Type: multipart/form-data" \
   -H "Authorization: Bearer your-jwt-token-here" \
   -F "file=@document.pdf" \
@@ -161,8 +161,8 @@ curl -X POST https://api.hastecrm.com/v1/files/upload \
     "filename": "document.pdf",
     "size": 1048576,
     "mimeType": "application/pdf",
-    "url": "https://storage.hastecrm.com/files/file_789xyz",
-    "thumbnailUrl": "https://storage.hastecrm.com/thumbnails/file_789xyz",
+    "url": "https://storage.haste.nyc/files/file_789xyz",
+    "thumbnailUrl": "https://storage.haste.nyc/thumbnails/file_789xyz",
     "uploadedAt": "2024-01-15T10:30:00Z",
     "metadata": {
       "entityType": "contact",
@@ -201,7 +201,7 @@ POST /v1/files/upload-url
 {
   "success": true,
   "data": {
-    "uploadUrl": "https://storage.hastecrm.com/upload/...",
+    "uploadUrl": "https://storage.haste.nyc/upload/...",
     "fileId": "file_abc123",
     "expiresAt": "2024-01-15T11:00:00Z"
   }
@@ -287,7 +287,7 @@ GET /v1/auth/google/callback?code=AUTH_CODE&state=STATE_TOKEN
 
 **Response (Redirect):**
 ```
-Location: https://app.hastecrm.com/auth/success?token=your-jwt-token-here
+Location: https://app.haste.nyc/auth/success?token=your-jwt-token-here
 ```
 
 ### Microsoft OAuth
@@ -542,7 +542,7 @@ data: {"timestamp":"2024-01-15T10:30:00Z"}
 
 ### WebSocket Connection
 ```
-wss://api.hastecrm.com/v1/ws
+wss://api.haste.nyc/v1/ws
 ```
 
 **Authentication:**
@@ -726,7 +726,7 @@ POST /v1/batch
 import requests
 
 class HasteCRMAPI:
-    def __init__(self, api_key, base_url="https://api.hastecrm.com/v1"):
+    def __init__(self, api_key, base_url="https://api.haste.nyc/v1"):
         self.api_key = api_key
         self.base_url = base_url
         self.headers = {
@@ -761,7 +761,7 @@ const FormData = require('form-data');
 const fs = require('fs');
 
 class HasteCRMAPI {
-  constructor(apiKey, baseUrl = 'https://api.hastecrm.com/v1') {
+  constructor(apiKey, baseUrl = 'https://api.haste.nyc/v1') {
     this.apiKey = apiKey;
     this.baseUrl = baseUrl;
   }
@@ -794,7 +794,7 @@ const result = await api.uploadFile('document.pdf', 'contact', 'contact_123');
 ### cURL Examples
 ```bash
 # Upload file
-curl -X POST https://api.hastecrm.com/v1/files/upload \
+curl -X POST https://api.haste.nyc/v1/files/upload \
   -H "Content-Type: multipart/form-data" \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -F "file=@document.pdf" \
@@ -803,7 +803,7 @@ curl -X POST https://api.hastecrm.com/v1/files/upload \
   -F "entityId=contact_123"
 
 # Export contacts
-curl -X POST https://api.hastecrm.com/v1/export/contacts \
+curl -X POST https://api.haste.nyc/v1/export/contacts \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -813,13 +813,13 @@ curl -X POST https://api.hastecrm.com/v1/export/contacts \
   }'
 
 # Global search
-curl -X GET "https://api.hastecrm.com/v1/search?q=john&types=contact,deal" \
+curl -X GET "https://api.haste.nyc/v1/search?q=john&types=contact,deal" \
   -H "Authorization: Bearer YOUR_API_KEY"
 
 # Stream events (SSE)
 curl -N -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Accept: text/event-stream" \
-  https://api.hastecrm.com/v1/events/stream
+  https://api.haste.nyc/v1/events/stream
 ```
 
 ## Migration from v0 to v1
@@ -847,10 +847,10 @@ These v0 endpoints are deprecated and will be removed:
 ## Support
 
 For API support:
-- **Status Page**: [status.hastecrm.com](https://status.hastecrm.com)
-- **API Console**: [console.hastecrm.com](https://console.hastecrm.com)
-- **Developer Forum**: [forum.hastecrm.com/api](https://forum.hastecrm.com/api)
-- **Email**: api-support@hastecrm.com
+- **Status Page**: [status.haste.nyc](https://status.haste.nyc)
+- **API Console**: [console.haste.nyc](https://console.haste.nyc)
+- **Developer Forum**: [forum.haste.nyc/api](https://forum.haste.nyc/api)
+- **Email**: api-support@haste.nyc
 
 ---
 
@@ -865,7 +865,7 @@ For API support:
 2. **Use appropriate authentication flows**
    ```javascript
    // BAD: API key in frontend
-   fetch('https://api.hastecrm.com/v1/contacts', {
+   fetch('https://api.haste.nyc/v1/contacts', {
      headers: { 'Authorization': 'Bearer sk_live_abc123' }
    });
 
@@ -987,8 +987,8 @@ For API support:
 // Restrictive CORS policy
 const corsOptions = {
   origin: [
-    'https://app.hastecrm.com',
-    'https://staging.hastecrm.com'
+    'https://app.haste.nyc',
+    'https://staging.haste.nyc'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
@@ -1004,7 +1004,7 @@ const corsOptions = {
 class APIClient {
   constructor(apiKey, options = {}) {
     this.apiKey = apiKey;
-    this.baseURL = options.baseURL || 'https://api.hastecrm.com/v1';
+    this.baseURL = options.baseURL || 'https://api.haste.nyc/v1';
     this.maxRetries = options.maxRetries || 3;
     this.retryDelay = options.retryDelay || 1000;
   }
@@ -1129,7 +1129,7 @@ class HasteCRMSDK {
   
   constructor(config: APIConfig) {
     this.config = {
-      baseURL: 'https://api.hastecrm.com/v1',
+      baseURL: 'https://api.haste.nyc/v1',
       timeout: 30000,
       ...config
     };

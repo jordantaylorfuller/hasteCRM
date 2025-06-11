@@ -2663,10 +2663,10 @@ interface RevenueIntelligence {
 - [Performance Monitor](/tools/ai-monitor) - Track AI performance
 
 ### 15.3 Support
-- **AI Help Center**: [help.hastecrm.com/ai](https://help.hastecrm.com/ai)
-- **Developer Forum**: [forum.hastecrm.com/ai](https://forum.hastecrm.com/ai)
-- **API Status**: [status.hastecrm.com](https://status.hastecrm.com)
-- **Support**: ai-support@hastecrm.com
+- **AI Help Center**: [help.haste.nyc/ai](https://help.haste.nyc/ai)
+- **Developer Forum**: [forum.haste.nyc/ai](https://forum.haste.nyc/ai)
+- **API Status**: [status.haste.nyc](https://status.haste.nyc)
+- **Support**: ai-support@haste.nyc
 
 ### 15.4 Training
 - **hasteCRM AI Certification**: Learn to leverage AI effectively

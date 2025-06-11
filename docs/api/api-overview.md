@@ -38,11 +38,14 @@ All APIs use the same authentication system. See [Authentication Guide](./auth-g
 
 ### Rate Limits
 
-| API | Default Limit | Authenticated | Premium |
-|-----|--------------|---------------|---------|
-| GraphQL | 100/min | 1000/min | 5000/min |
-| REST | 60/min | 600/min | 3000/min |
-| WebSocket | 100 msg/min | 1000 msg/min | 5000 msg/min |
+> **Note**: See [MASTER-CONFIG.md](../MASTER-CONFIG.md#rate-limiting) for authoritative rate limit specifications.
+
+| API | Unauthenticated | Authenticated | Notes |
+|-----|----------------|---------------|-------|
+| GraphQL | 100 req/min | 1000 req/min | Per [MASTER-CONFIG.md](../MASTER-CONFIG.md) |
+| REST | 50 req/min | 500 req/min | Per [MASTER-CONFIG.md](../MASTER-CONFIG.md) |
+| WebSocket | N/A | 100 msg/min | Authenticated only |
+| File Upload | N/A | 10 req/min | Authenticated only |
 
 ## API Documentation
 
@@ -106,5 +109,5 @@ go get github.com/hastecrm/sdk-go
 
 - 📚 [API Changelog](./CHANGELOG.md) - Latest updates
 - 🐛 [Report Issues](https://github.com/hastecrm/api/issues)
-- 💬 [Community Forum](https://forum.hastecrm.com/api)
-- 📧 [Contact Support](mailto:api-support@hastecrm.com)
+- 💬 [Community Forum](https://forum.haste.nyc/api)
+- 📧 [Contact Support](mailto:api-support@haste.nyc)

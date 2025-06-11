@@ -335,7 +335,7 @@ import { createClient } from 'graphql-ws';
 
 const wsLink = new GraphQLWsLink(
   createClient({
-    url: 'wss://api.hastecrm.com/graphql',
+    url: 'wss://api.haste.nyc/graphql',
     connectionParams: {
       authorization: `Bearer ${getToken()}`
     },

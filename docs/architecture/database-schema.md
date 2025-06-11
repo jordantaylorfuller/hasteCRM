@@ -42,6 +42,10 @@ CREATE TABLE workspaces (
     updated_at TIMESTAMPTZ DEFAULT NOW(),
     deleted_at TIMESTAMPTZ,
     
+    -- Plan limits (stored in settings JSONB for flexibility)
+    -- Example: settings->>'maxUsers' = '5'
+    -- Example: settings->>'maxContacts' = '1000'
+    
     -- Subscription info
     stripe_customer_id VARCHAR(255),
     stripe_subscription_id VARCHAR(255),
@@ -72,8 +76,9 @@ CREATE TABLE users (
     
     -- OAuth providers
     google_id VARCHAR(255) UNIQUE,
-    google_refresh_token TEXT,
+    google_refresh_token TEXT, -- For user authentication only
     microsoft_id VARCHAR(255) UNIQUE,
+    -- Note: Email account tokens are stored in email_accounts table
     
     -- Metadata
     last_login_at TIMESTAMPTZ,

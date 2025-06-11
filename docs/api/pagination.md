@@ -183,7 +183,7 @@ class PaginatedAPI {
 }
 
 // Usage
-const api = new PaginatedAPI('https://api.hastecrm.com/v1', token);
+const api = new PaginatedAPI('https://api.haste.nyc/v1', token);
 
 for await (const contact of api.paginate('/contacts')) {
   console.log(contact.email);

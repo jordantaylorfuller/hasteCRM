@@ -7,8 +7,8 @@ The hasteCRM REST API provides a comprehensive set of endpoints for integrating 
 ## Base URL
 
 ```
-Production: https://api.hastecrm.com/v1
-Staging: https://api-staging.hastecrm.com/v1
+Production: https://api.haste.nyc/v1
+Staging: https://api-staging.haste.nyc/v1
 Development: http://localhost:4000/v1
 ```
 

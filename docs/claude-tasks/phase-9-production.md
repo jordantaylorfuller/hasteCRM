@@ -456,18 +456,18 @@ CREATE EXTENSION IF NOT EXISTS "pg_stat_statements";
 -- Create read-only user for analytics
 CREATE USER hastecrm_analytics WITH PASSWORD 'secure_password';
 GRANT CONNECT ON DATABASE hastecrm_production TO hastecrm_analytics;
-GRANT USAGE ON SCHEMA public TO crm_analytics;
-GRANT SELECT ON ALL TABLES IN SCHEMA public TO crm_analytics;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO crm_analytics;
+GRANT USAGE ON SCHEMA public TO hastecrm_analytics;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO hastecrm_analytics;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO hastecrm_analytics;
 
 -- Create application user
 CREATE USER hastecrm_app WITH PASSWORD 'secure_password';
 GRANT CONNECT ON DATABASE hastecrm_production TO hastecrm_app;
-GRANT USAGE ON SCHEMA public TO crm_app;
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO crm_app;
-GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO crm_app;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO crm_app;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO crm_app;
+GRANT USAGE ON SCHEMA public TO hastecrm_app;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO hastecrm_app;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO hastecrm_app;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO hastecrm_app;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO hastecrm_app;
 
 -- Configure connection limits
 ALTER DATABASE hastecrm_production SET max_connections = 200;
@@ -1533,7 +1533,7 @@ export function securityHeaders() {
           "'self'",
           "https://api.segment.io",
           "https://sentry.io",
-          "wss://hastecrm.com"
+          "wss://api.haste.nyc"
         ],
         frameSrc: ["'none'"],
         objectSrc: ["'none'"],
@@ -2085,7 +2085,7 @@ kubectl set env deployment/crm-api \
 
 # Step 5: Verify application health
 kubectl get pods -n crm-production
-curl https://api.hastecrm.com/health
+curl https://api.haste.nyc/health
 ```
 
 ### 2. Region Failure
@@ -2101,8 +2101,8 @@ kubectl scale deployment hastecrm-api --replicas=10 \
   --context=us-west-2
 
 # Step 3: Verify traffic routing
-dig api.hastecrm.com
-curl -I https://api.hastecrm.com/health
+dig api.haste.nyc
+curl -I https://api.haste.nyc/health
 ```
 
 ### 3. Data Corruption
@@ -2162,13 +2162,13 @@ kubectl apply -f security-enhanced-monitoring.yaml
 
 ### Incident Response Team
 - **Incident Commander**: CTO
-- **Technical Lead**: VP Engineering
-- **Communications**: VP Marketing
-- **Customer Success**: VP Customer Success
+- **Technical Lead**: Jordan Taylor Fuller
+- **Communications**: Jordan Taylor Fuller
+- **Customer Success**: Jordan Taylor Fuller
 
 ### Communication Channels
 1. Internal: Slack #incident-response
-2. Status Page: https://status.hastecrm.com
+2. Status Page: https://status.haste.nyc
 3. Customer Email: Template in `/templates/incident-notification.html`
 4. Social Media: Twitter @CRMStatus
 
@@ -2176,9 +2176,9 @@ kubectl apply -f security-enhanced-monitoring.yaml
 | Severity | Notification Time | Stakeholders |
 |----------|------------------|--------------|
 | Critical | Immediate | All C-level, Board |
-| High | 15 minutes | VP Engineering, CTO |
+| High | 15 minutes | Jordan Taylor Fuller |
 | Medium | 1 hour | Engineering Manager |
-| Low | Next business day | Team Lead |
+| Low | Next business day | Jordan Taylor Fuller |
 ```
 
 ## Operational Procedures
@@ -2200,7 +2200,7 @@ echo "Date: $(date)"
 
 # API Health
 echo -n "API Health: "
-curl -s https://api.crm.com/health | jq -r .status
+curl -s https://api.haste.nyc/health | jq -r .status
 
 # Database Health
 echo -n "Database Connections: "

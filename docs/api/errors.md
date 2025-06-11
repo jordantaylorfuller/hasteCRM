@@ -213,7 +213,7 @@ class APIClient:
             try:
                 response = self.session.request(
                     method, 
-                    f'https://api.hastecrm.com/v1{path}',
+                    f'https://api.haste.nyc/v1{path}',
                     headers=headers,
                     **kwargs
                 )

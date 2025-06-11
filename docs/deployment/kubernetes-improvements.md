@@ -62,7 +62,7 @@ spec:
       mode: SIMPLE
       credentialName: hastecrm-tls-cert
     hosts:
-    - "*.hastecrm.com"
+    - "*.haste.nyc"
 ---
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
@@ -71,8 +71,8 @@ metadata:
   namespace: hastecrm-production
 spec:
   hosts:
-  - app.hastecrm.com
-  - api.hastecrm.com
+  - app.haste.nyc
+  - api.haste.nyc
   gateways:
   - hastecrm-gateway
   http:
@@ -327,7 +327,7 @@ spec:
     gateways:
     - public-gateway.istio-system.svc.cluster.local
     hosts:
-    - api.hastecrm.com
+    - api.haste.nyc
   analysis:
     interval: 30s
     threshold: 5
@@ -347,7 +347,7 @@ spec:
       url: http://flagger-loadtester.test/
       timeout: 5s
       metadata:
-        cmd: "hey -z 1m -q 10 -c 2 https://api.hastecrm.com/health"
+        cmd: "hey -z 1m -q 10 -c 2 https://api.haste.nyc/health"
 ```
 
 #### b. Blue-Green Deployments
@@ -588,7 +588,7 @@ spec:
     spec:
       project: default
       source:
-        repoURL: https://github.com/company/hastecrm-k8s-config
+        repoURL: https://github.com/hasteNYC/hastecrm-k8s-config
         targetRevision: main
         path: 'environments/{{env}}'
       destination:

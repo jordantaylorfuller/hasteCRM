@@ -32,9 +32,13 @@ async function exampleFunction(): Promise<Result> {
 ```
 
 ### API Examples
-- Use GraphQL for queries and mutations
-- Use REST only for file uploads, webhooks, and external integrations
-- Always include error handling
+> **Important**: See [MASTER-CONFIG.md](../MASTER-CONFIG.md#api-architecture) for the authoritative API strategy
+
+**Hybrid API Approach**:
+- GraphQL: Primary interface for complex queries, mutations, and subscriptions
+- REST: File uploads, webhooks, OAuth callbacks, exports, legacy integrations
+- WebSocket: Real-time collaboration and live updates
+- Always include error handling in all examples
 
 ### Import Statements
 ```typescript

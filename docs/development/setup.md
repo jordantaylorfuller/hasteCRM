@@ -31,7 +31,7 @@ Before you begin, ensure you have the following installed:
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-org/hastecrm.git
+git clone https://github.com/haste/hastecrm.git
 cd hastecrm
 
 # 2. Run the setup script (NEW!)
@@ -791,11 +791,11 @@ MOCK_ALL_EXTERNAL=true pnpm dev
 ### Self-Service
 1. Run diagnostics: `./scripts/diagnose.sh`
 2. Check logs: `pnpm logs:all`
-3. Search issues: [GitHub Issues](https://github.com/your-org/hastecrm/issues)
+3. Search issues: [GitHub Issues](https://github.com/haste/hastecrm/issues)
 
 ### Team Support
 - **Slack**: #crm-development (fastest)
-- **Email**: crm-dev-team@company.com
+- **Email**: crm-dev-team@haste.nyc
 - **Office Hours**: Tue/Thu 2-3pm PST
 
 ### Bug Reports

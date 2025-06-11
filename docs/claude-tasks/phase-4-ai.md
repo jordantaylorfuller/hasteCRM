@@ -469,7 +469,7 @@ class ConversationAnalysisModel:
 - 2 Backend Engineers
 - 1 Frontend Engineer
 - 1 Data Engineer
-- 1 Product Manager
+- 1 Product Manager (Jordan Taylor Fuller)
 
 ### Infrastructure Requirements
 - Kubernetes cluster with GPU support

@@ -8,7 +8,7 @@ The CRM WebSocket API provides real-time bidirectional communication for instant
 
 ### Endpoint
 ```
-wss://api.hastecrm.com/socket.io/
+wss://api.haste.nyc/socket.io/
 ```
 
 ### Authentication
@@ -16,7 +16,7 @@ WebSocket connections require authentication via one of the following methods:
 
 1. **JWT Token** (Recommended)
 ```javascript
-const socket = io('wss://api.hastecrm.com', {
+const socket = io('wss://api.haste.nyc', {
   auth: {
     token: 'your-jwt-token'
   }
@@ -25,7 +25,7 @@ const socket = io('wss://api.hastecrm.com', {
 
 2. **API Key**
 ```javascript
-const socket = io('wss://api.hastecrm.com', {
+const socket = io('wss://api.haste.nyc', {
   auth: {
     apiKey: 'your-api-key'
   }
@@ -34,7 +34,7 @@ const socket = io('wss://api.hastecrm.com', {
 
 ### Connection Options
 ```javascript
-const socket = io('wss://api.hastecrm.com', {
+const socket = io('wss://api.haste.nyc', {
   transports: ['websocket', 'polling'],
   reconnection: true,
   reconnectionAttempts: 5,
@@ -423,7 +423,7 @@ export function useWebSocket(token) {
   const [connected, setConnected] = useState(false);
   
   useEffect(() => {
-    const socketInstance = io('wss://api.hastecrm.com', {
+    const socketInstance = io('wss://api.haste.nyc', {
       auth: { token }
     });
     
@@ -488,7 +488,7 @@ function ContactDetails({ contactId }) {
 ### Connection Testing
 ```bash
 # Test WebSocket connection
-wscat -c wss://api.hastecrm.com/socket.io/ \
+wscat -c wss://api.haste.nyc/socket.io/ \
   -H "Authorization: Bearer your-jwt-token"
 ```
 
