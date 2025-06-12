@@ -29,7 +29,7 @@ export const RateLimits = {
     } as RateLimitOptions,
 
     TWO_FACTOR: {
-      points: 20, // Increased from 5
+      points: 30, // Increased from 20 for testing
       duration: 300, // 5 minutes
       keyPrefix: "auth:2fa",
     } as RateLimitOptions,

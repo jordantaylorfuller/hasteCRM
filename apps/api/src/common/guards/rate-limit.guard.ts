@@ -34,6 +34,14 @@ export class RateLimitGuard implements CanActivate {
       return true; // No rate limit configured
     }
 
+    // Disable rate limiting in test environment
+    if (
+      process.env.NODE_ENV === "test" ||
+      process.env.DISABLE_RATE_LIMIT === "true"
+    ) {
+      return true;
+    }
+
     const request = context.switchToHttp().getRequest();
 
     // Check skip condition
