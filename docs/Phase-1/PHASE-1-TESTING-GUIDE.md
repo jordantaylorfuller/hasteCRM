@@ -3,6 +3,7 @@
 ## Overview
 
 Phase 1 implements a complete authentication system with the following features:
+
 - User registration with email verification
 - JWT-based authentication
 - Google OAuth integration
@@ -14,6 +15,7 @@ Phase 1 implements a complete authentication system with the following features:
 ## Testing Status
 
 ### ✅ Core Features Implemented:
+
 1. **Registration & Login** - Working with email verification requirement
 2. **JWT Authentication** - Access and refresh tokens working
 3. **Google OAuth** - Configured and redirecting properly
@@ -24,6 +26,7 @@ Phase 1 implements a complete authentication system with the following features:
 8. **Rate Limiting** - Applied to all auth endpoints
 
 ### 🔧 Controllers Created:
+
 - `AuthController` - Main authentication endpoints
 - `TwoFactorController` - 2FA management endpoints
 - `SessionController` - Session management endpoints
@@ -46,6 +49,7 @@ cd apps/web && pnpm dev
 ### 2. Manual Testing via Web UI
 
 1. **Registration Flow:**
+
    - Go to http://localhost:3001/register
    - Fill in registration form
    - Check Mailhog at http://localhost:8025 for verification email
@@ -53,6 +57,7 @@ cd apps/web && pnpm dev
    - You'll be redirected to verify-email page
 
 2. **Login Flow:**
+
    - Go to http://localhost:3001/login
    - Login with verified account
    - You'll be redirected to dashboard
@@ -105,6 +110,7 @@ curl -X POST http://localhost:4000/auth/login \
 ## Email Verification
 
 In development, all emails are sent to Mailhog:
+
 - Mailhog UI: http://localhost:8025
 - SMTP: localhost:1025
 
@@ -153,15 +159,18 @@ curl -X POST http://localhost:4000/auth/2fa/verify \
 ### Common Issues:
 
 1. **"Please verify your email before logging in"**
+
    - Check Mailhog for verification email
    - Click the verification link
    - Or manually update user status in database
 
 2. **404 on 2FA endpoints**
+
    - Ensure TwoFactorController is created and imported
    - Restart the API server
 
 3. **Rate limiting not working**
+
    - Check Redis is running: `docker ps`
    - Check Redis connection in logs
 
@@ -191,6 +200,7 @@ SELECT * FROM "User";
 ## Test Coverage
 
 ### What's Tested:
+
 - ✅ User registration with validation
 - ✅ Email verification flow
 - ✅ Login with JWT tokens
@@ -203,6 +213,7 @@ SELECT * FROM "User";
 - ✅ Session management
 
 ### What Needs Testing:
+
 - [ ] Backup code recovery for 2FA
 - [ ] Session revocation
 - [ ] Token blacklisting on logout
@@ -212,6 +223,7 @@ SELECT * FROM "User";
 ## Summary
 
 Phase 1 authentication is fully implemented and functional. The system enforces proper security:
+
 - Users must verify email before login
 - Passwords are hashed with bcrypt
 - JWT tokens expire and can be refreshed
