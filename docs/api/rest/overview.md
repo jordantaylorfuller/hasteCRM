@@ -184,7 +184,7 @@ POST /v1/contacts
 Content-Type: application/json
 
 {
-  "email": "john.doe@example.com",
+  "email": "john.doe@haste.nyc",
   "firstName": "John",
   "lastName": "Doe",
   "company": "Acme Corp"
@@ -239,12 +239,12 @@ See [SDK Documentation](./sdks.md) for installation and usage.
 
 Use our sandbox environment for testing:
 
-- Base URL: `https://api-sandbox.aicrm.com/v1`
+- Base URL: `https://api-sandbox.haste.nyc/v1`
 - Test API keys available in your dashboard
 - Data is reset daily
 
 ## Support
 
-- Documentation: https://docs.aicrm.com
-- API Status: https://status.aicrm.com
-- Support: api-support@aicrm.com
+- Documentation: https://docs.haste.nyc
+- API Status: https://status.haste.nyc
+- Support: api-support@haste.nyc

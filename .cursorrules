@@ -1,0 +1,160 @@
+# hasteCRM Development Rules for Claude Code
+
+## ✅ AUTO-ACCEPTS ENABLED IN CURSOR IDE
+
+This project is fully configured for Claude Code to work with **auto-accepts enabled**. All necessary files, configurations, and safeguards are in place to ensure successful autonomous development.
+
+## 🔴 MANDATORY: Documentation-First Development
+
+### Before ANY task, Claude Code MUST:
+
+1. **Check Documentation First**
+   ```
+   ALWAYS read the relevant documentation in this order:
+   1. /docs/MASTER-CONFIG.md - For version numbers and standards
+   2. /docs/CLAUDE.md - For current project status and next steps
+   3. /docs/claude-tasks/phase-X-*.md - For specific task details
+   4. /docs/ERROR-RECOVERY.md - If encountering any errors
+   ```
+
+2. **Validate Setup**
+   ```bash
+   # Run before starting ANY work:
+   node scripts/check-setup.js
+   ```
+
+3. **Reference Documentation in Code**
+   ```typescript
+   // When implementing features, add comments like:
+   // Implementation follows: docs/claude-tasks/phase-1-foundation.md#authentication
+   ```
+
+## 📋 Task Execution Rules
+
+### For Every New Feature:
+1. READ the task documentation completely
+2. CHECK if similar patterns exist in codebase
+3. FOLLOW the documented approach exactly
+4. TEST after implementation
+5. UPDATE CLAUDE.md with progress
+
+### Documentation References Required:
+- Every new file MUST include a header comment with doc reference
+- Every major function MUST reference its specification
+- Every API endpoint MUST reference its documentation
+
+## 🚫 NEVER Do These:
+
+1. **NEVER implement without reading docs first**
+2. **NEVER skip the setup validation check**
+3. **NEVER hardcode values that are in MASTER-CONFIG.md**
+4. **NEVER create new patterns without checking existing ones**
+5. **NEVER skip tests after implementation**
+
+## ✅ ALWAYS Do These:
+
+1. **ALWAYS check docs/CLAUDE.md for current status**
+2. **ALWAYS follow phase order (Phase 1 → 2 → 3, etc.)**
+3. **ALWAYS use mock services in development**
+4. **ALWAYS run tests after each component**
+5. **ALWAYS update progress in CLAUDE.md**
+
+## 📝 Code Templates
+
+### File Header Template:
+```typescript
+/**
+ * @module ModuleName
+ * @description Brief description
+ * @docs docs/claude-tasks/phase-X-feature.md#section
+ * @implements Specification from docs/api/graphql-schema.md#Type
+ */
+```
+
+### Before Starting Work:
+```typescript
+// Check: docs/CLAUDE.md#current-focus
+// Task: docs/claude-tasks/phase-1-foundation.md#2.1
+// Follows: docs/architecture/api-design.md#patterns
+```
+
+## 🔄 Development Workflow
+
+1. **Start Session**
+   ```bash
+   # Always run first:
+   node scripts/check-setup.js
+   cat docs/CLAUDE.md | grep "Current Focus"
+   ```
+
+2. **Before Each Task**
+   ```bash
+   # Read the specific task documentation
+   # Example for authentication:
+   cat docs/claude-tasks/phase-1-foundation.md | grep -A 20 "2.1 JWT Implementation"
+   ```
+
+3. **During Implementation**
+   - Keep documentation open
+   - Cross-reference with MASTER-CONFIG.md
+   - Follow existing patterns in codebase
+
+4. **After Implementation**
+   ```bash
+   # Run tests
+   pnpm test
+   
+   # Update progress
+   # Edit docs/CLAUDE.md "Current Focus" section
+   ```
+
+## 🎯 Success Metrics
+
+Your implementation is correct when:
+- [ ] It matches the documentation specification exactly
+- [ ] All tests pass
+- [ ] No hardcoded values (uses config/env)
+- [ ] Follows existing code patterns
+- [ ] Includes documentation references in comments
+
+## 🚨 Error Handling
+
+If you encounter an error:
+1. FIRST check docs/ERROR-RECOVERY.md
+2. THEN check if it's a known issue in documentation
+3. ONLY THEN attempt to fix
+
+## 📊 Progress Tracking
+
+After each completed task:
+1. Update docs/CLAUDE.md with completion status
+2. Mark task as complete in the phase documentation
+3. Run full test suite
+4. Commit with descriptive message referencing the task
+
+## 🔗 Quick References
+
+- Current Status: `docs/CLAUDE.md#current-focus`
+- Next Task: `docs/CLAUDE.md#next-milestone`
+- Versions: `docs/MASTER-CONFIG.md`
+- Errors: `docs/ERROR-RECOVERY.md`
+- Setup: `docs/CLAUDE-CODE-GUIDE.md`
+
+## 💡 Pro Tips
+
+1. Use `grep` to quickly find documentation:
+   ```bash
+   grep -r "authentication" docs/
+   ```
+
+2. Keep these files open while coding:
+   - MASTER-CONFIG.md (versions)
+   - Current phase task list
+   - ERROR-RECOVERY.md
+
+3. Commit often with doc references:
+   ```bash
+   git commit -m "feat: implement JWT auth per docs/claude-tasks/phase-1-foundation.md#2.1"
+   ```
+
+Remember: The documentation is the source of truth. When in doubt, check the docs!

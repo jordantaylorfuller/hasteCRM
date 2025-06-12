@@ -94,7 +94,7 @@ Triggered when a new contact is created
   "timestamp": "2025-01-10T12:00:00Z",
   "data": {
     "id": "contact_123",
-    "email": "john.doe@example.com",
+    "email": "john.doe@haste.nyc",
     "firstName": "John",
     "lastName": "Doe",
     "company": "Acme Corp",
@@ -259,7 +259,7 @@ Triggered when an email is received
   "data": {
     "id": "email_123",
     "threadId": "thread_456",
-    "from": "client@example.com",
+    "from": "client@haste.nyc",
     "to": ["sales@yourcompany.com"],
     "subject": "Re: Product Demo",
     "snippet": "Thanks for the demo. I have a few questions...",
@@ -278,7 +278,7 @@ Triggered when an email is sent
   "data": {
     "id": "email_456",
     "threadId": "thread_456",
-    "to": ["client@example.com"],
+    "to": ["client@haste.nyc"],
     "subject": "Re: Product Demo",
     "contactId": "contact_123",
     "sentBy": "user_456",
@@ -295,7 +295,7 @@ Triggered when an email bounces
   "timestamp": "2025-01-10T12:00:00Z",
   "data": {
     "id": "email_456",
-    "recipient": "client@example.com",
+    "recipient": "client@haste.nyc",
     "bounceType": "hard",
     "bounceReason": "Invalid email address",
     "contactId": "contact_123"

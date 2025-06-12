@@ -473,7 +473,7 @@ const operations = [
   {
     id: 'op1',
     type: 'CREATE_CONTACT',
-    input: { email: 'john@example.com', firstName: 'John' }
+    input: { email: 'john@haste.nyc', firstName: 'John' }
   },
   {
     id: 'op2',

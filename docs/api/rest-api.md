@@ -249,7 +249,7 @@ POST /v1/webhooks/sendgrid
 [
   {
     "event": "delivered",
-    "email": "recipient@example.com",
+    "email": "recipient@haste.nyc",
     "timestamp": 1705318200,
     "smtp-id": "<14c5d75ce93.dfd.64b469@ismtpd-555>",
     "sg_event_id": "sendgrid_event_123",
@@ -287,7 +287,7 @@ GET /v1/auth/google/callback?code=AUTH_CODE&state=STATE_TOKEN
 
 **Response (Redirect):**
 ```
-Location: https://app.haste.nyc/auth/success?token=your-jwt-token-here
+Location: https://www.haste.nyc/auth/success?token=your-jwt-token-here
 ```
 
 ### Microsoft OAuth
@@ -356,7 +356,7 @@ Content-Type: text/csv
 Content-Disposition: attachment; filename="contacts_2024-01-15.csv"
 
 email,firstName,lastName,company,budget
-john@example.com,John,Doe,Acme Corp,50000
+john@haste.nyc,John,Doe,Acme Corp,50000
 ...
 ```
 
@@ -409,7 +409,7 @@ GET /v1/search?q=john&types=contact,deal,email&limit=20
         "url": "/contacts/contact_123",
         "highlights": {
           "firstName": "<mark>John</mark>",
-          "email": "<mark>john</mark>@example.com"
+          "email": "<mark>john</mark>@haste.nyc"
         }
       }
     ],
@@ -534,7 +534,7 @@ event: contact_updated
 data: {"id":"contact_123","changes":{"score":85}}
 
 event: email_received
-data: {"id":"email_456","from":"client@example.com","subject":"Re: Proposal"}
+data: {"id":"email_456","from":"client@haste.nyc","subject":"Re: Proposal"}
 
 event: ping
 data: {"timestamp":"2024-01-15T10:30:00Z"}
@@ -619,7 +619,7 @@ POST /v1/utils/validate-email
 **Request:**
 ```json
 {
-  "email": "john@example.com"
+  "email": "john@haste.nyc"
 }
 ```
 
@@ -638,7 +638,7 @@ POST /v1/utils/validate-email
     },
     "mx": {
       "valid": true,
-      "records": ["mx1.example.com", "mx2.example.com"]
+      "records": ["mx1.haste.nyc", "mx2.haste.nyc"]
     }
   }
 }
@@ -652,7 +652,7 @@ POST /v1/utils/parse-email
 **Request:**
 ```json
 {
-  "headers": "From: John Doe <john@example.com>\nTo: jane@example.com\n...",
+  "headers": "From: John Doe <john@haste.nyc>\nTo: jane@haste.nyc\n...",
   "body": "Email body content..."
 }
 ```
@@ -675,7 +675,7 @@ POST /v1/batch
       "method": "POST",
       "path": "/v1/contacts",
       "body": {
-        "email": "john@example.com",
+        "email": "john@haste.nyc",
         "firstName": "John"
       }
     },
@@ -703,7 +703,7 @@ POST /v1/batch
         "status": 201,
         "body": {
           "id": "contact_789",
-          "email": "john@example.com"
+          "email": "john@haste.nyc"
         }
       },
       {
@@ -842,7 +842,7 @@ These v0 endpoints are deprecated and will be removed:
 - [WebSocket Documentation](./websockets.md) - Real-time communication
 - [Webhook Configuration](./webhooks.md) - Setting up webhooks
 - [Authentication Guide](../features/auth.md) - Detailed auth flows
-- [API Client Libraries](https://github.com/hastecrm/client-libraries) - Official SDKs
+- [API Client Libraries](https://github.com/hasteNYC/hasteCRM-client-libraries) - Official SDKs
 
 ## Support
 
@@ -947,8 +947,8 @@ For API support:
      "ip": "192.168.1.1",
      "changes": {
        "email": {
-         "from": "old@example.com",
-         "to": "new@example.com"
+         "from": "old@haste.nyc",
+         "to": "new@haste.nyc"
        }
      }
    }
@@ -987,7 +987,7 @@ For API support:
 // Restrictive CORS policy
 const corsOptions = {
   origin: [
-    'https://app.haste.nyc',
+    'https://www.haste.nyc',
     'https://staging.haste.nyc'
   ],
   credentials: true,

@@ -120,7 +120,7 @@ GET /v1/contacts?cursor=eyJpZCI6MTIzfQ&limit=50
     "items": [
       {
         "id": "contact_123",
-        "email": "john@example.com"
+        "email": "john@haste.nyc"
       }
       // ... more items
     ],

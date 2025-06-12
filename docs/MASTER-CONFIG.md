@@ -10,21 +10,26 @@
 ## Technology Stack
 
 ### Core Runtime
-- **Node.js**: 18.x LTS (minimum 18.17.0)
-- **pnpm**: 8.x (minimum 8.6.0)
-- **TypeScript**: 5.x (minimum 5.2.0)
+- **Node.js**: 18.19.0 LTS (exact version for consistency)
+- **pnpm**: 8.14.0 (exact version for consistency)
+- **TypeScript**: 5.3.3 (exact version for consistency)
+- **Turborepo**: 1.11.3 (monorepo orchestration)
 
 ### Infrastructure
-- **Docker**: 24.x (minimum 24.0.0)
-- **Docker Compose**: 2.x (minimum 2.20.0)
-- **Kubernetes**: 1.28+ (for production deployments)
+- **Docker**: 24.0.7 (minimum 24.0.0)
+- **Docker Compose**: 2.23.3 (minimum 2.20.0)
+- **Kubernetes**: 1.28.4 (for production deployments)
 
 ### Databases
-- **PostgreSQL**: 15.x (minimum 15.0)
-  - Extensions: pgvector 0.5.x, uuid-ossp, pg_trgm
-- **Redis**: 7.x (minimum 7.0.0)
+- **PostgreSQL**: 15.5 (exact version)
+  - Extensions: pgvector 0.5.1, uuid-ossp, pg_trgm
+- **Redis**: 7.2.4 (exact version)
   - Cluster mode for staging/production
   - Single instance for development
+- **Elasticsearch**: 8.11.1 (exact version)
+  - Used for full-text search and analytics
+  - Single node for development
+  - Cluster for production
 
 ### API Architecture
 
@@ -197,7 +202,44 @@ Examples:
 2. Update affected documentation
 3. Include change reason in commit
 
+### Framework Versions
+
+#### Backend (NestJS)
+- **NestJS**: 10.3.0
+- **@nestjs/graphql**: 12.0.11
+- **@nestjs/apollo**: 12.0.11
+- **Apollo Server**: 3.12.1
+- **Prisma**: 5.7.1
+- **BullMQ**: 5.1.1
+
+#### Frontend (Next.js)
+- **Next.js**: 14.0.4
+- **React**: 18.2.0
+- **React DOM**: 18.2.0
+- **Zustand**: 4.4.7
+- **@tanstack/react-query**: 5.17.1
+- **Shadcn/ui**: Latest components
+- **Tailwind CSS**: 3.4.0
+
+#### Testing
+- **Jest**: 29.7.0
+- **React Testing Library**: 14.1.2
+- **Playwright**: 1.40.1
+- **MSW (Mock Service Worker)**: 2.0.11
+
+#### Development Tools
+- **ESLint**: 8.56.0
+- **Prettier**: 3.1.1
+- **Husky**: 8.0.3
+- **lint-staged**: 15.2.0
+
 ## Change Log
+
+### 2024-01-15 (Update 2)
+- Added exact versions for all core dependencies
+- Added Turborepo version
+- Added Elasticsearch configuration
+- Added framework-specific versions
 
 ### 2024-01-15
 - Initial master configuration document

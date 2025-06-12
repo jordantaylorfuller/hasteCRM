@@ -14,7 +14,7 @@ POST /api/v1/auth/login
 Content-Type: application/json
 
 {
-  "email": "user@example.com",
+  "email": "user@haste.nyc",
   "password": "secure-password"
 }
 
@@ -25,7 +25,7 @@ Content-Type: application/json
   "expiresIn": 3600,
   "user": {
     "id": "user_123",
-    "email": "user@example.com",
+    "email": "user@haste.nyc",
     "workspaceId": "workspace_456"
   }
 }
@@ -50,7 +50,7 @@ Supported providers:
 
 ```bash
 # Initiate OAuth flow
-GET /api/v1/auth/google?redirect_uri=https://app.example.com/callback
+GET /api/v1/auth/google?redirect_uri=https://app.haste.nyc/callback
 
 # Handle callback
 GET /api/v1/auth/google/callback?code=xxx&state=yyy
@@ -121,7 +121,7 @@ Access tokens contain:
 ```json
 {
   "sub": "user_123",
-  "email": "user@example.com", 
+  "email": "user@haste.nyc", 
   "workspaceId": "workspace_456",
   "permissions": ["read:contacts", "write:contacts"],
   "exp": 1641826800,
@@ -176,7 +176,7 @@ Authorization: Bearer {token}
 ```bash
 POST /api/v1/auth/login
 {
-  "email": "user@example.com",
+  "email": "user@haste.nyc",
   "password": "password",
   "mfaCode": "123456"
 }
@@ -327,7 +327,7 @@ async function isTokenBlacklisted(token) {
 
 ```bash
 # Development environment only
-Email: test@example.com
+Email: test@haste.nyc
 Password: test123
 API Key: ak_test_xxxxxxxxxxxx
 ```
@@ -338,7 +338,7 @@ API Key: ak_test_xxxxxxxxxxxx
 # Test login
 curl -X POST https://api.haste.nyc/v1/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","password":"test123"}'
+  -d '{"email":"test@haste.nyc","password":"test123"}'
 
 # Test authenticated request
 curl https://api.haste.nyc/v1/me \

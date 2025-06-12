@@ -9,7 +9,7 @@ The Contacts API allows you to manage individual contacts in your CRM. Contacts 
 ```json
 {
   "id": "cont_1234567890",
-  "email": "john.doe@example.com",
+  "email": "john.doe@haste.nyc",
   "firstName": "John",
   "lastName": "Doe",
   "fullName": "John Doe",
@@ -90,7 +90,7 @@ GET /v1/contacts?lifecycle=lead&tag=vip&sort=-score&limit=20
   "data": [
     {
       "id": "cont_1234567890",
-      "email": "john.doe@example.com",
+      "email": "john.doe@haste.nyc",
       "firstName": "John",
       "lastName": "Doe",
       // ... full contact object
@@ -119,7 +119,7 @@ GET /v1/contacts/:id
 {
   "data": {
     "id": "cont_1234567890",
-    "email": "john.doe@example.com",
+    "email": "john.doe@haste.nyc",
     // ... full contact object
   }
 }
@@ -137,7 +137,7 @@ POST /v1/contacts
 
 ```json
 {
-  "email": "john.doe@example.com",
+  "email": "john.doe@haste.nyc",
   "firstName": "John",
   "lastName": "Doe",
   "phone": "+1-555-0123",
@@ -165,7 +165,7 @@ POST /v1/contacts
 {
   "data": {
     "id": "cont_1234567890",
-    "email": "john.doe@example.com",
+    "email": "john.doe@haste.nyc",
     // ... full contact object
   }
 }
@@ -257,12 +257,12 @@ POST /v1/contacts/bulk
 {
   "contacts": [
     {
-      "email": "john.doe@example.com",
+      "email": "john.doe@haste.nyc",
       "firstName": "John",
       "lastName": "Doe"
     },
     {
-      "email": "jane.smith@example.com",
+      "email": "jane.smith@haste.nyc",
       "firstName": "Jane",
       "lastName": "Smith"
     }
@@ -280,11 +280,11 @@ POST /v1/contacts/bulk
     "contacts": [
       {
         "id": "cont_1234567890",
-        "email": "john.doe@example.com"
+        "email": "john.doe@haste.nyc"
       },
       {
         "id": "cont_0987654321",
-        "email": "jane.smith@example.com"
+        "email": "jane.smith@haste.nyc"
       }
     ]
   }

@@ -18,7 +18,7 @@ POST /v1/auth/login
 
 ```json
 {
-  "email": "user@example.com",
+  "email": "user@haste.nyc",
   "password": "your-password"
 }
 ```
@@ -34,7 +34,7 @@ POST /v1/auth/login
     "tokenType": "Bearer",
     "user": {
       "id": "usr_1234567890",
-      "email": "user@example.com",
+      "email": "user@haste.nyc",
       "firstName": "John",
       "lastName": "Doe",
       "role": "ADMIN",
@@ -130,7 +130,7 @@ POST /v1/auth/verify-email
     "message": "Email verified successfully",
     "user": {
       "id": "usr_1234567890",
-      "email": "user@example.com",
+      "email": "user@haste.nyc",
       "emailVerified": true
     }
   }
@@ -149,7 +149,7 @@ POST /v1/auth/forgot-password
 
 ```json
 {
-  "email": "user@example.com"
+  "email": "user@haste.nyc"
 }
 ```
 
@@ -205,7 +205,7 @@ Authorization: Bearer YOUR_ACCESS_TOKEN
 {
   "data": {
     "id": "usr_1234567890",
-    "email": "user@example.com",
+    "email": "user@haste.nyc",
     "firstName": "John",
     "lastName": "Doe",
     "avatar": "https://cdn.haste.nyc/avatars/usr_1234567890.jpg",

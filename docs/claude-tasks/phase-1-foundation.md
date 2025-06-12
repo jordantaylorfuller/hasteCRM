@@ -39,7 +39,7 @@ Before starting Phase 1, ensure you have:
 #### 1.1 Monorepo Initialization
 ```bash
 # Execute these commands for Claude Code
-mkdir hastecrm-platform && cd hastecrm-platform
+mkdir hasteCRM && cd hasteCRM
 npx create-turbo@latest
 ```
 
@@ -72,7 +72,7 @@ pnpm test  # Should run all tests
     postgres:
       image: postgres:15-alpine
       environment:
-        POSTGRES_DB: hastecrm_dev
+        POSTGRES_DB: hasteCRM_dev
         POSTGRES_USER: postgres
         POSTGRES_PASSWORD: change-me-in-production
       ports:

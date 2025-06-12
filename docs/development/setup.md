@@ -31,8 +31,8 @@ Before you begin, ensure you have the following installed:
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/haste/hastecrm.git
-cd hastecrm
+git clone https://github.com/hasteNYC/hasteCRM.git
+cd hasteCRM
 
 # 2. Run the setup script (NEW!)
 ./scripts/setup.sh
@@ -786,12 +786,61 @@ MOCK_ALL_EXTERNAL=true pnpm dev
 - [Frontend Patterns](../../examples/frontend/)
 - [Testing Patterns](../../examples/testing/)
 
+## 🚨 Troubleshooting Common Issues
+
+### Port Already in Use
+```bash
+# Find and kill process
+lsof -i :3000
+kill -9 <PID>
+
+# Or use one-liner:
+npx kill-port 3000 4000 5432 6379
+```
+
+### Docker Not Running
+```bash
+# macOS:
+open -a Docker
+
+# Wait 30 seconds, then verify:
+docker ps
+```
+
+### Database Connection Failed
+```bash
+# Restart database container
+docker-compose down
+docker-compose up -d postgres
+
+# Recreate database
+docker exec -it hastecrm-postgres psql -U postgres -c "CREATE DATABASE hastecrm_dev"
+pnpm run db:push
+```
+
+### Module Not Found Errors
+```bash
+# Clean and rebuild
+pnpm run clean
+rm -rf node_modules
+pnpm install
+pnpm run build
+```
+
+### TypeScript Errors
+```bash
+# Generate Prisma client
+cd packages/database
+pnpm run db:generate
+cd ../..
+```
+
 ## 🆘 Getting Help
 
 ### Self-Service
-1. Run diagnostics: `./scripts/diagnose.sh`
+1. Run diagnostics: `node scripts/check-setup.js`
 2. Check logs: `pnpm logs:all`
-3. Search issues: [GitHub Issues](https://github.com/haste/hastecrm/issues)
+3. Search issues: [GitHub Issues](https://github.com/hasteNYC/hasteCRM/issues)
 
 ### Team Support
 - **Slack**: #crm-development (fastest)

@@ -217,7 +217,7 @@ mutation CreateContact($input: CreateContactInput!) {
 // Example Input
 {
   "input": {
-    "email": "john@example.com",
+    "email": "john@haste.nyc",
     "firstName": "John",
     "lastName": "Doe",
     "company": "Acme Corp",
@@ -382,7 +382,7 @@ interface Activity {
   entityId: 'contact_123',
   metadata: {
     duration: 1800, // seconds
-    attendees: ['john@example.com', 'team@ourcompany.com'],
+    attendees: ['john@haste.nyc', 'team@ourcompany.com'],
     recordingUrl: 'https://...',
     transcriptId: 'transcript_123'
   }

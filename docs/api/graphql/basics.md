@@ -125,7 +125,7 @@ Variables:
 ```json
 {
   "input": {
-    "email": "john@example.com",
+    "email": "john@haste.nyc",
     "firstName": "John",
     "lastName": "Doe",
     "company": "Acme Corp"

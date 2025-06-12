@@ -143,7 +143,7 @@ socket.on('email-received', (data) => {
   //   emailId: 'email_789',
   //   contactId: 'contact_123',
   //   subject: 'Re: Follow up',
-  //   from: 'client@example.com',
+  //   from: 'client@haste.nyc',
   //   timestamp: '2025-01-10T12:00:00Z'
   // }
 });

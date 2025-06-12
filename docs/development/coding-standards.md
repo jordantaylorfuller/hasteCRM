@@ -82,7 +82,7 @@ function filterContacts(contacts: Contact[], query: string): Contact[] {
 #### Variables and Functions
 ```typescript
 // Use camelCase for variables and functions
-const userEmail = 'user@example.com';
+const userEmail = 'user@haste.nyc';
 function calculateTotalRevenue(deals: Deal[]): number {
   // Implementation
 }
@@ -710,7 +710,7 @@ interface ApiResponse<T> {
 {
   "data": {
     "id": "123",
-    "email": "john@example.com",
+    "email": "john@haste.nyc",
     "firstName": "John",
     "lastName": "Doe"
   },
@@ -800,7 +800,7 @@ describe('ContactService', () => {
     it('should create a contact with valid input', async () => {
       // Arrange
       const input: CreateContactInput = {
-        email: 'test@example.com',
+        email: 'test@haste.nyc',
         firstName: 'John',
         lastName: 'Doe',
       };
@@ -862,14 +862,14 @@ describe('POST /api/contacts', () => {
       .post('/api/contacts')
       .set('Authorization', 'Bearer test-token')
       .send({
-        email: 'test@example.com',
+        email: 'test@haste.nyc',
         firstName: 'John',
         lastName: 'Doe',
       });
     
     expect(response.status).toBe(201);
     expect(response.body.data).toMatchObject({
-      email: 'test@example.com',
+      email: 'test@haste.nyc',
       firstName: 'John',
       lastName: 'Doe',
     });
@@ -877,7 +877,7 @@ describe('POST /api/contacts', () => {
     // Verify in database
     const contact = await testDb.query(
       'SELECT * FROM contacts WHERE email = $1',
-      ['test@example.com']
+      ['test@haste.nyc']
     );
     expect(contact.rows).toHaveLength(1);
   });
@@ -1030,7 +1030,7 @@ app.use(cors({
  * 
  * @example
  * const contact = await contactService.createContact({
- *   email: 'john@example.com',
+ *   email: 'john@haste.nyc',
  *   firstName: 'John',
  *   lastName: 'Doe',
  * });

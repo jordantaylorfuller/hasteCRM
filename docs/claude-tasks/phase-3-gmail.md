@@ -262,7 +262,7 @@ POST   /api/emails/:id/archive
 POST   /api/emails/:id/labels
 
 # Email Search
-GET    /api/emails/search?q=subject:invoice&from=john@example.com
+GET    /api/emails/search?q=subject:invoice&from=john@haste.nyc
 GET    /api/emails/threads/:threadId
 
 # Templates

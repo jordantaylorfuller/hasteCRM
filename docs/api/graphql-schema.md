@@ -1042,7 +1042,7 @@ describe('Contact Queries', () => {
     const result = await graphqlRequest(query, { id: 'contact_123' });
     
     expect(result.data.contact).toBeDefined();
-    expect(result.data.contact.email).toBe('test@example.com');
+    expect(result.data.contact.email).toBe('test@haste.nyc');
     expect(result.data.contact.aiInsights).toBeDefined();
   });
 });

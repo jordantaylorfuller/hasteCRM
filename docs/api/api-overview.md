@@ -77,10 +77,10 @@ All APIs use the same authentication system. See [Authentication Guide](./auth-g
 npm install @hastecrm/sdk
 
 # Python
-pip install hastecrm-sdk
+pip install hasteCRM-sdk
 
 # Go
-go get github.com/hastecrm/sdk-go
+go get github.com/hasteNYC/hasteCRM-sdk-go
 ```
 
 ### Development Tools
@@ -108,6 +108,6 @@ go get github.com/hastecrm/sdk-go
 ## Getting Help
 
 - 📚 [API Changelog](./CHANGELOG.md) - Latest updates
-- 🐛 [Report Issues](https://github.com/hastecrm/api/issues)
+- 🐛 [Report Issues](https://github.com/hasteNYC/hasteCRM/issues)
 - 💬 [Community Forum](https://forum.haste.nyc/api)
 - 📧 [Contact Support](mailto:api-support@haste.nyc)
