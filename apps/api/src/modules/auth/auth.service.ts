@@ -209,4 +209,111 @@ export class AuthService {
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '');
   }
+
+  async validateOAuthUser(oauthUser: {
+    googleId: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    avatar?: string;
+  }): Promise<AuthResponse> {
+    // Check if user exists
+    let user = await this.prisma.user.findUnique({
+      where: { email: oauthUser.email },
+      include: {
+        workspaces: {
+          where: { isDefault: true },
+          include: { workspace: true },
+        },
+      },
+    });
+
+    if (user) {
+      // Update Google ID if not set
+      if (!user.googleId && oauthUser.googleId) {
+        user = await this.prisma.user.update({
+          where: { id: user.id },
+          data: { 
+            googleId: oauthUser.googleId,
+            avatarUrl: user.avatarUrl || oauthUser.avatar,
+            lastLoginAt: new Date(),
+          },
+          include: {
+            workspaces: {
+              where: { isDefault: true },
+              include: { workspace: true },
+            },
+          },
+        });
+      }
+    } else {
+      // Create new user with workspace
+      const workspaceName = `${oauthUser.firstName} ${oauthUser.lastName}'s Workspace`;
+      
+      const result = await this.prisma.$transaction(async (tx) => {
+        // Create workspace
+        const workspace = await tx.workspace.create({
+          data: {
+            name: workspaceName,
+            slug: this.generateSlug(workspaceName),
+          },
+        });
+
+        // Create user
+        const newUser = await tx.user.create({
+          data: {
+            email: oauthUser.email,
+            googleId: oauthUser.googleId,
+            firstName: oauthUser.firstName,
+            lastName: oauthUser.lastName,
+            avatarUrl: oauthUser.avatar,
+            status: 'ACTIVE',
+          },
+        });
+        
+        // Create workspace user relation
+        const workspaceUser = await tx.workspaceUser.create({
+          data: {
+            workspaceId: workspace.id,
+            userId: newUser.id,
+            role: 'ADMIN',
+            isDefault: true,
+          },
+          include: {
+            workspace: true,
+            user: true,
+          },
+        });
+
+        return { user: newUser, workspace, workspaceUser };
+      });
+
+      user = await this.prisma.user.findUnique({
+        where: { id: result.user.id },
+        include: {
+          workspaces: {
+            where: { isDefault: true },
+            include: { workspace: true },
+          },
+        },
+      });
+    }
+
+    if (!user || !user.workspaces.length) {
+      throw new UnauthorizedException('Failed to authenticate with Google');
+    }
+
+    const defaultWorkspace = user.workspaces[0];
+    const tokens = await this.generateTokens(
+      user,
+      defaultWorkspace.workspaceId,
+      defaultWorkspace.role,
+    );
+
+    return {
+      user: this.sanitizeUser(user),
+      workspace: defaultWorkspace.workspace,
+      ...tokens,
+    };
+  }
 }

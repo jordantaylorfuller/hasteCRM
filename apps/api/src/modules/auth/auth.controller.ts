@@ -1,9 +1,11 @@
-import { Controller, Post, Body, UseGuards, Request, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Request, HttpCode, HttpStatus, Get, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { AuthResponse, TokenResponse } from '../../common/types/auth.types';
+import { AuthGuard } from '@nestjs/passport';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -41,5 +43,26 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async me(@Request() req) {
     return req.user;
+  }
+
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  async googleAuth() {
+    // Guard redirects to Google
+  }
+
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  async googleAuthCallback(@Request() req, @Res() res: Response) {
+    // Successful authentication, redirect with tokens
+    const authData = req.user as AuthResponse;
+    
+    // In production, you'd redirect to your frontend with tokens as query params
+    // For now, we'll return JSON response for testing
+    const redirectUrl = new URL('http://localhost:3000/auth/callback');
+    redirectUrl.searchParams.append('accessToken', authData.accessToken);
+    redirectUrl.searchParams.append('refreshToken', authData.refreshToken);
+    
+    res.redirect(redirectUrl.toString());
   }
 }

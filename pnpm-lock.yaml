@@ -120,6 +120,9 @@ importers:
       '@typescript-eslint/parser':
         specifier: ^5.59.11
         version: 5.62.0(eslint@8.57.1)(typescript@5.8.3)
+      dotenv:
+        specifier: ^16.5.0
+        version: 16.5.0
       eslint:
         specifier: ^8.42.0
         version: 8.57.1
@@ -3116,6 +3119,11 @@ packages:
     engines: {node: '>=6.0.0'}
     dependencies:
       esutils: 2.0.3
+    dev: true
+
+  /dotenv@16.5.0:
+    resolution: {integrity: sha512-m/C+AwOAr9/W1UOIZUo232ejMNnJAJtYQjUbHoNTBNTJSvqzzDh7vnrei3o3r3m9blf6ZoDkvcw0VmozNRFJxg==}
+    engines: {node: '>=12'}
     dev: true
 
   /dset@3.1.4:
