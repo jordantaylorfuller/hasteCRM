@@ -1,11 +1,14 @@
-import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
-import { PrismaClient } from '@ai-crm/database';
+import { Injectable, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
+import { PrismaClient } from "@ai-crm/database";
 
 @Injectable()
-export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+export class PrismaService
+  extends PrismaClient
+  implements OnModuleInit, OnModuleDestroy
+{
   constructor() {
     super({
-      log: ['query', 'info', 'warn', 'error'],
+      log: ["query", "info", "warn", "error"],
     });
   }
 
@@ -18,18 +21,20 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   }
 
   async cleanDatabase() {
-    if (process.env.NODE_ENV === 'production') {
-      throw new Error('cleanDatabase is not allowed in production');
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("cleanDatabase is not allowed in production");
     }
 
     const models = Reflect.ownKeys(this).filter(
-      (key) => typeof key === 'string' && key[0] !== '_' && key[0] !== '$',
+      (key) => typeof key === "string" && key[0] !== "_" && key[0] !== "$",
     ) as string[];
 
     return Promise.all(
-      models.map((modelKey) => {
-        return (this as any)[modelKey]?.deleteMany?.();
-      }).filter(Boolean),
+      models
+        .map((modelKey) => {
+          return (this as any)[modelKey]?.deleteMany?.();
+        })
+        .filter(Boolean),
     );
   }
 }
