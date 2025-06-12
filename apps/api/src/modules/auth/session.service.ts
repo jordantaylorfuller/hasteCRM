@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { RedisService } from "../redis/redis.service";
 import { randomBytes } from "crypto";
-import { User } from "@hasteCRM/database";
+import { User } from "../prisma/prisma-client";
 
 export interface SessionData {
   sessionId: string;

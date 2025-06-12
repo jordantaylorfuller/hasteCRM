@@ -1,0 +1,1368 @@
+// This is your Prisma schema file for hasteCRM
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// ENUMS
+// ==========================================
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  USER
+  VIEWER
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING
+}
+
+enum WorkspacePlan {
+  FREE
+  STARTER
+  PROFESSIONAL
+  ENTERPRISE
+}
+
+enum ContactSource {
+  MANUAL
+  IMPORT
+  API
+  GMAIL
+  WEBHOOK
+  ENRICHMENT
+}
+
+enum ContactStatus {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum PipelineType {
+  SALES
+  INVESTOR
+  RECRUITING
+  VENDOR
+  PARTNER
+  CUSTOM
+}
+
+enum DealStatus {
+  OPEN
+  WON
+  LOST
+  STALLED
+}
+
+enum ActivityType {
+  EMAIL_SENT
+  EMAIL_RECEIVED
+  CALL_MADE
+  CALL_RECEIVED
+  MEETING_SCHEDULED
+  MEETING_COMPLETED
+  NOTE_ADDED
+  TASK_CREATED
+  TASK_COMPLETED
+  DEAL_CREATED
+  DEAL_UPDATED
+  CONTACT_CREATED
+  CONTACT_UPDATED
+  STAGE_CHANGED
+  TAG_ADDED
+  TAG_REMOVED
+  ENRICHMENT_COMPLETED
+}
+
+enum EmailDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum EmailStatus {
+  DRAFT
+  SENT
+  DELIVERED
+  OPENED
+  CLICKED
+  BOUNCED
+  FAILED
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum WebhookStatus {
+  ACTIVE
+  INACTIVE
+  FAILED
+}
+
+enum NotificationType {
+  EMAIL
+  IN_APP
+  PUSH
+  SMS
+}
+
+enum TokenType {
+  ACCESS
+  REFRESH
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+  TWO_FACTOR
+}
+
+enum TwoFactorMethod {
+  TOTP
+  SMS
+  EMAIL
+}
+
+enum TemplateType {
+  EMAIL
+  SMS
+  TASK
+  NOTE
+}
+
+enum ImportStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  PARTIAL
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  EXPORT
+  IMPORT
+  VIEW
+  SHARE
+}
+
+// ==========================================
+// MODELS
+// ==========================================
+
+// User & Authentication
+model User {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  passwordHash String?
+  role         UserRole   @default(USER)
+  status       UserStatus @default(PENDING)
+
+  // Profile
+  firstName String?
+  lastName  String?
+  avatarUrl String? @db.Text
+  phone     String?
+  timezone  String  @default("UTC")
+  locale    String  @default("en")
+
+  // OAuth
+  googleId    String? @unique
+  microsoftId String? @unique
+
+  // Metadata
+  lastLoginAt DateTime?
+  loginCount  Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  // Relations
+  sessions       Session[]
+  tokens         Token[]
+  workspaces     WorkspaceUser[]
+  contacts       Contact[]
+  companies      Company[]
+  deals          Deal[]
+  activities     Activity[]
+  tasks          Task[]
+  notes          Note[]
+  emails         Email[]
+  emailAccounts  EmailAccount[]
+  tags           Tag[]
+  customFields   CustomField[]
+  lists          List[]
+  sequences      Sequence[]
+  imports        Import[]
+  exports        Export[]
+  auditLogs      AuditLog[]
+  notifications  Notification[]
+  emailTemplates EmailTemplate[]
+  twoFactorAuth  TwoFactorAuth?
+
+  @@index([email])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  token        String   @unique @db.Text
+  ipAddress    String?
+  userAgent    String?  @db.Text
+  lastActivity DateTime @default(now())
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+}
+
+model Token {
+  id        String    @id @default(cuid())
+  userId    String
+  token     String    @unique
+  type      TokenType
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@index([type])
+  @@index([expiresAt])
+}
+
+model TwoFactorAuth {
+  id          String          @id @default(cuid())
+  userId      String          @unique
+  secret      String
+  backupCodes String[]
+  method      TwoFactorMethod @default(TOTP)
+  isEnabled   Boolean         @default(false)
+  lastUsedAt  DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Workspace & Multi-tenancy
+model Workspace {
+  id      String        @id @default(cuid())
+  name    String
+  slug    String        @unique
+  logoUrl String?       @db.Text
+  plan    WorkspacePlan @default(FREE)
+
+  // Settings
+  settings Json     @default("{}")
+  features String[] @default([])
+
+  // Limits
+  userLimit    Int    @default(5)
+  contactLimit Int    @default(1000)
+  emailLimit   Int    @default(1000)
+  storageLimit BigInt @default(1073741824) // 1GB in bytes
+
+  // Usage
+  currentUsers    Int    @default(0)
+  currentContacts Int    @default(0)
+  currentStorage  BigInt @default(0)
+
+  // Billing
+  stripeCustomerId String?   @unique
+  trialEndsAt      DateTime?
+
+  // Metadata
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  // Relations
+  users          WorkspaceUser[]
+  contacts       Contact[]
+  companies      Company[]
+  pipelines      Pipeline[]
+  deals          Deal[]
+  activities     Activity[]
+  tasks          Task[]
+  notes          Note[]
+  emails         Email[]
+  emailAccounts  EmailAccount[]
+  tags           Tag[]
+  customFields   CustomField[]
+  lists          List[]
+  sequences      Sequence[]
+  webhooks       Webhook[]
+  apiKeys        ApiKey[]
+  imports        Import[]
+  exports        Export[]
+  auditLogs      AuditLog[]
+  emailTemplates EmailTemplate[]
+
+  @@index([slug])
+  @@index([plan])
+  @@index([createdAt])
+}
+
+model WorkspaceUser {
+  id          String   @id @default(cuid())
+  workspaceId String
+  userId      String
+  role        UserRole @default(USER)
+  isDefault   Boolean  @default(false)
+  joinedAt    DateTime @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+  @@index([workspaceId])
+  @@index([userId])
+}
+
+// Contacts & Companies
+model Contact {
+  id          String @id @default(cuid())
+  workspaceId String
+
+  // Basic Info
+  firstName String?
+  lastName  String?
+  email     String?
+  phone     String?
+  title     String?
+
+  // Additional Info
+  avatarUrl String?   @db.Text
+  bio       String?   @db.Text
+  website   String?
+  birthday  DateTime?
+
+  // Social
+  linkedinUrl String?
+  twitterUrl  String?
+  facebookUrl String?
+
+  // Location
+  address    String?
+  city       String?
+  state      String?
+  country    String?
+  postalCode String?
+  timezone   String?
+
+  // Metadata
+  source ContactSource @default(MANUAL)
+  status ContactStatus @default(ACTIVE)
+  score  Int           @default(0)
+
+  // Tracking
+  lastActivityAt DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+
+  // Relations
+  workspace           Workspace            @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy           User                 @relation(fields: [createdById], references: [id])
+  createdById         String
+  company             Company?             @relation(fields: [companyId], references: [id])
+  companyId           String?
+  activities          Activity[]
+  tasks               Task[]
+  notes               Note[]
+  emails              Email[]
+  deals               DealContact[]
+  tags                ContactTag[]
+  customFields        ContactCustomField[]
+  lists               ContactList[]
+  sequenceEnrollments SequenceEnrollment[]
+
+  @@unique([workspaceId, email])
+  @@index([workspaceId])
+  @@index([email])
+  @@index([companyId])
+  @@index([status])
+  @@index([source])
+  @@index([createdAt])
+  @@index([lastActivityAt])
+}
+
+model Company {
+  id          String @id @default(cuid())
+  workspaceId String
+
+  // Basic Info
+  name        String
+  domain      String?
+  website     String?
+  logoUrl     String? @db.Text
+  description String? @db.Text
+
+  // Details
+  industry    String?
+  size        String?
+  revenue     BigInt?
+  foundedYear Int?
+
+  // Social
+  linkedinUrl String?
+  twitterUrl  String?
+  facebookUrl String?
+
+  // Location
+  address    String?
+  city       String?
+  state      String?
+  country    String?
+  postalCode String?
+  phone      String?
+
+  // Metadata
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  // Relations
+  workspace    Workspace            @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy    User                 @relation(fields: [createdById], references: [id])
+  createdById  String
+  contacts     Contact[]
+  deals        Deal[]
+  activities   Activity[]
+  notes        Note[]
+  tags         CompanyTag[]
+  customFields CompanyCustomField[]
+
+  @@unique([workspaceId, domain])
+  @@index([workspaceId])
+  @@index([domain])
+  @@index([name])
+  @@index([createdAt])
+}
+
+// Pipelines & Deals
+model Pipeline {
+  id          String       @id @default(cuid())
+  workspaceId String
+  name        String
+  type        PipelineType @default(SALES)
+  isDefault   Boolean      @default(false)
+  order       Int          @default(0)
+  color       String       @default("#4F46E5")
+
+  // Settings
+  settings Json @default("{}")
+
+  // Metadata
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  // Relations
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  stages    Stage[]
+  deals     Deal[]
+
+  @@unique([workspaceId, name])
+  @@index([workspaceId])
+  @@index([type])
+}
+
+model Stage {
+  id          String @id @default(cuid())
+  pipelineId  String
+  name        String
+  order       Int    @default(0)
+  color       String @default("#6B7280")
+  probability Int    @default(0) // 0-100
+
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  pipeline Pipeline @relation(fields: [pipelineId], references: [id], onDelete: Cascade)
+  deals    Deal[]
+
+  @@unique([pipelineId, name])
+  @@index([pipelineId])
+  @@index([order])
+}
+
+model Deal {
+  id          String @id @default(cuid())
+  workspaceId String
+  pipelineId  String
+  stageId     String
+
+  // Basic Info
+  title       String
+  value       Decimal @db.Decimal(15, 2)
+  currency    String  @default("USD")
+  probability Int     @default(0) // 0-100
+
+  // Details
+  description String?    @db.Text
+  closeDate   DateTime?
+  status      DealStatus @default(OPEN)
+  wonReason   String?
+  lostReason  String?
+
+  // Metadata
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  closedAt  DateTime?
+  deletedAt DateTime?
+
+  // Relations
+  workspace    Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  pipeline     Pipeline          @relation(fields: [pipelineId], references: [id])
+  stage        Stage             @relation(fields: [stageId], references: [id])
+  owner        User              @relation(fields: [ownerId], references: [id])
+  ownerId      String
+  company      Company?          @relation(fields: [companyId], references: [id])
+  companyId    String?
+  contacts     DealContact[]
+  activities   Activity[]
+  tasks        Task[]
+  notes        Note[]
+  emails       Email[]
+  tags         DealTag[]
+  customFields DealCustomField[]
+
+  @@index([workspaceId])
+  @@index([pipelineId])
+  @@index([stageId])
+  @@index([ownerId])
+  @@index([companyId])
+  @@index([status])
+  @@index([closeDate])
+  @@index([createdAt])
+}
+
+model DealContact {
+  id        String   @id @default(cuid())
+  dealId    String
+  contactId String
+  isPrimary Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  deal    Deal    @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  contact Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@unique([dealId, contactId])
+  @@index([dealId])
+  @@index([contactId])
+}
+
+// Activities & Engagement
+model Activity {
+  id          String       @id @default(cuid())
+  workspaceId String
+  type        ActivityType
+
+  // Content
+  title       String
+  description String? @db.Text
+  metadata    Json    @default("{}")
+
+  // Associations
+  contactId String?
+  companyId String?
+  dealId    String?
+  emailId   String?
+  taskId    String?
+
+  // Metadata
+  createdAt DateTime @default(now())
+
+  // Relations
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id])
+  userId    String
+  contact   Contact?  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  company   Company?  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  deal      Deal?     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  email     Email?    @relation(fields: [emailId], references: [id], onDelete: Cascade)
+  task      Task?     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+  @@index([type])
+  @@index([userId])
+  @@index([contactId])
+  @@index([companyId])
+  @@index([dealId])
+  @@index([createdAt])
+}
+
+model Task {
+  id          String @id @default(cuid())
+  workspaceId String
+
+  // Content
+  title       String
+  description String?      @db.Text
+  status      TaskStatus   @default(TODO)
+  priority    TaskPriority @default(MEDIUM)
+
+  // Scheduling
+  dueDate     DateTime?
+  reminderAt  DateTime?
+  completedAt DateTime?
+
+  // Associations
+  contactId String?
+  dealId    String?
+
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  workspace    Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  assignedTo   User       @relation(fields: [assignedToId], references: [id])
+  assignedToId String
+  contact      Contact?   @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  deal         Deal?      @relation(fields: [dealId], references: [id], onDelete: SetNull)
+  activities   Activity[]
+
+  @@index([workspaceId])
+  @@index([assignedToId])
+  @@index([status])
+  @@index([priority])
+  @@index([dueDate])
+  @@index([contactId])
+  @@index([dealId])
+  @@index([createdAt])
+}
+
+model Note {
+  id          String @id @default(cuid())
+  workspaceId String
+
+  // Content
+  content String @db.Text
+
+  // Associations
+  contactId String?
+  companyId String?
+  dealId    String?
+
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  author    User      @relation(fields: [authorId], references: [id])
+  authorId  String
+  contact   Contact?  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  company   Company?  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  deal      Deal?     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+  @@index([authorId])
+  @@index([contactId])
+  @@index([companyId])
+  @@index([dealId])
+  @@index([createdAt])
+}
+
+// Email System
+model EmailAccount {
+  id          String @id @default(cuid())
+  workspaceId String
+  userId      String
+
+  // Account Info
+  email    String
+  provider String @default("gmail")
+
+  // Auth
+  accessToken    String   @db.Text
+  refreshToken   String   @db.Text
+  tokenExpiresAt DateTime
+
+  // Sync Status
+  syncEnabled Boolean   @default(true)
+  lastSyncAt  DateTime?
+  syncCursor  String?
+  historyId   String?
+
+  // Gmail Watch
+  watchExpiration DateTime?
+
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emails    Email[]
+
+  @@unique([workspaceId, email])
+  @@index([workspaceId])
+  @@index([userId])
+  @@index([email])
+}
+
+model Email {
+  id          String @id @default(cuid())
+  workspaceId String
+  accountId   String
+
+  // Email Data
+  messageId String  @unique
+  threadId  String
+  subject   String?
+  snippet   String?
+  bodyHtml  String? @db.Text
+  bodyText  String? @db.Text
+
+  // Participants
+  fromEmail String
+  fromName  String?
+  toEmails  String[]
+  toNames   String[]
+  ccEmails  String[]
+  ccNames   String[]
+  bccEmails String[]
+  bccNames  String[]
+
+  // Metadata
+  direction  EmailDirection
+  status     EmailStatus    @default(SENT)
+  sentAt     DateTime
+  receivedAt DateTime
+
+  // Gmail Data
+  gmailLabels    String[]
+  gmailHistoryId String?
+  isRead         Boolean  @default(false)
+  isStarred      Boolean  @default(false)
+  isImportant    Boolean  @default(false)
+  isDraft        Boolean  @default(false)
+
+  // Tracking
+  openCount     Int       @default(0)
+  clickCount    Int       @default(0)
+  firstOpenedAt DateTime?
+  lastOpenedAt  DateTime?
+
+  // Associations
+  contactId      String?
+  dealId         String?
+  sequenceStepId String?
+
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  workspace      Workspace            @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  account        EmailAccount         @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  sender         User                 @relation(fields: [senderId], references: [id])
+  senderId       String
+  contact        Contact?             @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  deal           Deal?                @relation(fields: [dealId], references: [id], onDelete: SetNull)
+  activities     Activity[]
+  attachments    EmailAttachment[]
+  trackingEvents EmailTrackingEvent[]
+
+  @@index([workspaceId])
+  @@index([accountId])
+  @@index([messageId])
+  @@index([threadId])
+  @@index([senderId])
+  @@index([contactId])
+  @@index([fromEmail])
+  @@index([sentAt])
+  @@index([direction])
+  @@index([status])
+}
+
+model EmailAttachment {
+  id        String   @id @default(cuid())
+  emailId   String
+  filename  String
+  mimeType  String
+  size      Int
+  url       String   @db.Text
+  gmailId   String?
+  createdAt DateTime @default(now())
+
+  email Email @relation(fields: [emailId], references: [id], onDelete: Cascade)
+
+  @@index([emailId])
+}
+
+model EmailTrackingEvent {
+  id        String   @id @default(cuid())
+  emailId   String
+  type      String // open, click
+  timestamp DateTime @default(now())
+  ipAddress String?
+  userAgent String?  @db.Text
+  city      String?
+  country   String?
+  metadata  Json     @default("{}")
+
+  email Email @relation(fields: [emailId], references: [id], onDelete: Cascade)
+
+  @@index([emailId])
+  @@index([type])
+  @@index([timestamp])
+}
+
+// Templates & Sequences
+model EmailTemplate {
+  id          String @id @default(cuid())
+  workspaceId String
+
+  // Content
+  name     String
+  subject  String
+  bodyHtml String       @db.Text
+  bodyText String?      @db.Text
+  type     TemplateType @default(EMAIL)
+
+  // Settings
+  isShared  Boolean  @default(false)
+  variables String[] @default([])
+
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  workspace     Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy     User           @relation(fields: [createdById], references: [id])
+  createdById   String
+  sequenceSteps SequenceStep[]
+
+  @@index([workspaceId])
+  @@index([createdById])
+  @@index([type])
+}
+
+model Sequence {
+  id          String @id @default(cuid())
+  workspaceId String
+
+  // Basic Info
+  name        String
+  description String? @db.Text
+
+  // Settings
+  isActive Boolean @default(true)
+  settings Json    @default("{}")
+
+  // Stats
+  enrolledCount     Int @default(0)
+  completedCount    Int @default(0)
+  unsubscribedCount Int @default(0)
+
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  workspace   Workspace            @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy   User                 @relation(fields: [createdById], references: [id])
+  createdById String
+  steps       SequenceStep[]
+  enrollments SequenceEnrollment[]
+
+  @@index([workspaceId])
+  @@index([isActive])
+  @@index([createdById])
+}
+
+model SequenceStep {
+  id         String @id @default(cuid())
+  sequenceId String
+  order      Int    @default(0)
+
+  // Timing
+  delayDays  Int @default(1)
+  delayHours Int @default(0)
+
+  // Content
+  type       String  @default("email") // email, task, etc
+  templateId String?
+
+  // Settings
+  settings Json @default("{}")
+
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  sequence    Sequence                 @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
+  template    EmailTemplate?           @relation(fields: [templateId], references: [id])
+  enrollments SequenceEnrollmentStep[]
+
+  @@index([sequenceId])
+  @@index([order])
+}
+
+model SequenceEnrollment {
+  id         String @id @default(cuid())
+  sequenceId String
+  contactId  String
+
+  // Status
+  status      String @default("active") // active, paused, completed, unsubscribed
+  currentStep Int    @default(0)
+
+  // Metadata
+  enrolledAt     DateTime  @default(now())
+  completedAt    DateTime?
+  unsubscribedAt DateTime?
+
+  // Relations
+  sequence Sequence                 @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
+  contact  Contact                  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  steps    SequenceEnrollmentStep[]
+
+  @@unique([sequenceId, contactId])
+  @@index([sequenceId])
+  @@index([contactId])
+  @@index([status])
+}
+
+model SequenceEnrollmentStep {
+  id           String @id @default(cuid())
+  enrollmentId String
+  stepId       String
+
+  // Status
+  status       String    @default("pending") // pending, sent, completed, failed
+  scheduledFor DateTime
+  executedAt   DateTime?
+
+  // Results
+  emailId String?
+  error   String?
+
+  // Relations
+  enrollment SequenceEnrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  step       SequenceStep       @relation(fields: [stepId], references: [id], onDelete: Cascade)
+
+  @@index([enrollmentId])
+  @@index([stepId])
+  @@index([status])
+  @@index([scheduledFor])
+}
+
+// Organization & Tagging
+model Tag {
+  id          String @id @default(cuid())
+  workspaceId String
+  name        String
+  color       String @default("#6B7280")
+
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  workspace   Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy   User         @relation(fields: [createdById], references: [id])
+  createdById String
+  contacts    ContactTag[]
+  companies   CompanyTag[]
+  deals       DealTag[]
+
+  @@unique([workspaceId, name])
+  @@index([workspaceId])
+  @@index([name])
+}
+
+model ContactTag {
+  id        String   @id @default(cuid())
+  contactId String
+  tagId     String
+  createdAt DateTime @default(now())
+
+  contact Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  tag     Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([contactId, tagId])
+  @@index([contactId])
+  @@index([tagId])
+}
+
+model CompanyTag {
+  id        String   @id @default(cuid())
+  companyId String
+  tagId     String
+  createdAt DateTime @default(now())
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  tag     Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, tagId])
+  @@index([companyId])
+  @@index([tagId])
+}
+
+model DealTag {
+  id        String   @id @default(cuid())
+  dealId    String
+  tagId     String
+  createdAt DateTime @default(now())
+
+  deal Deal @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([dealId, tagId])
+  @@index([dealId])
+  @@index([tagId])
+}
+
+// Lists & Segments
+model List {
+  id          String @id @default(cuid())
+  workspaceId String
+
+  // Basic Info
+  name        String
+  description String? @db.Text
+
+  // Type
+  isDynamic Boolean @default(false)
+  criteria  Json? // For dynamic lists
+
+  // Stats
+  contactCount Int @default(0)
+
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy   User          @relation(fields: [createdById], references: [id])
+  createdById String
+  contacts    ContactList[]
+
+  @@unique([workspaceId, name])
+  @@index([workspaceId])
+  @@index([isDynamic])
+}
+
+model ContactList {
+  id        String   @id @default(cuid())
+  listId    String
+  contactId String
+  addedAt   DateTime @default(now())
+
+  list    List    @relation(fields: [listId], references: [id], onDelete: Cascade)
+  contact Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@unique([listId, contactId])
+  @@index([listId])
+  @@index([contactId])
+}
+
+// Custom Fields
+model CustomField {
+  id          String @id @default(cuid())
+  workspaceId String
+
+  // Definition
+  name       String
+  label      String
+  type       String // text, number, date, select, multiselect, checkbox
+  entityType String // contact, company, deal
+
+  // Settings
+  isRequired   Boolean  @default(false)
+  isUnique     Boolean  @default(false)
+  options      String[] // For select/multiselect
+  defaultValue String?
+
+  // Metadata
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  workspace     Workspace            @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy     User                 @relation(fields: [createdById], references: [id])
+  createdById   String
+  contactValues ContactCustomField[]
+  companyValues CompanyCustomField[]
+  dealValues    DealCustomField[]
+
+  @@unique([workspaceId, entityType, name])
+  @@index([workspaceId])
+  @@index([entityType])
+}
+
+model ContactCustomField {
+  id        String   @id @default(cuid())
+  contactId String
+  fieldId   String
+  value     String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  contact Contact     @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  field   CustomField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+
+  @@unique([contactId, fieldId])
+  @@index([contactId])
+  @@index([fieldId])
+}
+
+model CompanyCustomField {
+  id        String   @id @default(cuid())
+  companyId String
+  fieldId   String
+  value     String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  field   CustomField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, fieldId])
+  @@index([companyId])
+  @@index([fieldId])
+}
+
+model DealCustomField {
+  id        String   @id @default(cuid())
+  dealId    String
+  fieldId   String
+  value     String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  deal  Deal        @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  field CustomField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+
+  @@unique([dealId, fieldId])
+  @@index([dealId])
+  @@index([fieldId])
+}
+
+// Integrations & Webhooks
+model Webhook {
+  id          String @id @default(cuid())
+  workspaceId String
+
+  // Configuration
+  url     String   @db.Text
+  events  String[]
+  headers Json     @default("{}")
+  secret  String
+
+  // Status
+  status      WebhookStatus @default(ACTIVE)
+  lastError   String?       @db.Text
+  lastFiredAt DateTime?
+
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+  @@index([status])
+}
+
+model ApiKey {
+  id          String @id @default(cuid())
+  workspaceId String
+
+  // Key Info
+  name      String
+  key       String @unique
+  hashedKey String @unique
+  prefix    String // First 8 chars for identification
+
+  // Permissions
+  scopes String[] @default(["read"])
+
+  // Usage
+  lastUsedAt DateTime?
+  usageCount Int       @default(0)
+
+  // Metadata
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+  revokedAt DateTime?
+
+  // Relations
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+  @@index([key])
+  @@index([hashedKey])
+  @@index([prefix])
+}
+
+// Import & Export
+model Import {
+  id          String @id @default(cuid())
+  workspaceId String
+
+  // Import Info
+  type     String // contacts, companies, deals
+  filename String
+  fileUrl  String @db.Text
+  mapping  Json
+
+  // Status
+  status        ImportStatus @default(PENDING)
+  totalRows     Int          @default(0)
+  processedRows Int          @default(0)
+  successRows   Int          @default(0)
+  errorRows     Int          @default(0)
+  errors        Json[]       @default([])
+
+  // Metadata
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  // Relations
+  workspace    Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  importedBy   User      @relation(fields: [importedById], references: [id])
+  importedById String
+
+  @@index([workspaceId])
+  @@index([status])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model Export {
+  id          String @id @default(cuid())
+  workspaceId String
+
+  // Export Info
+  type    String // contacts, companies, deals, activities
+  format  String // csv, excel, json
+  filters Json     @default("{}")
+  fields  String[] // Selected fields to export
+
+  // Results
+  fileUrl  String? @db.Text
+  rowCount Int     @default(0)
+
+  // Metadata
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  // Relations
+  workspace    Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  exportedBy   User      @relation(fields: [exportedById], references: [id])
+  exportedById String
+
+  @@index([workspaceId])
+  @@index([type])
+  @@index([createdAt])
+  @@index([expiresAt])
+}
+
+// Notifications
+model Notification {
+  id     String @id @default(cuid())
+  userId String
+
+  // Content
+  type  NotificationType
+  title String
+  body  String           @db.Text
+  data  Json             @default("{}")
+
+  // Status
+  isRead Boolean   @default(false)
+  readAt DateTime?
+
+  // Metadata
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([type])
+  @@index([createdAt])
+}
+
+// Audit & Compliance
+model AuditLog {
+  id          String @id @default(cuid())
+  workspaceId String
+  userId      String
+
+  // Event Info
+  action     AuditAction
+  entityType String
+  entityId   String
+
+  // Details
+  changes  Json @default("{}")
+  metadata Json @default("{}")
+
+  // Request Info
+  ipAddress String?
+  userAgent String? @db.Text
+
+  // Metadata
+  createdAt DateTime @default(now())
+
+  // Relations
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id])
+
+  @@index([workspaceId])
+  @@index([userId])
+  @@index([action])
+  @@index([entityType])
+  @@index([entityId])
+  @@index([createdAt])
+}

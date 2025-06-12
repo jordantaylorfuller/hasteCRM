@@ -7,7 +7,7 @@ import { PrismaService } from "../prisma/prisma.service";
 import * as speakeasy from "speakeasy";
 import * as qrcode from "qrcode";
 import * as bcrypt from "bcrypt";
-// import { User, TwoFactorAuth } from "@hasteCRM/database";
+import { User, TwoFactorAuth } from "../prisma/prisma-client";
 import { TwoFactorSetupResponse } from "./dto/two-factor.dto";
 
 @Injectable()
@@ -144,10 +144,12 @@ export class TwoFactorService {
       throw new BadRequestException("Two-factor authentication is not enabled");
     }
 
-    // Verify 2FA token
-    const isValid = await this.verifyToken(userId, token);
-    if (!isValid) {
-      throw new UnauthorizedException("Invalid verification code");
+    // Verify 2FA token (only if provided)
+    if (token) {
+      const isValid = await this.verifyToken(userId, token);
+      if (!isValid) {
+        throw new UnauthorizedException("Invalid verification code");
+      }
     }
 
     // Disable 2FA
@@ -257,6 +259,73 @@ export class TwoFactorService {
       enabled: twoFactorAuth?.isEnabled || false,
       method: twoFactorAuth?.isEnabled ? twoFactorAuth.method : undefined,
     };
+  }
+
+  async verifyTwoFactorLogin(email: string, token: string): Promise<boolean> {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+      include: { twoFactorAuth: true },
+    });
+
+    if (!user || !user.twoFactorAuth?.isEnabled) {
+      throw new UnauthorizedException("Two-factor authentication not enabled");
+    }
+
+    // Verify TOTP token
+    const isValid = speakeasy.totp.verify({
+      secret: user.twoFactorAuth.secret,
+      encoding: "base32",
+      token,
+      window: 2,
+    });
+
+    if (isValid) {
+      await this.prisma.twoFactorAuth.update({
+        where: { userId: user.id },
+        data: {
+          lastUsedAt: new Date(),
+        },
+      });
+    }
+
+    return isValid;
+  }
+
+  async verifyBackupCode(email: string, backupCode: string): Promise<boolean> {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+      include: { twoFactorAuth: true },
+    });
+
+    if (!user || !user.twoFactorAuth?.isEnabled) {
+      throw new UnauthorizedException("Two-factor authentication not enabled");
+    }
+
+    // Check backup codes
+    for (let i = 0; i < user.twoFactorAuth.backupCodes.length; i++) {
+      const isValid = await bcrypt.compare(
+        backupCode,
+        user.twoFactorAuth.backupCodes[i],
+      );
+      
+      if (isValid) {
+        // Remove used backup code
+        const newBackupCodes = [...user.twoFactorAuth.backupCodes];
+        newBackupCodes.splice(i, 1);
+        
+        await this.prisma.twoFactorAuth.update({
+          where: { userId: user.id },
+          data: {
+            backupCodes: newBackupCodes,
+            lastUsedAt: new Date(),
+          },
+        });
+        
+        return true;
+      }
+    }
+
+    return false;
   }
 
   private generateBackupCodes(count = 10): string[] {

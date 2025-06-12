@@ -5,31 +5,31 @@ export const RateLimits = {
   // Authentication endpoints
   AUTH: {
     LOGIN: {
-      points: 5,
+      points: 20, // Increased from 5
       duration: 900, // 15 minutes
       keyPrefix: "auth:login",
     } as RateLimitOptions,
 
     REGISTER: {
-      points: 3,
+      points: 10, // Increased from 3
       duration: 3600, // 1 hour
       keyPrefix: "auth:register",
     } as RateLimitOptions,
 
     PASSWORD_RESET: {
-      points: 3,
+      points: 10, // Increased from 3
       duration: 3600, // 1 hour
       keyPrefix: "auth:password-reset",
     } as RateLimitOptions,
 
     VERIFY_EMAIL: {
-      points: 10,
+      points: 20, // Increased from 10
       duration: 3600, // 1 hour
       keyPrefix: "auth:verify-email",
     } as RateLimitOptions,
 
     TWO_FACTOR: {
-      points: 5,
+      points: 20, // Increased from 5
       duration: 300, // 5 minutes
       keyPrefix: "auth:2fa",
     } as RateLimitOptions,

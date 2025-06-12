@@ -15,14 +15,14 @@ import { LoginWithTwoFactorDto } from "./dto/two-factor.dto";
 import * as bcrypt from "bcrypt";
 import * as crypto from "crypto";
 import { JwtPayload } from "../../common/interfaces/jwt-payload.interface";
-import { User } from "@hasteCRM/database";
+import { User, Workspace, WorkspaceUser } from "../prisma/prisma-client";
 import { AuthResponse, TokenResponse } from "../../common/types/auth.types";
 
-// type UserWithWorkspace = User & {
-//   workspaces: (WorkspaceUser & {
-//     workspace: Workspace;
-//   })[];
-// };
+type UserWithWorkspace = User & {
+  workspaces: (WorkspaceUser & {
+    workspace: Workspace;
+  })[];
+};
 
 @Injectable()
 export class AuthService {
@@ -270,7 +270,7 @@ export class AuthService {
     };
   }
 
-  async validateUser(email: string, password: string): Promise<any> {
+  async validateUser(email: string, password: string): Promise<Omit<User, 'passwordHash'> | null> {
     const user = await this.prisma.user.findUnique({
       where: { email },
     });
@@ -334,7 +334,7 @@ export class AuthService {
     };
   }
 
-  private sanitizeUser(user: any) {
+  private sanitizeUser(user: User): Omit<User, 'passwordHash'> {
     const { passwordHash: _passwordHash, ...sanitized } = user;
     return sanitized;
   }
@@ -619,5 +619,43 @@ export class AuthService {
     });
 
     return { message: "Password reset successfully" };
+  }
+
+  async verifyTwoFactorLogin(
+    email: string,
+    password: string,
+    token: string,
+  ): Promise<AuthResponse> {
+    return this.loginWithTwoFactor({ email, password, token });
+  }
+
+  async verifyBackupCode(
+    userId: string,
+    backupCode: string,
+  ): Promise<boolean> {
+    return this.twoFactorService.verifyBackupCode(userId, backupCode);
+  }
+
+  async getCurrentUser(userId: string): Promise<any> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        workspaces: {
+          where: { isDefault: true },
+          include: { workspace: true },
+        },
+      },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException("User not found");
+    }
+
+    const defaultWorkspace = user.workspaces[0];
+    
+    return {
+      user: this.sanitizeUser(user),
+      workspace: defaultWorkspace?.workspace || null,
+    };
   }
 }

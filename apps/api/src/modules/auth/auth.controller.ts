@@ -12,6 +12,7 @@ import {
 import { AuthService } from "./auth.service";
 import { RegisterDto } from "./dto/register.dto";
 import { LoginDto } from "./dto/login.dto";
+import { LoginWithTwoFactorDto } from "./dto/two-factor.dto";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { RateLimitGuard } from "../../common/guards/rate-limit.guard";
 import { RateLimit } from "../../common/decorators/rate-limit.decorator";
@@ -52,6 +53,13 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
+  @Post("login/2fa")
+  @RateLimit(RateLimits.AUTH.TWO_FACTOR)
+  @HttpCode(HttpStatus.OK)
+  async loginWithTwoFactor(@Body() loginDto: LoginWithTwoFactorDto) {
+    return this.authService.loginWithTwoFactor(loginDto);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Post("refresh")
   @HttpCode(HttpStatus.OK)
@@ -71,7 +79,12 @@ export class AuthController {
   @Post("me")
   @HttpCode(HttpStatus.OK)
   async me(@Request() req) {
-    return req.user;
+    try {
+      return await this.authService.getCurrentUser(req.user.sub);
+    } catch (error) {
+      // If getting full user data fails, return JWT payload
+      return req.user;
+    }
   }
 
   @Get("google")
@@ -88,7 +101,8 @@ export class AuthController {
 
     // In production, you'd redirect to your frontend with tokens as query params
     // For now, we'll return JSON response for testing
-    const redirectUrl = new URL("http://localhost:3000/auth/callback");
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3001";
+    const redirectUrl = new URL(`${frontendUrl}/auth/callback`);
     redirectUrl.searchParams.append("accessToken", authData.accessToken);
     redirectUrl.searchParams.append("refreshToken", authData.refreshToken);
 

@@ -3,6 +3,13 @@ export interface JwtPayload {
   email: string;
   workspaceId: string;
   role: string;
+  firstName?: string;
+  lastName?: string;
+  status?: string;
+  twoFactorEnabled?: boolean;
+  workspaceName?: string;
+  workspaceSlug?: string;
+  plan?: string;
   iat?: number;
   exp?: number;
 }
