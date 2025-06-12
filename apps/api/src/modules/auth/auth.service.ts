@@ -15,7 +15,7 @@ import { LoginWithTwoFactorDto } from "./dto/two-factor.dto";
 import * as bcrypt from "bcrypt";
 import * as crypto from "crypto";
 import { JwtPayload } from "../../common/interfaces/jwt-payload.interface";
-import { User } from "@ai-crm/database";
+import { User } from "@hasteCRM/database";
 import { AuthResponse, TokenResponse } from "../../common/types/auth.types";
 
 // type UserWithWorkspace = User & {

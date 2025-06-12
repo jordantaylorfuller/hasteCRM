@@ -7,7 +7,7 @@ import { PrismaService } from "../prisma/prisma.service";
 import * as speakeasy from "speakeasy";
 import * as qrcode from "qrcode";
 import * as bcrypt from "bcrypt";
-// import { User, TwoFactorAuth } from "@ai-crm/database";
+// import { User, TwoFactorAuth } from "@hasteCRM/database";
 import { TwoFactorSetupResponse } from "./dto/two-factor.dto";
 
 @Injectable()

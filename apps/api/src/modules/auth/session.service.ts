@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { RedisService } from "../redis/redis.service";
 import { randomBytes } from "crypto";
-import { User } from "@ai-crm/database";
+import { User } from "@hasteCRM/database";
 
 export interface SessionData {
   sessionId: string;

@@ -1,5 +1,5 @@
 {
-  "name": "@ai-crm/api",
+  "name": "@hasteCRM/api",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -10,7 +10,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@ai-crm/database": "workspace:^",
+    "@hasteCRM/database": "workspace:^",
     "@apollo/server": "^4.9.0",
     "@nestjs/apollo": "^12.0.0",
     "@nestjs/common": "^10.0.0",
