@@ -2,6 +2,256 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type CompaniesResponse {
+  companies: [Company!]!
+  hasMore: Boolean!
+  total: Int!
+}
+
+type Company {
+  address: String
+  city: String
+  country: String
+  createdAt: DateTime!
+  createdById: String!
+  deletedAt: DateTime
+  description: String
+  domain: String
+  facebookUrl: String
+  foundedYear: Int
+  id: ID!
+  industry: String
+  linkedinUrl: String
+  logoUrl: String
+  name: String!
+  phone: String
+  postalCode: String
+  revenue: Int
+  size: String
+  state: String
+  twitterUrl: String
+  updatedAt: DateTime!
+  website: String
+  workspaceId: String!
+}
+
+type Contact {
+  address: String
+  avatarUrl: String
+  bio: String
+  birthday: DateTime
+  city: String
+  companyId: String
+  country: String
+  createdAt: DateTime!
+  createdById: String!
+  deletedAt: DateTime
+  email: String
+  facebookUrl: String
+  firstName: String
+
+  """Full name of the contact"""
+  fullName: String
+  id: ID!
+  lastActivityAt: DateTime
+  lastName: String
+  linkedinUrl: String
+  phone: String
+  postalCode: String
+  score: Int!
+  source: ContactSource!
+  state: String
+  status: ContactStatus!
+  timezone: String
+  title: String
+  twitterUrl: String
+  updatedAt: DateTime!
+  website: String
+  workspaceId: String!
+}
+
+input ContactFiltersInput {
+  city: String
+  companyId: String
+  country: String
+  search: String
+  source: ContactSource
+  state: String
+  status: ContactStatus
+  tags: [String!]
+}
+
+"""The source of a contact"""
+enum ContactSource {
+  API
+  ENRICHMENT
+  GMAIL
+  IMPORT
+  MANUAL
+  WEBHOOK
+}
+
+"""The status of a contact"""
+enum ContactStatus {
+  ACTIVE
+  ARCHIVED
+  INACTIVE
+}
+
+type ContactsResponse {
+  contacts: [Contact!]!
+  hasMore: Boolean!
+  total: Int!
+}
+
+input CreateCompanyInput {
+  address: String
+  city: String
+  country: String
+  description: String
+  domain: String
+  facebookUrl: String
+  foundedYear: Int
+  industry: String
+  linkedinUrl: String
+  logoUrl: String
+  name: String!
+  phone: String
+  postalCode: String
+  revenue: Int
+  size: String
+  state: String
+  twitterUrl: String
+  website: String
+}
+
+input CreateContactInput {
+  address: String
+  bio: String
+  city: String
+  companyId: String
+  country: String
+  email: String
+  facebookUrl: String
+  firstName: String
+  lastName: String
+  linkedinUrl: String
+  phone: String
+  postalCode: String
+  state: String
+  timezone: String
+  title: String
+  twitterUrl: String
+  website: String
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+input ExportContactsInput {
+  fields: [String!]
+  filters: JSONObject
+  format: String! = "csv"
+}
+
+type ExportResult {
+  expiresAt: DateTime!
+  exportId: String!
+  fileUrl: String!
+  format: String!
+  rowCount: Int!
+}
+
+type ExportStatus {
+  createdAt: DateTime!
+  expiresAt: DateTime!
+  fileUrl: String
+  format: String!
+  id: String!
+  rowCount: Int!
+  type: String!
+}
+
+input ImportContactsInput {
+  fileUrl: String!
+  format: String!
+  mapping: JSONObject!
+}
+
+type ImportResult {
+  errors: [JSON!]!
+  importId: String!
+  processed: Int!
+  success: Int!
+  total: Int!
+}
+
+type ImportStatus {
+  completedAt: DateTime
+  createdAt: DateTime!
+  errorRows: Int!
+  errors: [JSON!]
+  id: String!
+  processedRows: Int!
+  status: String!
+  successRows: Int!
+  totalRows: Int!
+}
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+"""
+The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSONObject
+
+type Mutation {
+  createCompany(input: CreateCompanyInput!): Company!
+  createContact(input: CreateContactInput!): Contact!
+  exportContacts(input: ExportContactsInput): ExportResult!
+  importContacts(fileContent: String!, input: ImportContactsInput!): ImportResult!
+  removeCompany(id: String!): Company!
+  removeContact(id: String!): Contact!
+  restoreContact(id: String!): Contact!
+  updateCompany(id: String!, input: CreateCompanyInput!): Company!
+  updateContact(input: UpdateContactInput!): Contact!
+  updateContactScore(id: String!, score: Int!): Contact!
+}
+
 type Query {
+  companies(search: String, skip: Int! = 0, take: Int! = 20): CompaniesResponse!
+  company(id: String!): Company!
+  contact(id: String!): Contact!
+  contacts(filters: ContactFiltersInput, skip: Int! = 0, take: Int! = 20): ContactsResponse!
+  contactsByCompany(companyId: String!): [Contact!]!
+  exportStatus(exportId: String!): ExportStatus!
   health: String!
+  importStatus(importId: String!): ImportStatus!
+  searchContacts(filters: ContactFiltersInput, query: String!, skip: Int! = 0, take: Int! = 20): ContactsResponse!
+}
+
+input UpdateContactInput {
+  address: String
+  bio: String
+  city: String
+  companyId: String
+  country: String
+  email: String
+  facebookUrl: String
+  firstName: String
+  id: ID!
+  lastName: String
+  linkedinUrl: String
+  phone: String
+  postalCode: String
+  state: String
+  timezone: String
+  title: String
+  twitterUrl: String
+  website: String
 }

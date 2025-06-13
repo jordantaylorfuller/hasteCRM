@@ -7,7 +7,6 @@ import { PrismaService } from "../prisma/prisma.service";
 import * as speakeasy from "speakeasy";
 import * as qrcode from "qrcode";
 import * as bcrypt from "bcrypt";
-import { User, TwoFactorAuth } from "../prisma/prisma-client";
 import { TwoFactorSetupResponse } from "./dto/two-factor.dto";
 
 @Injectable()
@@ -307,12 +306,12 @@ export class TwoFactorService {
         backupCode,
         user.twoFactorAuth.backupCodes[i],
       );
-      
+
       if (isValid) {
         // Remove used backup code
         const newBackupCodes = [...user.twoFactorAuth.backupCodes];
         newBackupCodes.splice(i, 1);
-        
+
         await this.prisma.twoFactorAuth.update({
           where: { userId: user.id },
           data: {
@@ -320,7 +319,7 @@ export class TwoFactorService {
             lastUsedAt: new Date(),
           },
         });
-        
+
         return true;
       }
     }

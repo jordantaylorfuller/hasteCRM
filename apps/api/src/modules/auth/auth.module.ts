@@ -8,6 +8,7 @@ import { AuthService } from "./auth.service";
 import { TwoFactorService } from "./two-factor.service";
 import { SessionService } from "./session.service";
 import { JwtStrategy } from "./strategies/jwt.strategy";
+import { RefreshJwtStrategy } from "./strategies/refresh-jwt.strategy";
 import { LocalStrategy } from "./strategies/local.strategy";
 import { GoogleStrategy } from "./strategies/google.strategy";
 import { RateLimitGuard } from "../../common/guards/rate-limit.guard";
@@ -33,6 +34,7 @@ import { RedisModule } from "../redis/redis.module";
     SessionService,
     LocalStrategy,
     JwtStrategy,
+    RefreshJwtStrategy,
     GoogleStrategy,
     {
       provide: "APP_GUARD",

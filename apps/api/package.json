@@ -34,8 +34,11 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
     "connect-redis": "^8.1.0",
+    "csv-parse": "^5.6.0",
+    "csv-stringify": "^6.5.2",
     "express-session": "^1.18.1",
     "graphql": "^16.8.0",
+    "graphql-type-json": "^0.3.2",
     "ioredis": "^5.6.1",
     "nodemailer": "^7.0.3",
     "passport": "^0.7.0",
@@ -45,7 +48,8 @@
     "qrcode": "^1.5.4",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
-    "speakeasy": "^2.0.0"
+    "speakeasy": "^2.0.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

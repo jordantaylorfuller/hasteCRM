@@ -14,6 +14,7 @@ import { RegisterDto } from "./dto/register.dto";
 import { LoginDto } from "./dto/login.dto";
 import { LoginWithTwoFactorDto } from "./dto/two-factor.dto";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
+import { RefreshJwtAuthGuard } from "../../common/guards/refresh-jwt-auth.guard";
 import { RateLimitGuard } from "../../common/guards/rate-limit.guard";
 import { RateLimit } from "../../common/decorators/rate-limit.decorator";
 import { RateLimits } from "../../common/config/rate-limits";
@@ -60,7 +61,7 @@ export class AuthController {
     return this.authService.loginWithTwoFactor(loginDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(RefreshJwtAuthGuard)
   @Post("refresh")
   @HttpCode(HttpStatus.OK)
   async refresh(@Request() req) {
@@ -70,8 +71,14 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post("logout")
   @HttpCode(HttpStatus.OK)
-  async logout(@Request() _req) {
-    // In a real app, you might want to blacklist the token or clear session
+  async logout(@Request() req) {
+    // Get the token from the authorization header
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      const token = authHeader.substring(7);
+      await this.authService.logout(token);
+    }
+
     return { message: "Logged out successfully" };
   }
 
