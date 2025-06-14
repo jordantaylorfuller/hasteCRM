@@ -1,8 +1,9 @@
-import { Injectable, OnModuleDestroy } from "@nestjs/common";
+import { Injectable, OnModuleDestroy, Logger } from "@nestjs/common";
 import Redis from "ioredis";
 
 @Injectable()
 export class RedisService implements OnModuleDestroy {
+  private readonly logger = new Logger(RedisService.name);
   private client: Redis;
   private sessionClient: Redis;
 
@@ -160,5 +161,30 @@ export class RedisService implements OnModuleDestroy {
     if (keys.length > 0) {
       await this.client.del(...keys);
     }
+  }
+
+  // Proxy methods for direct Redis operations
+  async get(key: string): Promise<string | null> {
+    return this.client.get(key);
+  }
+
+  async set(key: string, value: string, ...args: any[]): Promise<"OK"> {
+    return this.client.set(key, value, ...args);
+  }
+
+  async hincrby(
+    key: string,
+    field: string,
+    increment: number,
+  ): Promise<number> {
+    return this.client.hincrby(key, field, increment);
+  }
+
+  async expire(key: string, seconds: number): Promise<number> {
+    return this.client.expire(key, seconds);
+  }
+
+  async hgetall(key: string): Promise<Record<string, string>> {
+    return this.client.hgetall(key);
   }
 }

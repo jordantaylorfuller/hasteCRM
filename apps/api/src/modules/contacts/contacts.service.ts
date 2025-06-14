@@ -3,13 +3,17 @@ import { PrismaService } from "../prisma/prisma.service";
 import { CreateContactInput } from "./dto/create-contact.input";
 import { UpdateContactInput } from "./dto/update-contact.input";
 import { ContactFiltersInput } from "./dto/contact-filters.input";
-import { ContactStatus, Prisma } from "../prisma/prisma-client";
+import { ContactStatus, Prisma, Contact, Tag } from "../prisma/prisma-client";
 
 @Injectable()
 export class ContactsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(workspaceId: string, userId: string, input: CreateContactInput) {
+  async create(
+    workspaceId: string,
+    userId: string,
+    input: CreateContactInput,
+  ): Promise<Contact> {
     return this.prisma.contact.create({
       data: {
         ...input,
@@ -25,7 +29,11 @@ export class ContactsService {
     filters?: ContactFiltersInput,
     skip = 0,
     take = 20,
-  ) {
+  ): Promise<{
+    contacts: Contact[];
+    total: number;
+    hasMore: boolean;
+  }> {
     const where: Prisma.ContactWhereInput = {
       workspaceId,
       deletedAt: null,
@@ -94,7 +102,7 @@ export class ContactsService {
     };
   }
 
-  async findOne(id: string, workspaceId: string) {
+  async findOne(id: string, workspaceId: string): Promise<Contact> {
     const contact = await this.prisma.contact.findFirst({
       where: {
         id,
@@ -114,7 +122,7 @@ export class ContactsService {
     id: string,
     workspaceId: string,
     input: Omit<UpdateContactInput, "id">,
-  ) {
+  ): Promise<Contact> {
     await this.findOne(id, workspaceId);
 
     return this.prisma.contact.update({
@@ -126,7 +134,7 @@ export class ContactsService {
     });
   }
 
-  async remove(id: string, workspaceId: string) {
+  async remove(id: string, workspaceId: string): Promise<Contact> {
     await this.findOne(id, workspaceId);
 
     return this.prisma.contact.update({
@@ -137,7 +145,7 @@ export class ContactsService {
     });
   }
 
-  async restore(id: string, workspaceId: string) {
+  async restore(id: string, workspaceId: string): Promise<Contact> {
     const contact = await this.prisma.contact.findFirst({
       where: {
         id,
@@ -163,7 +171,11 @@ export class ContactsService {
     filters?: ContactFiltersInput,
     skip = 0,
     take = 20,
-  ) {
+  ): Promise<{
+    contacts: Contact[];
+    total: number;
+    hasMore: boolean;
+  }> {
     const searchConditions: Prisma.ContactWhereInput = {
       workspaceId,
       deletedAt: null,
@@ -210,7 +222,11 @@ export class ContactsService {
     };
   }
 
-  async updateScore(id: string, workspaceId: string, score: number) {
+  async updateScore(
+    id: string,
+    workspaceId: string,
+    score: number,
+  ): Promise<Contact> {
     await this.findOne(id, workspaceId);
 
     return this.prisma.contact.update({
@@ -219,7 +235,10 @@ export class ContactsService {
     });
   }
 
-  async getContactsByCompany(companyId: string, workspaceId: string) {
+  async getContactsByCompany(
+    companyId: string,
+    workspaceId: string,
+  ): Promise<Contact[]> {
     return this.prisma.contact.findMany({
       where: {
         companyId,
@@ -254,7 +273,7 @@ export class ContactsService {
     });
   }
 
-  async getTags(contactId: string, workspaceId: string) {
+  async getTags(contactId: string, workspaceId: string): Promise<Tag[]> {
     await this.findOne(contactId, workspaceId);
 
     const contactTags = await this.prisma.contactTag.findMany({

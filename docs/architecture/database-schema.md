@@ -7,9 +7,10 @@ The hasteCRM uses PostgreSQL 15+ as its primary database, leveraging advanced fe
 ## Database Architecture
 
 ### Technology Stack
+
 - **Database**: PostgreSQL 15+
 - **ORM**: Prisma 5.x
-- **Extensions**: 
+- **Extensions**:
   - pgvector (AI embeddings)
   - uuid-ossp (UUID generation)
   - pg_trgm (Fuzzy text search)
@@ -18,6 +19,7 @@ The hasteCRM uses PostgreSQL 15+ as its primary database, leveraging advanced fe
 - **Search**: PostgreSQL FTS + Redis
 
 ### Design Principles
+
 1. **Multi-tenancy**: Workspace-based isolation with RLS
 2. **Audit Trail**: Every table has created/updated timestamps and user tracking
 3. **Soft Deletes**: Logical deletion with `deletedAt` timestamps
@@ -41,20 +43,20 @@ CREATE TABLE workspaces (
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
     deleted_at TIMESTAMPTZ,
-    
+
     -- Plan limits (stored in settings JSONB for flexibility)
     -- Example: settings->>'maxUsers' = '5'
     -- Example: settings->>'maxContacts' = '1000'
-    
+
     -- Subscription info
     stripe_customer_id VARCHAR(255),
     stripe_subscription_id VARCHAR(255),
     subscription_status VARCHAR(50),
     trial_ends_at TIMESTAMPTZ,
-    
+
     -- Usage tracking
     usage_metrics JSONB DEFAULT '{}',
-    
+
     CONSTRAINT valid_plan CHECK (plan IN ('free', 'starter', 'professional', 'enterprise'))
 );
 
@@ -73,20 +75,20 @@ CREATE TABLE users (
     phone VARCHAR(50),
     timezone VARCHAR(50) DEFAULT 'UTC',
     locale VARCHAR(10) DEFAULT 'en',
-    
+
     -- OAuth providers
     google_id VARCHAR(255) UNIQUE,
     google_refresh_token TEXT, -- For user authentication only
     microsoft_id VARCHAR(255) UNIQUE,
     -- Note: Email account tokens are stored in email_accounts table
-    
+
     -- Metadata
     last_login_at TIMESTAMPTZ,
     login_count INTEGER DEFAULT 0,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
     deleted_at TIMESTAMPTZ,
-    
+
     -- Preferences
     preferences JSONB DEFAULT '{}'
 );
@@ -101,19 +103,19 @@ CREATE TABLE workspace_members (
     workspace_id UUID NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     role VARCHAR(50) NOT NULL DEFAULT 'member',
-    
+
     -- Permissions
     permissions JSONB DEFAULT '{}',
-    
+
     -- Status
     status VARCHAR(50) DEFAULT 'active',
     invited_by UUID REFERENCES users(id),
     invited_at TIMESTAMPTZ,
     joined_at TIMESTAMPTZ,
-    
+
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
-    
+
     CONSTRAINT valid_role CHECK (role IN ('owner', 'admin', 'member', 'viewer')),
     CONSTRAINT unique_workspace_member UNIQUE (workspace_id, user_id)
 );
@@ -129,19 +131,19 @@ CREATE INDEX idx_workspace_members_user ON workspace_members(user_id);
 CREATE TABLE contacts (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     workspace_id UUID NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
-    
+
     -- Basic info
     email VARCHAR(255),
     first_name VARCHAR(100),
     last_name VARCHAR(100),
     phone VARCHAR(50),
     mobile VARCHAR(50),
-    
+
     -- Company info
     company VARCHAR(255),
     title VARCHAR(255),
     department VARCHAR(100),
-    
+
     -- Address
     address_line1 VARCHAR(255),
     address_line2 VARCHAR(255),
@@ -149,39 +151,39 @@ CREATE TABLE contacts (
     state VARCHAR(100),
     country VARCHAR(100),
     postal_code VARCHAR(50),
-    
+
     -- Contact metadata
     source VARCHAR(50) DEFAULT 'manual',
     source_details JSONB DEFAULT '{}',
     score INTEGER DEFAULT 0,
     lifecycle_stage VARCHAR(50) DEFAULT 'lead',
-    
+
     -- Social profiles
     linkedin_url TEXT,
     twitter_handle VARCHAR(100),
     facebook_url TEXT,
     website TEXT,
-    
+
     -- AI and enrichment
     enrichment_data JSONB DEFAULT '{}',
     enrichment_updated_at TIMESTAMPTZ,
     ai_insights JSONB DEFAULT '{}',
     embedding vector(1536), -- For semantic search
-    
+
     -- Custom fields
     custom_fields JSONB DEFAULT '{}',
-    
+
     -- Relationships
     owner_id UUID REFERENCES users(id),
     created_by UUID REFERENCES users(id),
-    
+
     -- Tracking
     last_activity_at TIMESTAMPTZ,
     last_contacted_at TIMESTAMPTZ,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
     deleted_at TIMESTAMPTZ,
-    
+
     CONSTRAINT valid_source CHECK (source IN ('manual', 'import', 'website', 'email', 'api', 'linkedin', 'enrichment')),
     CONSTRAINT valid_lifecycle CHECK (lifecycle_stage IN ('lead', 'MQL', 'SQL', 'opportunity', 'customer', 'evangelist'))
 );
@@ -198,10 +200,10 @@ CREATE INDEX idx_contacts_deleted_at ON contacts(deleted_at);
 
 -- Full-text search
 CREATE INDEX idx_contacts_search ON contacts USING gin(
-    to_tsvector('english', 
-        coalesce(first_name, '') || ' ' || 
-        coalesce(last_name, '') || ' ' || 
-        coalesce(email, '') || ' ' || 
+    to_tsvector('english',
+        coalesce(first_name, '') || ' ' ||
+        coalesce(last_name, '') || ' ' ||
+        coalesce(email, '') || ' ' ||
         coalesce(company, '')
     )
 );
@@ -217,7 +219,7 @@ CREATE TABLE tags (
     color VARCHAR(7) DEFAULT '#808080',
     description TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW(),
-    
+
     CONSTRAINT unique_workspace_tag UNIQUE (workspace_id, name)
 );
 
@@ -225,7 +227,7 @@ CREATE TABLE contact_tags (
     contact_id UUID NOT NULL REFERENCES contacts(id) ON DELETE CASCADE,
     tag_id UUID NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
     created_at TIMESTAMPTZ DEFAULT NOW(),
-    
+
     PRIMARY KEY (contact_id, tag_id)
 );
 
@@ -240,18 +242,18 @@ CREATE INDEX idx_contact_tags_tag ON contact_tags(tag_id);
 CREATE TABLE companies (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     workspace_id UUID NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
-    
+
     -- Basic info
     name VARCHAR(255) NOT NULL,
     domain VARCHAR(255),
     website TEXT,
-    
+
     -- Details
     industry VARCHAR(100),
     company_size VARCHAR(50),
     annual_revenue DECIMAL(15,2),
     currency VARCHAR(3) DEFAULT 'USD',
-    
+
     -- Location
     address_line1 VARCHAR(255),
     address_line2 VARCHAR(255),
@@ -260,35 +262,35 @@ CREATE TABLE companies (
     country VARCHAR(100),
     postal_code VARCHAR(50),
     timezone VARCHAR(50),
-    
+
     -- Contact info
     phone VARCHAR(50),
     email VARCHAR(255),
-    
+
     -- Social
     linkedin_url TEXT,
     twitter_handle VARCHAR(100),
     facebook_url TEXT,
-    
+
     -- Enrichment
     enrichment_data JSONB DEFAULT '{}',
     enrichment_updated_at TIMESTAMPTZ,
     logo_url TEXT,
     description TEXT,
-    
+
     -- AI
     ai_insights JSONB DEFAULT '{}',
     embedding vector(1536),
-    
+
     -- Metadata
     custom_fields JSONB DEFAULT '{}',
     tags TEXT[],
-    
+
     -- Relationships
     parent_company_id UUID REFERENCES companies(id),
     owner_id UUID REFERENCES users(id),
     created_by UUID REFERENCES users(id),
-    
+
     -- Tracking
     employee_count INTEGER,
     founded_year INTEGER,
@@ -296,7 +298,7 @@ CREATE TABLE companies (
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
     deleted_at TIMESTAMPTZ,
-    
+
     CONSTRAINT valid_company_size CHECK (company_size IN ('1-10', '11-50', '51-200', '201-500', '501-1000', '1001-5000', '5000+'))
 );
 
@@ -310,8 +312,8 @@ CREATE INDEX idx_companies_deleted_at ON companies(deleted_at);
 
 -- Full-text search
 CREATE INDEX idx_companies_search ON companies USING gin(
-    to_tsvector('english', 
-        coalesce(name, '') || ' ' || 
+    to_tsvector('english',
+        coalesce(name, '') || ' ' ||
         coalesce(domain, '') || ' ' ||
         coalesce(description, '')
     )
@@ -321,12 +323,12 @@ CREATE INDEX idx_companies_search ON companies USING gin(
 CREATE TABLE company_contacts (
     company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
     contact_id UUID NOT NULL REFERENCES contacts(id) ON DELETE CASCADE,
-    
+
     role VARCHAR(100),
     is_primary BOOLEAN DEFAULT FALSE,
-    
+
     created_at TIMESTAMPTZ DEFAULT NOW(),
-    
+
     PRIMARY KEY (company_id, contact_id)
 );
 
@@ -341,29 +343,29 @@ CREATE INDEX idx_company_contacts_contact ON company_contacts(contact_id);
 CREATE TABLE notes (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     workspace_id UUID NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
-    
+
     -- Content
     content TEXT NOT NULL,
     content_html TEXT,
-    
+
     -- Relationships (polymorphic)
     entity_type VARCHAR(50) NOT NULL,
     entity_id UUID NOT NULL,
-    
+
     -- Specific relationships for indexing
     contact_id UUID REFERENCES contacts(id),
     company_id UUID REFERENCES companies(id),
     deal_id UUID REFERENCES deals(id),
-    
+
     -- Metadata
     is_pinned BOOLEAN DEFAULT FALSE,
     mentions UUID[], -- User IDs mentioned
-    
+
     created_by UUID NOT NULL REFERENCES users(id),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
     deleted_at TIMESTAMPTZ,
-    
+
     CONSTRAINT valid_entity_type CHECK (entity_type IN ('contact', 'company', 'deal', 'task'))
 );
 
@@ -384,26 +386,26 @@ CREATE INDEX idx_notes_search ON notes USING gin(
 -- Comments (for collaboration)
 CREATE TABLE comments (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    
+
     -- Parent entity (polymorphic)
     entity_type VARCHAR(50) NOT NULL,
     entity_id UUID NOT NULL,
-    
+
     -- Content
     content TEXT NOT NULL,
-    
+
     -- Threading
     parent_comment_id UUID REFERENCES comments(id),
-    
+
     -- Metadata
     mentions UUID[], -- User IDs mentioned
     reactions JSONB DEFAULT '{}', -- {"👍": [user_ids], "❤️": [user_ids]}
-    
+
     created_by UUID NOT NULL REFERENCES users(id),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
     deleted_at TIMESTAMPTZ,
-    
+
     CONSTRAINT valid_entity_type CHECK (entity_type IN ('note', 'task', 'deal', 'email'))
 );
 
@@ -420,30 +422,30 @@ CREATE TABLE email_accounts (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     workspace_id UUID NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    
+
     -- Account info
     email VARCHAR(255) NOT NULL,
     display_name VARCHAR(255),
     provider VARCHAR(50) NOT NULL,
-    
+
     -- OAuth tokens
     access_token TEXT,
     refresh_token TEXT,
     token_expires_at TIMESTAMPTZ,
-    
+
     -- Gmail specific
     gmail_history_id VARCHAR(255),
     gmail_sync_token TEXT,
-    
+
     -- Settings
     is_primary BOOLEAN DEFAULT FALSE,
     sync_enabled BOOLEAN DEFAULT TRUE,
     signature TEXT,
-    
+
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
     deleted_at TIMESTAMPTZ,
-    
+
     CONSTRAINT valid_provider CHECK (provider IN ('gmail', 'outlook', 'smtp'))
 );
 
@@ -454,13 +456,13 @@ CREATE INDEX idx_email_accounts_user ON email_accounts(user_id);
 CREATE TABLE emails (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     workspace_id UUID NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
-    
+
     -- Email identifiers
     message_id VARCHAR(255) NOT NULL,
     thread_id VARCHAR(255),
     in_reply_to VARCHAR(255),
     references TEXT[],
-    
+
     -- Headers
     subject TEXT,
     from_email VARCHAR(255) NOT NULL,
@@ -469,12 +471,12 @@ CREATE TABLE emails (
     cc_emails TEXT[],
     bcc_emails TEXT[],
     reply_to VARCHAR(255),
-    
+
     -- Content
     body_html TEXT,
     body_text TEXT,
     snippet TEXT,
-    
+
     -- Metadata
     folder VARCHAR(50) DEFAULT 'inbox',
     labels TEXT[],
@@ -483,30 +485,30 @@ CREATE TABLE emails (
     is_important BOOLEAN DEFAULT FALSE,
     is_draft BOOLEAN DEFAULT FALSE,
     is_sent BOOLEAN DEFAULT FALSE,
-    
+
     -- Tracking
     tracking_id UUID,
     track_opens BOOLEAN DEFAULT FALSE,
     track_clicks BOOLEAN DEFAULT FALSE,
-    
+
     -- Relationships
     email_account_id UUID REFERENCES email_accounts(id),
     contact_id UUID REFERENCES contacts(id),
     deal_id UUID REFERENCES deals(id),
-    
+
     -- AI analysis
     ai_analysis JSONB DEFAULT '{}',
     sentiment VARCHAR(20),
     category VARCHAR(50),
     priority VARCHAR(20),
-    
+
     -- Timestamps
     sent_at TIMESTAMPTZ,
     received_at TIMESTAMPTZ,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
     deleted_at TIMESTAMPTZ,
-    
+
     CONSTRAINT unique_message_id UNIQUE (workspace_id, message_id)
 );
 
@@ -520,8 +522,8 @@ CREATE INDEX idx_emails_folder ON emails(workspace_id, folder);
 
 -- Full-text search
 CREATE INDEX idx_emails_search ON emails USING gin(
-    to_tsvector('english', 
-        coalesce(subject, '') || ' ' || 
+    to_tsvector('english',
+        coalesce(subject, '') || ' ' ||
         coalesce(body_text, '')
     )
 );
@@ -530,16 +532,16 @@ CREATE INDEX idx_emails_search ON emails USING gin(
 CREATE TABLE email_attachments (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     email_id UUID NOT NULL REFERENCES emails(id) ON DELETE CASCADE,
-    
+
     filename VARCHAR(255) NOT NULL,
     content_type VARCHAR(100),
     size INTEGER,
     storage_url TEXT NOT NULL,
-    
+
     -- Security
     virus_scanned BOOLEAN DEFAULT FALSE,
     virus_scan_result JSONB,
-    
+
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -549,24 +551,24 @@ CREATE INDEX idx_email_attachments_email ON email_attachments(email_id);
 CREATE TABLE email_tracking_events (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     email_id UUID NOT NULL REFERENCES emails(id) ON DELETE CASCADE,
-    
+
     event_type VARCHAR(50) NOT NULL,
-    
+
     -- Event data
     ip_address INET,
     user_agent TEXT,
     referer TEXT,
-    
+
     -- Click tracking
     link_url TEXT,
     link_position INTEGER,
-    
+
     -- Location (from IP)
     country VARCHAR(2),
     city VARCHAR(100),
-    
+
     occurred_at TIMESTAMPTZ DEFAULT NOW(),
-    
+
     CONSTRAINT valid_event_type CHECK (event_type IN ('open', 'click', 'bounce', 'complaint', 'unsubscribe'))
 );
 
@@ -581,25 +583,25 @@ CREATE INDEX idx_tracking_events_occurred ON email_tracking_events(occurred_at D
 CREATE TABLE pipelines (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     workspace_id UUID NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
-    
+
     name VARCHAR(255) NOT NULL,
     type VARCHAR(50) NOT NULL DEFAULT 'sales',
     description TEXT,
-    
+
     -- Settings
     currency VARCHAR(3) DEFAULT 'USD',
     probability_enabled BOOLEAN DEFAULT TRUE,
     rotting_enabled BOOLEAN DEFAULT TRUE,
     rotting_days INTEGER DEFAULT 30,
-    
+
     -- Permissions
     visibility VARCHAR(50) DEFAULT 'everyone',
-    
+
     created_by UUID REFERENCES users(id),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
     deleted_at TIMESTAMPTZ,
-    
+
     CONSTRAINT valid_type CHECK (type IN ('sales', 'recruitment', 'investor', 'vendor', 'custom'))
 );
 
@@ -609,20 +611,20 @@ CREATE INDEX idx_pipelines_workspace ON pipelines(workspace_id);
 CREATE TABLE pipeline_stages (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     pipeline_id UUID NOT NULL REFERENCES pipelines(id) ON DELETE CASCADE,
-    
+
     name VARCHAR(255) NOT NULL,
     order_index INTEGER NOT NULL,
     probability DECIMAL(5,2) DEFAULT 0,
-    
+
     -- Visual
     color VARCHAR(7) DEFAULT '#808080',
-    
+
     -- Automation
     automation_rules JSONB DEFAULT '{}',
-    
+
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
-    
+
     CONSTRAINT unique_stage_order UNIQUE (pipeline_id, order_index)
 );
 
@@ -632,49 +634,49 @@ CREATE INDEX idx_pipeline_stages_pipeline ON pipeline_stages(pipeline_id);
 CREATE TABLE deals (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     workspace_id UUID NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
-    
+
     -- Basic info
     title VARCHAR(255) NOT NULL,
     value DECIMAL(15,2),
     currency VARCHAR(3) DEFAULT 'USD',
-    
+
     -- Pipeline position
     pipeline_id UUID NOT NULL REFERENCES pipelines(id),
     stage_id UUID NOT NULL REFERENCES pipeline_stages(id),
-    
+
     -- Relationships
     contact_id UUID REFERENCES contacts(id),
     company_id UUID REFERENCES companies(id),
     owner_id UUID NOT NULL REFERENCES users(id),
-    
+
     -- Deal details
     probability DECIMAL(5,2),
     expected_close_date DATE,
     actual_close_date DATE,
-    
+
     -- Status
     status VARCHAR(50) DEFAULT 'open',
     won_reason TEXT,
     lost_reason TEXT,
-    
+
     -- Tracking
     stage_entered_at TIMESTAMPTZ DEFAULT NOW(),
     last_activity_at TIMESTAMPTZ,
     rotting_days INTEGER DEFAULT 0,
-    
+
     -- AI predictions
     ai_score DECIMAL(5,2),
     ai_insights JSONB DEFAULT '{}',
     ai_predicted_close_date DATE,
-    
+
     -- Custom fields
     custom_fields JSONB DEFAULT '{}',
-    
+
     created_by UUID REFERENCES users(id),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
     deleted_at TIMESTAMPTZ,
-    
+
     CONSTRAINT valid_status CHECK (status IN ('open', 'won', 'lost'))
 );
 
@@ -692,11 +694,11 @@ CREATE INDEX idx_deals_value ON deals(workspace_id, value DESC);
 CREATE TABLE deal_history (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     deal_id UUID NOT NULL REFERENCES deals(id) ON DELETE CASCADE,
-    
+
     field_name VARCHAR(100) NOT NULL,
     old_value TEXT,
     new_value TEXT,
-    
+
     changed_by UUID NOT NULL REFERENCES users(id),
     changed_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -712,31 +714,31 @@ CREATE INDEX idx_deal_history_changed_at ON deal_history(changed_at DESC);
 CREATE TABLE activities (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     workspace_id UUID NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
-    
+
     -- Activity info
     type VARCHAR(50) NOT NULL,
     title VARCHAR(255) NOT NULL,
     description TEXT,
-    
+
     -- Relationships (polymorphic)
     entity_type VARCHAR(50) NOT NULL,
     entity_id UUID NOT NULL,
-    
+
     -- Specific relationships
     contact_id UUID REFERENCES contacts(id),
     deal_id UUID REFERENCES deals(id),
     company_id UUID REFERENCES companies(id),
-    
+
     -- User info
     user_id UUID REFERENCES users(id),
-    
+
     -- Metadata
     metadata JSONB DEFAULT '{}',
-    
+
     -- Timestamps
     occurred_at TIMESTAMPTZ DEFAULT NOW(),
     created_at TIMESTAMPTZ DEFAULT NOW(),
-    
+
     CONSTRAINT valid_type CHECK (type IN (
         'email_sent', 'email_received', 'email_opened', 'email_clicked',
         'meeting_held', 'meeting_scheduled', 'call_made', 'call_received',
@@ -761,40 +763,40 @@ CREATE INDEX idx_activities_type ON activities(workspace_id, type);
 CREATE TABLE tasks (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     workspace_id UUID NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
-    
+
     -- Task info
     title VARCHAR(255) NOT NULL,
     description TEXT,
     type VARCHAR(50) DEFAULT 'task',
     priority VARCHAR(20) DEFAULT 'medium',
-    
+
     -- Relationships
     contact_id UUID REFERENCES contacts(id),
     deal_id UUID REFERENCES deals(id),
     company_id UUID REFERENCES companies(id),
-    
+
     -- Assignment
     assigned_to UUID NOT NULL REFERENCES users(id),
     assigned_by UUID REFERENCES users(id),
-    
+
     -- Scheduling
     due_date DATE,
     due_time TIME,
     reminder_minutes INTEGER,
-    
+
     -- Status
     status VARCHAR(50) DEFAULT 'pending',
     completed_at TIMESTAMPTZ,
     completed_by UUID REFERENCES users(id),
-    
+
     -- Recurrence
     recurrence_rule JSONB,
     recurrence_parent_id UUID REFERENCES tasks(id),
-    
+
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
     deleted_at TIMESTAMPTZ,
-    
+
     CONSTRAINT valid_type CHECK (type IN ('task', 'call', 'email', 'meeting')),
     CONSTRAINT valid_priority CHECK (priority IN ('low', 'medium', 'high', 'urgent')),
     CONSTRAINT valid_status CHECK (status IN ('pending', 'in_progress', 'completed', 'cancelled'))
@@ -816,24 +818,24 @@ CREATE INDEX idx_tasks_status ON tasks(status);
 CREATE TABLE ai_models (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     workspace_id UUID NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
-    
+
     name VARCHAR(255) NOT NULL,
     type VARCHAR(50) NOT NULL,
     provider VARCHAR(50) NOT NULL,
     model_id VARCHAR(255),
-    
+
     -- Configuration
     config JSONB DEFAULT '{}',
-    
+
     -- Performance metrics
     metrics JSONB DEFAULT '{}',
-    
+
     -- Status
     status VARCHAR(50) DEFAULT 'active',
-    
+
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
-    
+
     CONSTRAINT valid_type CHECK (type IN ('classification', 'generation', 'embedding', 'analysis')),
     CONSTRAINT valid_provider CHECK (provider IN ('openai', 'anthropic', 'perplexity', 'custom'))
 );
@@ -842,41 +844,41 @@ CREATE TABLE ai_models (
 CREATE TABLE automations (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     workspace_id UUID NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
-    
+
     name VARCHAR(255) NOT NULL,
     description TEXT,
     category VARCHAR(50),
-    
+
     -- Trigger configuration
     trigger_type VARCHAR(50) NOT NULL,
     trigger_config JSONB NOT NULL,
-    
+
     -- Conditions
     conditions JSONB DEFAULT '[]',
-    
+
     -- Actions
     actions JSONB NOT NULL,
-    
+
     -- Settings
     enabled BOOLEAN DEFAULT TRUE,
     run_once BOOLEAN DEFAULT FALSE,
-    
+
     -- Error handling
     on_error VARCHAR(50) DEFAULT 'stop',
     max_retries INTEGER DEFAULT 3,
-    
+
     -- Execution stats
     last_run_at TIMESTAMPTZ,
     next_run_at TIMESTAMPTZ,
     run_count INTEGER DEFAULT 0,
     success_count INTEGER DEFAULT 0,
     error_count INTEGER DEFAULT 0,
-    
+
     created_by UUID REFERENCES users(id),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
     deleted_at TIMESTAMPTZ,
-    
+
     CONSTRAINT valid_trigger_type CHECK (trigger_type IN (
         'contact_created', 'contact_updated', 'contact_tagged',
         'email_received', 'email_opened', 'email_clicked',
@@ -893,25 +895,25 @@ CREATE INDEX idx_automations_trigger ON automations(trigger_type);
 CREATE TABLE automation_executions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     automation_id UUID NOT NULL REFERENCES automations(id) ON DELETE CASCADE,
-    
+
     -- Trigger info
     triggered_by VARCHAR(50),
     trigger_entity_type VARCHAR(50),
     trigger_entity_id UUID,
-    
+
     -- Execution details
     status VARCHAR(50) NOT NULL,
     started_at TIMESTAMPTZ DEFAULT NOW(),
     completed_at TIMESTAMPTZ,
-    
+
     -- Results
     actions_executed JSONB DEFAULT '[]',
     error_message TEXT,
     error_details JSONB,
-    
+
     -- Metrics
     duration_ms INTEGER,
-    
+
     CONSTRAINT valid_status CHECK (status IN ('running', 'completed', 'failed', 'cancelled'))
 );
 
@@ -922,34 +924,34 @@ CREATE INDEX idx_automation_executions_started ON automation_executions(started_
 CREATE TABLE ai_tasks (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     workspace_id UUID NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
-    
+
     type VARCHAR(50) NOT NULL,
     status VARCHAR(50) DEFAULT 'pending',
-    
+
     -- Input/Output
     input JSONB NOT NULL,
     output JSONB,
-    
+
     -- Model info
     model_provider VARCHAR(50),
     model_name VARCHAR(100),
-    
+
     -- Metrics
     tokens_used INTEGER,
     cost_cents INTEGER,
     duration_ms INTEGER,
-    
+
     -- Error handling
     error_message TEXT,
     retry_count INTEGER DEFAULT 0,
-    
+
     -- User context
     user_id UUID REFERENCES users(id),
-    
+
     created_at TIMESTAMPTZ DEFAULT NOW(),
     started_at TIMESTAMPTZ,
     completed_at TIMESTAMPTZ,
-    
+
     CONSTRAINT valid_type CHECK (type IN (
         'email_generation', 'email_reply', 'summarization',
         'sentiment_analysis', 'entity_extraction', 'classification',
@@ -970,30 +972,30 @@ CREATE INDEX idx_ai_tasks_created ON ai_tasks(created_at DESC);
 CREATE TABLE custom_field_definitions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     workspace_id UUID NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
-    
+
     object_type VARCHAR(50) NOT NULL,
     field_name VARCHAR(100) NOT NULL,
     field_type VARCHAR(50) NOT NULL,
-    
+
     -- Display
     label VARCHAR(255) NOT NULL,
     description TEXT,
     placeholder TEXT,
-    
+
     -- Validation
     required BOOLEAN DEFAULT FALSE,
     validation_rules JSONB DEFAULT '{}',
-    
+
     -- Options (for select/multiselect)
     options JSONB,
-    
+
     -- Settings
     is_active BOOLEAN DEFAULT TRUE,
     order_index INTEGER DEFAULT 0,
-    
+
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
-    
+
     CONSTRAINT valid_object_type CHECK (object_type IN ('contact', 'company', 'deal')),
     CONSTRAINT valid_field_type CHECK (field_type IN ('text', 'number', 'date', 'datetime', 'boolean', 'select', 'multiselect', 'url', 'email', 'phone')),
     CONSTRAINT unique_field_name UNIQUE (workspace_id, object_type, field_name)
@@ -1005,23 +1007,23 @@ CREATE INDEX idx_custom_fields_workspace ON custom_field_definitions(workspace_i
 CREATE TABLE saved_views (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     workspace_id UUID NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
-    
+
     name VARCHAR(255) NOT NULL,
     object_type VARCHAR(50) NOT NULL,
-    
+
     -- View configuration
     filters JSONB NOT NULL,
     columns JSONB,
     sort_by VARCHAR(100),
     sort_order VARCHAR(4) DEFAULT 'ASC',
-    
+
     -- Sharing
     visibility VARCHAR(50) DEFAULT 'private',
     created_by UUID NOT NULL REFERENCES users(id),
-    
+
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
-    
+
     CONSTRAINT valid_visibility CHECK (visibility IN ('private', 'workspace'))
 );
 
@@ -1032,30 +1034,30 @@ CREATE INDEX idx_saved_views_user ON saved_views(created_by);
 CREATE TABLE reports (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     workspace_id UUID NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
-    
+
     name VARCHAR(255) NOT NULL,
     type VARCHAR(50) NOT NULL,
     description TEXT,
-    
+
     -- Report configuration
     config JSONB NOT NULL,
-    
+
     -- Scheduling
     schedule_enabled BOOLEAN DEFAULT FALSE,
     schedule_cron VARCHAR(100),
     schedule_timezone VARCHAR(50) DEFAULT 'UTC',
-    
+
     -- Distribution
     recipients JSONB DEFAULT '[]',
-    
+
     -- Cache
     last_generated_at TIMESTAMPTZ,
     cached_data JSONB,
-    
+
     created_by UUID NOT NULL REFERENCES users(id),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
-    
+
     CONSTRAINT valid_type CHECK (type IN ('pipeline', 'activity', 'email', 'revenue', 'custom'))
 );
 
@@ -1085,7 +1087,7 @@ BEGIN
     start_date := date_trunc('month', CURRENT_DATE);
     end_date := start_date + interval '1 month';
     partition_name := 'activities_' || to_char(start_date, 'YYYY_MM');
-    
+
     EXECUTE format('CREATE TABLE IF NOT EXISTS %I PARTITION OF activities FOR VALUES FROM (%L) TO (%L)',
         partition_name, start_date, end_date);
 END;
@@ -1131,7 +1133,7 @@ CREATE POLICY deal_access ON deals
 ```sql
 -- Contact engagement scores
 CREATE MATERIALIZED VIEW contact_engagement_scores AS
-SELECT 
+SELECT
     c.id,
     c.workspace_id,
     COUNT(DISTINCT e.id) as email_count,
@@ -1139,7 +1141,7 @@ SELECT
     COUNT(DISTINCT CASE WHEN et.event_type = 'click' THEN et.id END) as email_clicks,
     COUNT(DISTINCT a.id) as activity_count,
     MAX(a.occurred_at) as last_activity_at,
-    
+
     -- Calculate engagement score
     (
         COUNT(DISTINCT CASE WHEN et.event_type = 'open' THEN et.id END) * 1 +
@@ -1147,7 +1149,7 @@ SELECT
         COUNT(DISTINCT CASE WHEN a.type = 'meeting_held' THEN a.id END) * 10 +
         COUNT(DISTINCT CASE WHEN a.type = 'email_received' THEN a.id END) * 5
     ) as engagement_score
-    
+
 FROM contacts c
 LEFT JOIN emails e ON c.id = e.contact_id
 LEFT JOIN email_tracking_events et ON e.id = et.email_id
@@ -1160,7 +1162,7 @@ CREATE INDEX idx_engagement_scores_score ON contact_engagement_scores(workspace_
 
 -- Refresh every hour
 CREATE EXTENSION IF NOT EXISTS pg_cron;
-SELECT cron.schedule('refresh-engagement-scores', '0 * * * *', 
+SELECT cron.schedule('refresh-engagement-scores', '0 * * * *',
     'REFRESH MATERIALIZED VIEW CONCURRENTLY contact_engagement_scores');
 ```
 
@@ -1178,24 +1180,24 @@ BEGIN
         'recent_emails', (
             SELECT json_agg(row_to_json(e.*))
             FROM (
-                SELECT * FROM emails 
-                WHERE contact_id = p_contact_id 
-                ORDER BY received_at DESC 
+                SELECT * FROM emails
+                WHERE contact_id = p_contact_id
+                ORDER BY received_at DESC
                 LIMIT 10
             ) e
         ),
         'activities', (
             SELECT json_agg(row_to_json(a.*))
             FROM (
-                SELECT * FROM activities 
-                WHERE contact_id = p_contact_id 
-                ORDER BY occurred_at DESC 
+                SELECT * FROM activities
+                WHERE contact_id = p_contact_id
+                ORDER BY occurred_at DESC
                 LIMIT 20
             ) a
         ),
         'deals', (
             SELECT json_agg(row_to_json(d.*))
-            FROM deals d 
+            FROM deals d
             WHERE d.contact_id = p_contact_id
         ),
         'tags', (
@@ -1252,7 +1254,7 @@ find /backup/logical -name "*.dump" -mtime +30 -delete
 
 ```sql
 -- Table sizes
-SELECT 
+SELECT
     schemaname,
     tablename,
     pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename)) AS size,
@@ -1262,7 +1264,7 @@ WHERE schemaname NOT IN ('pg_catalog', 'information_schema')
 ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC;
 
 -- Slow queries
-SELECT 
+SELECT
     query,
     calls,
     mean_exec_time,
@@ -1274,7 +1276,7 @@ ORDER BY mean_exec_time DESC
 LIMIT 20;
 
 -- Index usage
-SELECT 
+SELECT
     schemaname,
     tablename,
     indexname,
@@ -1285,7 +1287,7 @@ FROM pg_stat_user_indexes
 ORDER BY idx_scan;
 
 -- Cache hit ratio
-SELECT 
+SELECT
     sum(heap_blks_read) as heap_read,
     sum(heap_blks_hit)  as heap_hit,
     sum(heap_blks_hit) / (sum(heap_blks_hit) + sum(heap_blks_read)) as ratio
@@ -1295,6 +1297,7 @@ FROM pg_statio_user_tables;
 ## Best Practices
 
 ### Naming Conventions
+
 - Tables: Plural, snake_case (e.g., `contacts`, `email_accounts`)
 - Columns: Singular, snake_case (e.g., `first_name`, `created_at`)
 - Indexes: `idx_<table>_<column(s)>` (e.g., `idx_contacts_email`)
@@ -1302,6 +1305,7 @@ FROM pg_statio_user_tables;
 - Constraints: Descriptive names (e.g., `valid_email_format`)
 
 ### Data Types
+
 - UUIDs for all primary keys
 - TIMESTAMPTZ for all timestamps
 - JSONB for flexible/extensible data
@@ -1309,6 +1313,7 @@ FROM pg_statio_user_tables;
 - DECIMAL for monetary values
 
 ### Performance Guidelines
+
 1. Index foreign keys and commonly queried columns
 2. Use partial indexes for filtered queries
 3. Leverage JSONB indexes for custom fields
@@ -1317,6 +1322,7 @@ FROM pg_statio_user_tables;
 6. Regular VACUUM and ANALYZE
 
 ### Security Guidelines
+
 1. Enable RLS on all user-data tables
 2. Use workspace_id for multi-tenancy isolation
 3. Audit sensitive operations

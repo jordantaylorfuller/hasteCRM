@@ -148,7 +148,7 @@ export function EmailList({
                 onCheckedChange={() => toggleEmailSelection(email.id)}
                 onClick={(e) => e.stopPropagation()}
               />
-              
+
               <Button
                 variant="ghost"
                 size="icon"
@@ -211,7 +211,10 @@ export function EmailList({
               </div>
 
               <DropdownMenu>
-                <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                <DropdownMenuTrigger
+                  asChild
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <Button variant="ghost" size="icon" className="h-8 w-8">
                     <span className="sr-only">Open menu</span>
                     <svg

@@ -1,6 +1,7 @@
 # Architecture Overview
 
 ## Table of Contents
+
 1. [System Architecture](#system-architecture)
 2. [Technology Decisions](#technology-decisions)
 3. [Architecture Principles](#architecture-principles)
@@ -24,32 +25,32 @@ The hasteCRM is built using a modern, scalable microservices architecture with A
 ┌─────────────────────────────────────────────────────────────────────┐
 │                        Load Balancer (nginx)                        │
 └───────────────────────┬─────────────────────┬──────────────────────┘
-                       │                     │                        
-                       ↓                     ↓                        
-           ┌───────────────────────┐   ┌───────────────────┐             
-           │  Web App (3000)       │   │   API Gateway     │             
-           │  Next.js 14           │   │   (4000)          │             
-           │  - React 18           │   │   NestJS + GQL    │             
-           │  - Tailwind CSS       │   │                   │             
-           │  - Shadcn/ui          │   │                   │             
-           └───────────────────────┘   └─────────┬─────────┘             
-                                                 │                        
-                                                 ↓                        
-                                 ┌───────────────────────────┐            
-                                 │    Service Mesh       │            
-                                 │ (Internal Services)   │            
-                                 ├───────────────────────┤            
-                                 │ • Auth Service        │            
-                                 │ • Contact Service     │            
-                                 │ • Email Service       │            
-                                 │ • Pipeline Service    │            
-                                 │ • AI Orchestration    │            
-                                 │ • Analytics Service   │            
-                                 └───────────┬───────────┘            
-                                             │                        
-                                             ↓                        
-                    ┌────────────────────────┴─────────────────────┐   
-                    │                                             │   
+                       │                     │
+                       ↓                     ↓
+           ┌───────────────────────┐   ┌───────────────────┐
+           │  Web App (3000)       │   │   API Gateway     │
+           │  Next.js 14           │   │   (4000)          │
+           │  - React 18           │   │   NestJS + GQL    │
+           │  - Tailwind CSS       │   │                   │
+           │  - Shadcn/ui          │   │                   │
+           └───────────────────────┘   └─────────┬─────────┘
+                                                 │
+                                                 ↓
+                                 ┌───────────────────────────┐
+                                 │    Service Mesh       │
+                                 │ (Internal Services)   │
+                                 ├───────────────────────┤
+                                 │ • Auth Service        │
+                                 │ • Contact Service     │
+                                 │ • Email Service       │
+                                 │ • Pipeline Service    │
+                                 │ • AI Orchestration    │
+                                 │ • Analytics Service   │
+                                 └───────────┬───────────┘
+                                             │
+                                             ↓
+                    ┌────────────────────────┴─────────────────────┐
+                    │                                             │
        ┌────────────┴──────┐    ┌────────────┴───────┐   ┌────────┴──────┐
        │   PostgreSQL      │    │      Redis         │   │ Message Queue │
        │   Primary DB      │    │  Cache/Sessions    │   │    BullMQ     │
@@ -62,27 +63,30 @@ The hasteCRM is built using a modern, scalable microservices architecture with A
 
 ### Why These Technologies?
 
-| Component | Technology | Version | Justification |
-|-----------|-----------|---------|--------------|
-| Frontend | Next.js | 14.x | App Router for better performance, RSC support |
-| Backend | NestJS | 10.x | Enterprise-grade structure, built-in DI |
-| Database | PostgreSQL | 15+ | JSONB for flexibility, pgvector for AI embeddings |
-| Cache | Redis | 7.2+ | Streams for event sourcing, JSON support |
-| Queue | BullMQ | 4.x | Redis-based, better than RabbitMQ for our scale |
-| AI Orchestration | LangChain | 0.1.x | Unified interface for multiple LLMs |
-| Container | Docker | 24.x | Industry standard, great ecosystem |
-| Orchestration | Kubernetes | 1.28+ | Production-grade container orchestration |
-| Monitoring | Prometheus | 2.x | Time-series metrics, Kubernetes native |
+| Component        | Technology | Version | Justification                                     |
+| ---------------- | ---------- | ------- | ------------------------------------------------- |
+| Frontend         | Next.js    | 14.x    | App Router for better performance, RSC support    |
+| Backend          | NestJS     | 10.x    | Enterprise-grade structure, built-in DI           |
+| Database         | PostgreSQL | 15+     | JSONB for flexibility, pgvector for AI embeddings |
+| Cache            | Redis      | 7.2+    | Streams for event sourcing, JSON support          |
+| Queue            | BullMQ     | 4.x     | Redis-based, better than RabbitMQ for our scale   |
+| AI Orchestration | LangChain  | 0.1.x   | Unified interface for multiple LLMs               |
+| Container        | Docker     | 24.x    | Industry standard, great ecosystem                |
+| Orchestration    | Kubernetes | 1.28+   | Production-grade container orchestration          |
+| Monitoring       | Prometheus | 2.x     | Time-series metrics, Kubernetes native            |
 
 ## Architecture Principles
 
 ### 1. AI-First Design
+
 Every component is designed with AI integration in mind:
+
 - Natural language interfaces for user interactions
 - AI-powered data processing pipelines
 - Intelligent caching and prediction systems
 
 ### 2. Event-Driven Architecture
+
 ```
 User Action → API Gateway → Service → Event Bus → Subscribers
                                            ↓
@@ -94,11 +98,13 @@ User Action → API Gateway → Service → Event Bus → Subscribers
 ### 3. Multi-Tenancy```
 
 ### 3. Multi-Tenancy
+
 - Workspace-level isolation
 - Row-level security (RLS) in PostgreSQL
 - Separate Redis namespaces per workspace
 
 ### 4. Scalability Patterns
+
 - Horizontal scaling for all services
 - Read replicas for database
 - Redis clustering for cache
@@ -107,6 +113,7 @@ User Action → API Gateway → Service → Event Bus → Subscribers
 ## Service Communication
 
 ### Synchronous Communication
+
 ```mermaid
 graph LR
     A[API Gateway] -->|GraphQL| B[Contact Service]
@@ -115,6 +122,7 @@ graph LR
 ```
 
 ### Asynchronous Communication
+
 ```mermaid
 graph LR
     A[Contact Service] -->|Publish| B[Event Bus]
@@ -124,6 +132,7 @@ graph LR
 ```
 
 ### Communication Patterns:
+
 - **Request-Response**: GraphQL for client queries
 - **Event Sourcing**: All state changes emit events
 - **CQRS**: Separate read/write models
@@ -132,6 +141,7 @@ graph LR
 ## Core Components
 
 ### Frontend (Next.js Application)
+
 ```typescript
 // Key architectural decisions:
 - App Router for better performance
@@ -142,6 +152,7 @@ graph LR
 ```
 
 ### API Gateway (NestJS + GraphQL)
+
 ```typescript
 // Architecture patterns:
 - GraphQL for flexible queries
@@ -152,7 +163,9 @@ graph LR
 ```
 
 ### Service Layer
+
 Each service follows Domain-Driven Design:
+
 ```
 Service/
     domain/          # Business logic
@@ -171,6 +184,7 @@ Service/
 ```
 
 ### AI Integration Layer
+
 ```
          ┌─────────────────┐
          │   AI Gateway    │
@@ -190,6 +204,7 @@ Service/
 ## Resilience Patterns
 
 ### Circuit Breaker Implementation
+
 ```typescript
 // AI Service calls with circuit breaker
 @CircuitBreaker({
@@ -203,11 +218,13 @@ async callClaudeAPI(prompt: string) {
 ```
 
 ### Retry Strategies
+
 - **Exponential Backoff**: For transient failures
 - **Dead Letter Queue**: For persistent failures
 - **Fallback Responses**: Graceful degradation
 
 ### Health Checks
+
 ```yaml
 /health/live    - Kubernetes liveness probe
 /health/ready   - Kubernetes readiness probe
@@ -217,6 +234,7 @@ async callClaudeAPI(prompt: string) {
 ## Data Flow Examples
 
 ### Email Processing Flow
+
 ```mermaid
 sequenceDiagram
     participant Gmail
@@ -225,7 +243,7 @@ sequenceDiagram
     participant EmailService
     participant AI
     participant DB
-    
+
     Gmail->>Webhook: New email notification
     Webhook->>Queue: Enqueue email job
     Queue->>EmailService: Process email
@@ -237,6 +255,7 @@ sequenceDiagram
 ```
 
 ### Contact Creation Flow
+
 ```mermaid
 sequenceDiagram
     participant Client
@@ -244,7 +263,7 @@ sequenceDiagram
     participant ContactService
     participant AI
     participant EventBus
-    
+
     Client->>API: Create contact mutation
     API->>ContactService: Validate & create
     ContactService->>AI: Enrich contact data
@@ -257,14 +276,16 @@ sequenceDiagram
 ## Performance Targets
 
 ### API Performance
-| Endpoint Type | Target (p95) | Current | SLO |
-|--------------|-------------|---------|-----|
-| GraphQL Query | <100ms | 85ms | 99.9% |
-| GraphQL Mutation | <200ms | 150ms | 99.5% |
-| File Upload | <5s | 3.2s | 99% |
-| WebSocket Message | <50ms | 35ms | 99.9% |
+
+| Endpoint Type     | Target (p95) | Current | SLO   |
+| ----------------- | ------------ | ------- | ----- |
+| GraphQL Query     | <100ms       | 85ms    | 99.9% |
+| GraphQL Mutation  | <200ms       | 150ms   | 99.5% |
+| File Upload       | <5s          | 3.2s    | 99%   |
+| WebSocket Message | <50ms        | 35ms    | 99.9% |
 
 ### Throughput Targets
+
 - Email Processing: 10,000/minute
 - API Requests: 1,000 RPS
 - WebSocket Connections: 50,000 concurrent
@@ -273,12 +294,14 @@ sequenceDiagram
 ## Data Architecture
 
 ### Primary Database (PostgreSQL)
+
 - **Version**: 15+
 - **Extensions**: pgvector (for embeddings), uuid-ossp
 - **Partitioning**: Time-based for activities and emails
 - **Indexes**: Carefully optimized for common queries
 
 ### Caching Strategy (Redis)
+
 ```
 Cache Layers:
 1. Session Cache    - User sessions (TTL: 24h)
@@ -288,6 +311,7 @@ Cache Layers:
 ```
 
 ### Message Queue (BullMQ)
+
 ```
 Queues:
 - email-sync       - Gmail synchronization
@@ -300,6 +324,7 @@ Queues:
 ## Security Zones
 
 ### Network Architecture
+
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │              DMZ (Public Zone)                      │
@@ -307,16 +332,16 @@ Queues:
 │  │     WAF     │         │      LB     │          │
 │  └─────────────┘         └─────────────┘          │
 └──────────────────────────┬──────────────────────────┘
-                           │                          
-                           ↓                          
+                           │
+                           ↓
 ┌──────────────────────────┴──────────────────────────┐
 │          Application Zone (Private)                │
 │  ┌─────────────┐         ┌─────────────┐          │
 │  │     Web     │         │     API     │          │
 │  └─────────────┘         └─────────────┘          │
 └──────────────────────────┬──────────────────────────┘
-                           │                          
-                           ↓                          
+                           │
+                           ↓
 ┌──────────────────────────┴──────────────────────────┐
 │           Data Zone (Restricted)                   │
 │  ┌─────────────┐         ┌─────────────┐          │
@@ -328,6 +353,7 @@ Queues:
 ### Authentication & Authorization```
 
 ### Authentication & Authorization
+
 ```
 Request Flow:
 1. Client → JWT Token
@@ -337,6 +363,7 @@ Request Flow:
 ```
 
 ### Data Encryption
+
 - **At Rest**: AES-256 for sensitive data
 - **In Transit**: TLS 1.3 minimum
 - **Secrets**: Vault for API keys
@@ -345,21 +372,25 @@ Request Flow:
 ## Cost Optimization
 
 ### Resource Allocation
+
 ```yaml
 Service CPU/Memory Allocation:
-- API Gateway: 2 CPU, 4GB RAM
-- Services: 1 CPU, 2GB RAM
-- AI Workers: 4 CPU, 8GB RAM
-- Cache: 4 CPU, 16GB RAM
+  - API Gateway: 2 CPU, 4GB RAM
+  - Services: 1 CPU, 2GB RAM
+  - AI Workers: 4 CPU, 8GB RAM
+  - Cache: 4 CPU, 16GB RAM
 ```
 
 ### Cost Reduction Strategies
+
 1. **AI API Optimization**
+
    - Cache common responses
    - Use cheaper models for simple tasks
    - Batch requests when possible
 
 2. **Database Optimization**
+
    - Automatic partitioning for old data
    - Archive to cold storage after 1 year
    - Read replicas only for analytics
@@ -372,6 +403,7 @@ Service CPU/Memory Allocation:
 ## Real-time Architecture
 
 ### WebSocket Strategy
+
 ```
 Client ↔ WebSocket ↔ API Gateway
                            ↓
@@ -383,6 +415,7 @@ Client ↔ WebSocket ↔ API Gateway
 ```
 
 ### Event Types
+
 - Contact updates
 - Email arrival
 - Pipeline changes
@@ -392,6 +425,7 @@ Client ↔ WebSocket ↔ API Gateway
 ## Deployment Architecture
 
 ### Container Strategy
+
 ```
 Each service runs in its own container:
 - web:latest       - Frontend application
@@ -403,34 +437,38 @@ Each service runs in its own container:
 ```
 
 ### Kubernetes Deployment
+
 ```yaml
 Namespace: haste-crm
-    Deployments
-        web-deployment
-        api-deployment
-        service-deployments
-    Services
-        web-service
-        api-service
-        internal-services
-    ConfigMaps
-        app-config
-    Secrets
-        api-keys
+  Deployments
+  web-deployment
+  api-deployment
+  service-deployments
+  Services
+  web-service
+  api-service
+  internal-services
+  ConfigMaps
+  app-config
+  Secrets
+  api-keys
 ```
 
 ## Disaster Recovery
 
 ### Backup Strategy
+
 - **Database**: Continuous replication + daily snapshots
 - **File Storage**: Cross-region replication
 - **Configuration**: Git-based with encrypted secrets
 
 ### RTO/RPO Targets
+
 - **RTO** (Recovery Time Objective): 1 hour
 - **RPO** (Recovery Point Objective): 5 minutes
 
 ### Failover Procedures
+
 1. Automatic health check failure detection
 2. DNS failover to standby region (5 min)
 3. Database promotion if needed (10 min)
@@ -440,20 +478,23 @@ Namespace: haste-crm
 ## Monitoring & Alerting
 
 ### Three Pillars
+
 1. **Logs**: Structured JSON logging → ELK Stack
 2. **Metrics**: Prometheus + Grafana dashboards
 3. **Traces**: OpenTelemetry → Jaeger
 
 ### Critical Alerts
-| Metric | Threshold | Action |
-|--------|-----------|--------|
-| API Error Rate | >1% | Page on-call |
-| Response Time | >500ms (p95) | Investigate |
-| AI API Failures | >5 in 5min | Failover to backup |
-| Email Queue Depth | >10,000 | Scale workers |
-| Database CPU | >80% | Scale up |
+
+| Metric            | Threshold    | Action             |
+| ----------------- | ------------ | ------------------ |
+| API Error Rate    | >1%          | Page on-call       |
+| Response Time     | >500ms (p95) | Investigate        |
+| AI API Failures   | >5 in 5min   | Failover to backup |
+| Email Queue Depth | >10,000      | Scale workers      |
+| Database CPU      | >80%         | Scale up           |
 
 ### Dashboards
+
 1. **Executive Dashboard**: KPIs, revenue impact
 2. **Operations Dashboard**: System health
 3. **AI Usage Dashboard**: Costs and performance
@@ -462,8 +503,9 @@ Namespace: haste-crm
 ## Development Environment
 
 ### Local Development Stack
+
 ```yaml
-version: '3.8'
+version: "3.8"
 services:
   # Development database with sample data
   postgres:
@@ -472,14 +514,14 @@ services:
       - ./init.sql:/docker-entrypoint-initdb.d/
     ports:
       - "5432:5432"
-    
+
   # Redis with persistence disabled
   redis:
     image: redis:7-alpine
     command: redis-server --save ""
     ports:
       - "6379:6379"
-    
+
   # Local S3 (MinIO)
   minio:
     image: minio/minio
@@ -487,7 +529,7 @@ services:
     ports:
       - "9000:9000"
       - "9001:9001"
-    
+
   # Email testing (MailHog)
   mailhog:
     image: mailhog/mailhog
@@ -497,6 +539,7 @@ services:
 ```
 
 ### Development Workflow
+
 ```
 1. Git Push → GitHub
 2. GitHub Actions → Run Tests
@@ -510,6 +553,7 @@ services:
 ## Frontend Architecture
 
 ### Component Structure
+
 ```
 components/
     ui/              # Shadcn/ui components
@@ -522,6 +566,7 @@ components/
 ```
 
 ### State Management
+
 ```typescript
 // Using Zustand for client state
 // Server state via React Query + GraphQL
@@ -540,13 +585,16 @@ Server State:
 ## Integration Points
 
 ### External Services
+
 1. **Google Workspace**
+
    - OAuth 2.0 for authentication
    - Gmail API for email sync
    - Google Drive for attachments
    - Calendar API for meetings
 
 2. **AI Services**
+
    - Claude API for complex reasoning
    - GPT-4 for content generation
    - Perplexity for web research
@@ -561,12 +609,14 @@ Server State:
 ## Scaling Considerations
 
 ### Horizontal Scaling
+
 - Stateless services
 - Load balancer distribution
 - Database read replicas
 - Redis cluster mode
 
 ### Performance Optimizations
+
 - GraphQL query complexity limits
 - Database connection pooling
 - Aggressive caching strategy
@@ -576,6 +626,7 @@ Server State:
 ## Future Architecture
 
 ### Planned Enhancements
+
 1. **Edge Computing**: Deploy workers closer to users
 2. **ML Pipeline**: Custom model training infrastructure
 3. **Data Lake**: Historical data analysis
@@ -585,6 +636,7 @@ Server State:
 ## API Versioning Strategy
 
 ### Version Management
+
 We follow a URI-based versioning approach with backward compatibility guarantees:
 
 ```typescript
@@ -608,6 +660,7 @@ type ContactV2 {
 ```
 
 ### Deprecation Policy
+
 - 6-month deprecation notice
 - Automatic migration tools provided
 - Usage analytics before removal
@@ -616,10 +669,11 @@ type ContactV2 {
 ## Development Best Practices
 
 ### Code Organization
+
 ```
 src/
 ├── modules/           # Feature modules
-│   ├── contacts/     
+│   ├── contacts/
 │   │   ├── domain/    # Business logic
 │   │   ├── api/       # Controllers/Resolvers
 │   │   ├── infra/     # Database/External
@@ -630,6 +684,7 @@ src/
 ```
 
 ### Testing Strategy
+
 1. **Unit Tests**: 80% coverage minimum
 2. **Integration Tests**: Critical paths
 3. **E2E Tests**: User journeys
@@ -637,6 +692,7 @@ src/
 5. **Contract Tests**: API compatibility
 
 ### Code Quality Standards
+
 - ESLint + Prettier for consistency
 - Pre-commit hooks for validation
 - Required PR reviews (2 approvers)
@@ -644,6 +700,7 @@ src/
 - Performance budgets enforcement
 
 ### CI/CD Pipeline
+
 ```yaml
 Pipeline Stages:
 1. Lint & Format Check
@@ -662,6 +719,7 @@ Pipeline Stages:
 > **Note**: See [MASTER-CONFIG.md](../MASTER-CONFIG.md#monitoring-stack) for the authoritative monitoring stack configuration.
 
 ### Production Observability Stack
+
 ```
 ┌─────────────────────────────────────────────────────┐
 │                  Datadog Platform                    │
@@ -680,6 +738,7 @@ Pipeline Stages:
 ```
 
 ### Key Metrics
+
 ```typescript
 // Business Metrics
 - Monthly Active Users (MAU)
@@ -704,12 +763,13 @@ Pipeline Stages:
 ```
 
 ### Alerting Rules
+
 ```yaml
 # Critical Alerts (PagerDuty)
 - name: API_HIGH_ERROR_RATE
   expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.05
   severity: critical
-  
+
 - name: DATABASE_CONNECTION_POOL_EXHAUSTED
   expr: pg_connection_pool_available == 0
   severity: critical
@@ -721,6 +781,7 @@ Pipeline Stages:
 ```
 
 ### Distributed Tracing
+
 ```typescript
 // Trace Context Propagation
 interface TraceContext {
@@ -743,6 +804,7 @@ async processEmail(emailId: string): Promise<void> {
 ```
 
 ### Log Aggregation
+
 ```json
 {
   "timestamp": "2024-01-10T10:30:45.123Z",
@@ -762,6 +824,7 @@ async processEmail(emailId: string): Promise<void> {
 ## Performance Optimization Strategies
 
 ### Database Optimization
+
 - Connection pooling with pgBouncer
 - Prepared statements caching
 - Materialized views for analytics
@@ -769,6 +832,7 @@ async processEmail(emailId: string): Promise<void> {
 - Query optimization with EXPLAIN ANALYZE
 
 ### Caching Strategy
+
 ```typescript
 // Multi-layer caching
 1. Browser Cache (static assets)
@@ -784,6 +848,7 @@ async processEmail(emailId: string): Promise<void> {
 ```
 
 ### API Performance
+
 - GraphQL query complexity analysis
 - DataLoader for N+1 prevention
 - Field-level caching

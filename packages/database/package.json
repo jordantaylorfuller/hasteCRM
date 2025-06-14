@@ -1,8 +1,8 @@
 {
   "name": "@hasteCRM/database",
   "version": "0.0.1",
-  "main": "./index.ts",
-  "types": "./index.ts",
+  "main": "./index.js",
+  "types": "./index.d.ts",
   "scripts": {
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
@@ -10,6 +10,9 @@
     "db:studio": "prisma studio"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
     "@prisma/client": "^6.9.0"
   },
   "devDependencies": {

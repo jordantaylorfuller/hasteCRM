@@ -15,7 +15,6 @@ module.exports = {
   testEnvironment: 'node',
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
-    '^@hasteCRM/database$': '<rootDir>/../../packages/database/src',
   },
   setupFilesAfterEnv: ['<rootDir>/../test/jest.setup.ts'],
   moduleDirectories: ['node_modules', '<rootDir>'],

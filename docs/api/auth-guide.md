@@ -44,6 +44,7 @@ X-API-Key: ak_live_xxxxxxxxxxxxxxxxxxx
 ### 3. OAuth 2.0
 
 Supported providers:
+
 - Google
 - Microsoft
 - GitHub
@@ -63,20 +64,20 @@ GET /api/v1/auth/google/callback?code=xxx&state=yyy
 ```javascript
 // With Apollo Client
 const client = new ApolloClient({
-  uri: 'https://api.haste.nyc/graphql',
+  uri: "https://api.haste.nyc/graphql",
   headers: {
-    authorization: `Bearer ${accessToken}`
-  }
+    authorization: `Bearer ${accessToken}`,
+  },
 });
 
 // With fetch
-const response = await fetch('https://api.haste.nyc/graphql', {
-  method: 'POST',
+const response = await fetch("https://api.haste.nyc/graphql", {
+  method: "POST",
   headers: {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${accessToken}`
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${accessToken}`,
   },
-  body: JSON.stringify({ query, variables })
+  body: JSON.stringify({ query, variables }),
 });
 ```
 
@@ -85,17 +86,17 @@ const response = await fetch('https://api.haste.nyc/graphql', {
 ```javascript
 // With axios
 const api = axios.create({
-  baseURL: 'https://api.haste.nyc/v1',
+  baseURL: "https://api.haste.nyc/v1",
   headers: {
-    'Authorization': `Bearer ${accessToken}`
-  }
+    Authorization: `Bearer ${accessToken}`,
+  },
 });
 
 // With fetch
-const response = await fetch('https://api.haste.nyc/v1/contacts', {
+const response = await fetch("https://api.haste.nyc/v1/contacts", {
   headers: {
-    'Authorization': `Bearer ${accessToken}`
-  }
+    Authorization: `Bearer ${accessToken}`,
+  },
 });
 ```
 
@@ -103,10 +104,10 @@ const response = await fetch('https://api.haste.nyc/v1/contacts', {
 
 ```javascript
 // With Socket.IO
-const socket = io('wss://api.haste.nyc', {
+const socket = io("wss://api.haste.nyc", {
   auth: {
-    token: accessToken
-  }
+    token: accessToken,
+  },
 });
 
 // Native WebSocket
@@ -118,10 +119,11 @@ const ws = new WebSocket(`wss://api.haste.nyc/ws?token=${accessToken}`);
 ### Token Structure
 
 Access tokens contain:
+
 ```json
 {
   "sub": "user_123",
-  "email": "user@haste.nyc", 
+  "email": "user@haste.nyc",
   "workspaceId": "workspace_456",
   "permissions": ["read:contacts", "write:contacts"],
   "exp": 1641826800,
@@ -140,18 +142,18 @@ Access tokens contain:
 ```javascript
 // Refresh expired token
 async function refreshAccessToken(refreshToken) {
-  const response = await fetch('/api/v1/auth/refresh', {
-    method: 'POST',
+  const response = await fetch("/api/v1/auth/refresh", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json'
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify({ refreshToken })
+    body: JSON.stringify({ refreshToken }),
   });
-  
+
   const data = await response.json();
   return {
     accessToken: data.accessToken,
-    refreshToken: data.refreshToken // New rotating refresh token
+    refreshToken: data.refreshToken, // New rotating refresh token
   };
 }
 ```
@@ -216,17 +218,17 @@ Authorization: Bearer {token}
 
 ### Available Scopes
 
-| Scope | Description |
-|-------|-------------|
-| `read:contacts` | View contacts |
-| `write:contacts` | Create/update contacts |
-| `delete:contacts` | Delete contacts |
-| `read:deals` | View deals |
-| `write:deals` | Create/update deals |
-| `read:emails` | View emails |
-| `send:emails` | Send emails |
-| `read:analytics` | View analytics |
-| `admin:workspace` | Admin access |
+| Scope             | Description            |
+| ----------------- | ---------------------- |
+| `read:contacts`   | View contacts          |
+| `write:contacts`  | Create/update contacts |
+| `delete:contacts` | Delete contacts        |
+| `read:deals`      | View deals             |
+| `write:deals`     | Create/update deals    |
+| `read:emails`     | View emails            |
+| `send:emails`     | Send emails            |
+| `read:analytics`  | View analytics         |
+| `admin:workspace` | Admin access           |
 
 ### Checking Permissions
 
@@ -240,8 +242,8 @@ function hasPermission(user, scope) {
 function requirePermission(scope) {
   return (req, res, next) => {
     if (!req.user.permissions.includes(scope)) {
-      return res.status(403).json({ 
-        error: 'Insufficient permissions' 
+      return res.status(403).json({
+        error: "Insufficient permissions",
       });
     }
     next();
@@ -254,11 +256,13 @@ function requirePermission(scope) {
 ### 1. Token Storage
 
 **Do:**
+
 - Store tokens in httpOnly cookies
 - Use secure flag in production
 - Implement CSRF protection
 
 **Don't:**
+
 - Store tokens in localStorage (XSS vulnerable)
 - Include tokens in URLs
 - Log tokens
@@ -266,11 +270,13 @@ function requirePermission(scope) {
 ### 2. Token Transmission
 
 **Do:**
+
 - Always use HTTPS
 - Send tokens in Authorization header
 - Validate tokens on every request
 
 **Don't:**
+
 - Send tokens in query parameters
 - Use custom headers without prefix
 - Trust client-side validation
@@ -284,7 +290,7 @@ async function logout(token) {
   await redis.setex(
     `blacklist:${decoded.jti}`,
     decoded.exp - Math.floor(Date.now() / 1000),
-    'true'
+    "true",
   );
 }
 
@@ -299,13 +305,13 @@ async function isTokenBlacklisted(token) {
 
 ### Common Authentication Errors
 
-| Code | Message | Description |
-|------|---------|-------------|
-| `INVALID_CREDENTIALS` | Invalid email or password | Login failed |
-| `TOKEN_EXPIRED` | Access token expired | Refresh required |
-| `TOKEN_INVALID` | Invalid token format | Malformed JWT |
-| `MFA_REQUIRED` | MFA code required | 2FA enabled |
-| `INSUFFICIENT_PERMISSIONS` | Insufficient permissions | Missing scope |
+| Code                       | Message                   | Description      |
+| -------------------------- | ------------------------- | ---------------- |
+| `INVALID_CREDENTIALS`      | Invalid email or password | Login failed     |
+| `TOKEN_EXPIRED`            | Access token expired      | Refresh required |
+| `TOKEN_INVALID`            | Invalid token format      | Malformed JWT    |
+| `MFA_REQUIRED`             | MFA code required         | 2FA enabled      |
+| `INSUFFICIENT_PERMISSIONS` | Insufficient permissions  | Missing scope    |
 
 ### Error Response Format
 

@@ -16,6 +16,7 @@ import { ImportExportModule } from "./modules/import-export/import-export.module
 import { GmailModule } from "./modules/gmail/gmail.module";
 import { WebhooksModule } from "./modules/webhooks/webhooks.module";
 import { AiModule } from "./modules/ai/ai.module";
+import { PipelinesModule } from "./modules/pipelines/pipelines.module";
 
 @Module({
   imports: [
@@ -69,6 +70,7 @@ import { AiModule } from "./modules/ai/ai.module";
     GmailModule,
     WebhooksModule,
     AiModule,
+    PipelinesModule,
   ],
   controllers: [],
   providers: [],

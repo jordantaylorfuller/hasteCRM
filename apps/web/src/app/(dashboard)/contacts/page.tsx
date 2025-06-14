@@ -6,11 +6,7 @@ import { ContactList } from "@/components/contacts/ContactList";
 import { ContactFilters } from "@/components/contacts/ContactFilters";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Plus,
-  Upload,
-  Download,
-} from "lucide-react";
+import { Plus, Upload, Download } from "lucide-react";
 import { GET_CONTACTS } from "@/graphql/queries/contacts";
 import { ContactFiltersInput } from "@/types/contact";
 

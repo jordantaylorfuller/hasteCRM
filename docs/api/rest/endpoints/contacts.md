@@ -62,20 +62,20 @@ GET /v1/contacts
 
 #### Query Parameters
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| cursor | string | Pagination cursor |
-| limit | integer | Number of results (1-100, default: 50) |
-| search | string | Search query (searches name, email, company) |
-| status | string | Filter by status: active, inactive, bounced |
-| lifecycle | string | Filter by lifecycle: lead, opportunity, customer |
-| tag | string | Filter by tag (can be used multiple times) |
-| owner | string | Filter by owner user ID |
-| company | string | Filter by company ID |
-| created_after | datetime | Filter by creation date |
-| created_before | datetime | Filter by creation date |
-| updated_after | datetime | Filter by last update |
-| sort | string | Sort field: created_at, updated_at, last_name, score |
+| Parameter      | Type     | Description                                          |
+| -------------- | -------- | ---------------------------------------------------- |
+| cursor         | string   | Pagination cursor                                    |
+| limit          | integer  | Number of results (1-100, default: 50)               |
+| search         | string   | Search query (searches name, email, company)         |
+| status         | string   | Filter by status: active, inactive, bounced          |
+| lifecycle      | string   | Filter by lifecycle: lead, opportunity, customer     |
+| tag            | string   | Filter by tag (can be used multiple times)           |
+| owner          | string   | Filter by owner user ID                              |
+| company        | string   | Filter by company ID                                 |
+| created_after  | datetime | Filter by creation date                              |
+| created_before | datetime | Filter by creation date                              |
+| updated_after  | datetime | Filter by last update                                |
+| sort           | string   | Sort field: created_at, updated_at, last_name, score |
 
 #### Example Request
 
@@ -92,7 +92,7 @@ GET /v1/contacts?lifecycle=lead&tag=vip&sort=-score&limit=20
       "id": "cont_1234567890",
       "email": "john.doe@haste.nyc",
       "firstName": "John",
-      "lastName": "Doe",
+      "lastName": "Doe"
       // ... full contact object
     }
   ],
@@ -119,7 +119,7 @@ GET /v1/contacts/:id
 {
   "data": {
     "id": "cont_1234567890",
-    "email": "john.doe@haste.nyc",
+    "email": "john.doe@haste.nyc"
     // ... full contact object
   }
 }
@@ -165,7 +165,7 @@ POST /v1/contacts
 {
   "data": {
     "id": "cont_1234567890",
-    "email": "john.doe@haste.nyc",
+    "email": "john.doe@haste.nyc"
     // ... full contact object
   }
 }
@@ -235,7 +235,7 @@ POST /v1/contacts/merge
 {
   "data": {
     "id": "cont_1234567890",
-    "mergedCount": 2,
+    "mergedCount": 2
     // ... merged contact object
   }
 }
@@ -544,10 +544,10 @@ Contact events that trigger webhooks:
 
 ## Error Codes
 
-| Code | Description |
-|------|-------------|
-| CONTACT_NOT_FOUND | Contact with specified ID not found |
-| DUPLICATE_EMAIL | Contact with this email already exists |
-| INVALID_LIFECYCLE | Invalid lifecycle stage |
-| MERGE_CONFLICT | Cannot merge contacts due to conflicts |
-| BULK_LIMIT_EXCEEDED | Bulk operation exceeds maximum limit |
+| Code                | Description                            |
+| ------------------- | -------------------------------------- |
+| CONTACT_NOT_FOUND   | Contact with specified ID not found    |
+| DUPLICATE_EMAIL     | Contact with this email already exists |
+| INVALID_LIFECYCLE   | Invalid lifecycle stage                |
+| MERGE_CONFLICT      | Cannot merge contacts due to conflicts |
+| BULK_LIMIT_EXCEEDED | Bulk operation exceeds maximum limit   |

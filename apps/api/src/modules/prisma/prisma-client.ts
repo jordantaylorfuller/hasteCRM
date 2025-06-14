@@ -1,4 +1,2 @@
-import { PrismaClient } from "@prisma/client";
-
-export { PrismaClient };
-export * from "@prisma/client";
+export { PrismaClient } from "@hasteCRM/database";
+export * from "@hasteCRM/database";

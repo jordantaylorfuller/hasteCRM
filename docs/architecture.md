@@ -89,6 +89,7 @@ See full schema in `/packages/database/prisma/schema.prisma`
 ### GraphQL First
 
 Primary API using GraphQL for:
+
 - Complex queries with relationships
 - Real-time subscriptions
 - Type safety
@@ -113,6 +114,7 @@ type Subscription {
 ### REST Endpoints
 
 Supplementary REST API for:
+
 - File uploads
 - Webhooks
 - OAuth callbacks
@@ -120,16 +122,19 @@ Supplementary REST API for:
 ## Security
 
 ### Authentication
+
 - JWT tokens (RS256)
 - OAuth2 with Google
 - Multi-factor authentication support
 
 ### Authorization
+
 - Role-based access control (RBAC)
 - Workspace-level isolation
 - Row-level security in PostgreSQL
 
 ### Data Protection
+
 - Encryption at rest (AES-256)
 - TLS 1.3 for all connections
 - PII field encryption
@@ -137,11 +142,13 @@ Supplementary REST API for:
 ## Performance
 
 ### Targets
+
 - API Response: < 200ms (p95)
 - Page Load: < 2s
 - Database Query: < 50ms (p95)
 
 ### Optimization
+
 - Redis caching
 - Database connection pooling
 - CDN for static assets
@@ -150,12 +157,14 @@ Supplementary REST API for:
 ## Deployment
 
 ### Development
+
 ```bash
 docker-compose up -d
 pnpm dev
 ```
 
 ### Production
+
 - Kubernetes deployment
 - Blue-green deployments
 - Auto-scaling based on CPU/memory

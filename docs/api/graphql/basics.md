@@ -55,6 +55,7 @@ query GetContact($id: ID!) {
 ```
 
 Variables:
+
 ```json
 {
   "id": "contact_123"
@@ -86,13 +87,7 @@ query ListContacts {
 
 ```graphql
 query FilterContacts {
-  contacts(
-    filter: {
-      status: ACTIVE
-      createdAfter: "2024-01-01"
-    }
-    first: 20
-  ) {
+  contacts(filter: { status: ACTIVE, createdAfter: "2024-01-01" }, first: 20) {
     edges {
       node {
         id
@@ -122,6 +117,7 @@ mutation CreateContact($input: CreateContactInput!) {
 ```
 
 Variables:
+
 ```json
 {
   "input": {
@@ -240,18 +236,18 @@ async function getAllContacts() {
   const contacts = [];
   let hasNextPage = true;
   let cursor = null;
-  
+
   while (hasNextPage) {
     const result = await client.query({
       query: PAGINATED_CONTACTS,
-      variables: { cursor }
+      variables: { cursor },
     });
-    
-    contacts.push(...result.data.contacts.edges.map(e => e.node));
+
+    contacts.push(...result.data.contacts.edges.map((e) => e.node));
     hasNextPage = result.data.contacts.pageInfo.hasNextPage;
     cursor = result.data.contacts.pageInfo.endCursor;
   }
-  
+
   return contacts;
 }
 ```
@@ -285,19 +281,19 @@ GraphQL errors are returned in a standard format:
 ```javascript
 try {
   const result = await client.query({ query: GET_CONTACT });
-  
+
   if (result.errors) {
     // Handle GraphQL errors
-    result.errors.forEach(error => {
+    result.errors.forEach((error) => {
       console.error(`Error: ${error.message}`);
     });
   }
-  
+
   // Use data
   const contact = result.data.contact;
 } catch (error) {
   // Handle network errors
-  console.error('Network error:', error);
+  console.error("Network error:", error);
 }
 ```
 
@@ -415,11 +411,13 @@ query RenamedFields {
 ### GraphQL Playground
 
 Access the interactive GraphQL IDE at:
+
 ```
 http://localhost:4000/graphql
 ```
 
 Features:
+
 - Auto-complete
 - Schema documentation
 - Query history
@@ -444,6 +442,7 @@ query IntrospectionQuery {
 ### 1. Request Only What You Need
 
 ❌ **Bad:**
+
 ```graphql
 query GetEverything {
   contact(id: "123") {
@@ -460,6 +459,7 @@ query GetEverything {
 ```
 
 ✅ **Good:**
+
 ```graphql
 query GetContactEmail {
   contact(id: "123") {
@@ -472,6 +472,7 @@ query GetContactEmail {
 ### 2. Use Variables
 
 ❌ **Bad:**
+
 ```graphql
 query {
   contact(id: "contact_123") {
@@ -481,6 +482,7 @@ query {
 ```
 
 ✅ **Good:**
+
 ```graphql
 query GetContact($id: ID!) {
   contact(id: $id) {
@@ -492,6 +494,7 @@ query GetContact($id: ID!) {
 ### 3. Name Your Operations
 
 ❌ **Bad:**
+
 ```graphql
 query {
   me {
@@ -501,6 +504,7 @@ query {
 ```
 
 ✅ **Good:**
+
 ```graphql
 query GetCurrentUser {
   me {

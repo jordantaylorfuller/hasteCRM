@@ -19,31 +19,31 @@ X-RateLimit-Window: 3600       # Window duration in seconds
 
 ### GraphQL API
 
-| Plan | Queries/Hour | Mutations/Hour | Complexity/Query |
-|------|--------------|----------------|------------------|
-| Free | 1,000 | 100 | 1,000 |
-| Starter | 10,000 | 1,000 | 5,000 |
-| Professional | 50,000 | 5,000 | 10,000 |
-| Enterprise | Custom | Custom | Custom |
+| Plan         | Queries/Hour | Mutations/Hour | Complexity/Query |
+| ------------ | ------------ | -------------- | ---------------- |
+| Free         | 1,000        | 100            | 1,000            |
+| Starter      | 10,000       | 1,000          | 5,000            |
+| Professional | 50,000       | 5,000          | 10,000           |
+| Enterprise   | Custom       | Custom         | Custom           |
 
 ### REST API
 
-| Endpoint Category | Free | Starter | Professional | Enterprise |
-|------------------|------|---------|--------------|------------|
-| General | 1,000/hour | 10,000/hour | 50,000/hour | Custom |
-| File Upload | 100/hour | 500/hour | 2,000/hour | Custom |
-| Export | 10/hour | 50/hour | 200/hour | Custom |
-| Search | 100/min | 500/min | 2,000/min | Custom |
-| Webhooks | 10,000/hour | 50,000/hour | 200,000/hour | Custom |
+| Endpoint Category | Free        | Starter     | Professional | Enterprise |
+| ----------------- | ----------- | ----------- | ------------ | ---------- |
+| General           | 1,000/hour  | 10,000/hour | 50,000/hour  | Custom     |
+| File Upload       | 100/hour    | 500/hour    | 2,000/hour   | Custom     |
+| Export            | 10/hour     | 50/hour     | 200/hour     | Custom     |
+| Search            | 100/min     | 500/min     | 2,000/min    | Custom     |
+| Webhooks          | 10,000/hour | 50,000/hour | 200,000/hour | Custom     |
 
 ### WebSocket Limits
 
-| Plan | Connections | Messages/Min | Subscriptions |
-|------|------------|--------------|---------------|
-| Free | 10 | 100 | 50 |
-| Starter | 100 | 1,000 | 500 |
-| Professional | 1,000 | 10,000 | 5,000 |
-| Enterprise | Custom | Custom | Custom |
+| Plan         | Connections | Messages/Min | Subscriptions |
+| ------------ | ----------- | ------------ | ------------- |
+| Free         | 10          | 100          | 50            |
+| Starter      | 100         | 1,000        | 500           |
+| Professional | 1,000       | 10,000       | 5,000         |
+| Enterprise   | Custom      | Custom       | Custom        |
 
 ## Handling Rate Limits
 
@@ -51,17 +51,17 @@ X-RateLimit-Window: 3600       # Window duration in seconds
 
 ```javascript
 async function checkRateLimits() {
-  const response = await fetch('/api/v1/rate-limits', {
+  const response = await fetch("/api/v1/rate-limits", {
     headers: {
-      'Authorization': `Bearer ${token}`
-    }
+      Authorization: `Bearer ${token}`,
+    },
   });
-  
+
   return {
-    limit: parseInt(response.headers.get('X-RateLimit-Limit')),
-    remaining: parseInt(response.headers.get('X-RateLimit-Remaining')),
-    reset: new Date(parseInt(response.headers.get('X-RateLimit-Reset')) * 1000),
-    window: parseInt(response.headers.get('X-RateLimit-Window'))
+    limit: parseInt(response.headers.get("X-RateLimit-Limit")),
+    remaining: parseInt(response.headers.get("X-RateLimit-Remaining")),
+    reset: new Date(parseInt(response.headers.get("X-RateLimit-Reset")) * 1000),
+    window: parseInt(response.headers.get("X-RateLimit-Window")),
   };
 }
 ```
@@ -75,10 +75,10 @@ class RateLimitHandler {
     this.baseDelay = options.baseDelay || 1000;
     this.maxDelay = options.maxDelay || 32000;
   }
-  
+
   async executeWithRetry(fn) {
     let lastError;
-    
+
     for (let attempt = 0; attempt < this.maxRetries; attempt++) {
       try {
         const result = await fn();
@@ -87,20 +87,20 @@ class RateLimitHandler {
         if (error.status !== 429) {
           throw error; // Not a rate limit error
         }
-        
+
         lastError = error;
-        
+
         // Get retry delay from header or calculate
-        const retryAfter = error.headers?.get('Retry-After');
-        const delay = retryAfter 
+        const retryAfter = error.headers?.get("Retry-After");
+        const delay = retryAfter
           ? parseInt(retryAfter) * 1000
           : Math.min(this.baseDelay * Math.pow(2, attempt), this.maxDelay);
-        
+
         console.log(`Rate limited. Retrying in ${delay}ms...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise((resolve) => setTimeout(resolve, delay));
       }
     }
-    
+
     throw lastError;
   }
 }
@@ -122,27 +122,25 @@ class RateLimiter {
     this.window = window; // in milliseconds
     this.requests = [];
   }
-  
+
   async acquire() {
     const now = Date.now();
-    
+
     // Remove old requests outside the window
-    this.requests = this.requests.filter(
-      time => now - time < this.window
-    );
-    
+    this.requests = this.requests.filter((time) => now - time < this.window);
+
     if (this.requests.length >= this.limit) {
       // Calculate wait time
       const oldestRequest = this.requests[0];
       const waitTime = this.window - (now - oldestRequest);
-      
-      await new Promise(resolve => setTimeout(resolve, waitTime));
+
+      await new Promise((resolve) => setTimeout(resolve, waitTime));
       return this.acquire(); // Retry
     }
-    
+
     this.requests.push(now);
   }
-  
+
   async execute(fn) {
     await this.acquire();
     return fn();
@@ -166,13 +164,13 @@ for (const item of items) {
 ```javascript
 // Instead of individual requests
 for (const contact of contacts) {
-  await api.updateContact(contact.id, { status: 'active' });
+  await api.updateContact(contact.id, { status: "active" });
 }
 
 // Use bulk operations
 await api.bulkUpdateContacts({
-  ids: contacts.map(c => c.id),
-  data: { status: 'active' }
+  ids: contacts.map((c) => c.id),
+  data: { status: "active" },
 });
 ```
 
@@ -180,25 +178,26 @@ await api.bulkUpdateContacts({
 
 ```javascript
 class CachedAPI {
-  constructor(api, ttl = 300000) { // 5 minutes
+  constructor(api, ttl = 300000) {
+    // 5 minutes
     this.api = api;
     this.cache = new Map();
     this.ttl = ttl;
   }
-  
+
   async get(key, fetcher) {
     const cached = this.cache.get(key);
-    
+
     if (cached && Date.now() - cached.timestamp < this.ttl) {
       return cached.data;
     }
-    
+
     const data = await fetcher();
     this.cache.set(key, {
       data,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
-    
+
     return data;
   }
 }
@@ -206,10 +205,7 @@ class CachedAPI {
 const cachedAPI = new CachedAPI(api);
 
 // Cached request
-const contact = await cachedAPI.get(
-  `contact:${id}`,
-  () => api.getContact(id)
-);
+const contact = await cachedAPI.get(`contact:${id}`, () => api.getContact(id));
 ```
 
 ### 3. Request Prioritization
@@ -221,32 +217,32 @@ class PriorityQueue {
     this.queues = {
       high: [],
       medium: [],
-      low: []
+      low: [],
     };
     this.processing = false;
   }
-  
-  add(fn, priority = 'medium') {
+
+  add(fn, priority = "medium") {
     this.queues[priority].push(fn);
     this.process();
   }
-  
+
   async process() {
     if (this.processing) return;
     this.processing = true;
-    
+
     while (this.hasRequests()) {
       const fn = this.getNext();
       await this.rateLimiter.execute(fn);
     }
-    
+
     this.processing = false;
   }
-  
+
   hasRequests() {
-    return Object.values(this.queues).some(q => q.length > 0);
+    return Object.values(this.queues).some((q) => q.length > 0);
   }
-  
+
   getNext() {
     if (this.queues.high.length > 0) {
       return this.queues.high.shift();
@@ -266,13 +262,16 @@ class PriorityQueue {
 ```graphql
 # Each field has a complexity cost
 query ExpensiveQuery {
-  contacts(first: 100) {          # Cost: 100
+  contacts(first: 100) {
+    # Cost: 100
     edges {
       node {
-        id                        # Cost: 1
-        deals(first: 10) {        # Cost: 10 * 100 = 1000
+        id # Cost: 1
+        deals(first: 10) {
+          # Cost: 10 * 100 = 1000
           id
-          activities(first: 5) {  # Cost: 5 * 10 * 100 = 5000
+          activities(first: 5) {
+            # Cost: 5 * 10 * 100 = 5000
             id
           }
         }
@@ -293,7 +292,10 @@ query OptimizedQuery {
       node {
         id
         email
-        recentDeals: deals(first: 3, orderBy: { field: CREATED_AT, direction: DESC }) {
+        recentDeals: deals(
+          first: 3
+          orderBy: { field: CREATED_AT, direction: DESC }
+        ) {
           id
           value
         }
@@ -317,10 +319,10 @@ query OptimizedQuery {
 // Webhook receiver with rate limiting
 const webhookLimiter = new RateLimiter(100, 60000); // 100/min
 
-app.post('/webhook', async (req, res) => {
+app.post("/webhook", async (req, res) => {
   // Quick acknowledgment
-  res.status(200).send('OK');
-  
+  res.status(200).send("OK");
+
   // Process with rate limiting
   webhookLimiter.add(async () => {
     await processWebhook(req.body);
@@ -338,21 +340,21 @@ class UsageMonitor {
   constructor() {
     this.usage = new Map();
   }
-  
+
   track(endpoint, remaining, limit) {
     this.usage.set(endpoint, {
       remaining,
       limit,
       percentage: (remaining / limit) * 100,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
-    
+
     // Alert if running low
     if (remaining < limit * 0.1) {
       console.warn(`Low rate limit for ${endpoint}: ${remaining}/${limit}`);
     }
   }
-  
+
   getUsage() {
     return Object.fromEntries(this.usage);
   }
@@ -367,18 +369,18 @@ class CircuitBreaker {
     this.failures = 0;
     this.threshold = threshold;
     this.timeout = timeout;
-    this.state = 'CLOSED';
+    this.state = "CLOSED";
     this.nextAttempt = Date.now();
   }
-  
+
   async execute(fn) {
-    if (this.state === 'OPEN') {
+    if (this.state === "OPEN") {
       if (Date.now() < this.nextAttempt) {
-        throw new Error('Circuit breaker is OPEN');
+        throw new Error("Circuit breaker is OPEN");
       }
-      this.state = 'HALF_OPEN';
+      this.state = "HALF_OPEN";
     }
-    
+
     try {
       const result = await fn();
       this.onSuccess();
@@ -388,18 +390,18 @@ class CircuitBreaker {
       throw error;
     }
   }
-  
+
   onSuccess() {
     this.failures = 0;
-    this.state = 'CLOSED';
+    this.state = "CLOSED";
   }
-  
+
   onFailure(error) {
     if (error.status === 429) {
       this.failures++;
-      
+
       if (this.failures >= this.threshold) {
-        this.state = 'OPEN';
+        this.state = "OPEN";
         this.nextAttempt = Date.now() + this.timeout;
       }
     }
@@ -410,6 +412,7 @@ class CircuitBreaker {
 ### 3. Use Webhooks for Heavy Operations
 
 Instead of polling:
+
 ```javascript
 // ❌ Bad: Polling
 setInterval(async () => {
@@ -419,8 +422,8 @@ setInterval(async () => {
 
 // ✅ Good: Webhooks
 api.subscribeToWebhook({
-  url: 'https://your-app.com/webhooks/contacts',
-  events: ['contact.updated', 'contact.created']
+  url: "https://your-app.com/webhooks/contacts",
+  events: ["contact.updated", "contact.created"],
 });
 ```
 
@@ -451,25 +454,27 @@ class UnifiedRateLimitHandler {
     if (!this.isRateLimitError(error)) {
       throw error;
     }
-    
+
     switch (api) {
-      case 'graphql':
+      case "graphql":
         return this.handleGraphQLRateLimit(error);
-      case 'rest':
+      case "rest":
         return this.handleRESTRateLimit(error);
-      case 'websocket':
+      case "websocket":
         return this.handleWebSocketRateLimit(error);
     }
   }
-  
+
   isRateLimitError(error) {
-    return error.status === 429 || 
-           error.code === 'RATE_LIMITED' ||
-           error.extensions?.code === 'RATE_LIMITED';
+    return (
+      error.status === 429 ||
+      error.code === "RATE_LIMITED" ||
+      error.extensions?.code === "RATE_LIMITED"
+    );
   }
-  
+
   async wait(seconds) {
-    await new Promise(resolve => setTimeout(resolve, seconds * 1000));
+    await new Promise((resolve) => setTimeout(resolve, seconds * 1000));
   }
 }
 ```
@@ -508,10 +513,10 @@ query GetQuotas {
 ```javascript
 async function monitorQuotas() {
   const quotas = await api.getQuotas();
-  
+
   Object.entries(quotas).forEach(([resource, quota]) => {
     const usage = (quota.used / quota.limit) * 100;
-    
+
     if (usage > 90) {
       alert(`Critical: ${resource} quota at ${usage}%`);
     } else if (usage > 75) {

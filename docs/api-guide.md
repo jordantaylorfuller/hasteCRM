@@ -9,6 +9,7 @@ hasteCRM provides both GraphQL and REST APIs. GraphQL is the primary interface f
 All API requests require authentication using JWT tokens.
 
 ### Login
+
 ```bash
 POST /api/auth/login
 {
@@ -25,6 +26,7 @@ Response:
 ```
 
 ### Using Tokens
+
 ```bash
 # GraphQL
 Authorization: Bearer <accessToken>
@@ -36,6 +38,7 @@ Authorization: Bearer <accessToken>
 ## GraphQL API
 
 ### Endpoint
+
 ```
 POST https://api.haste.nyc/graphql
 ```
@@ -43,6 +46,7 @@ POST https://api.haste.nyc/graphql
 ### Common Queries
 
 #### Get Current User
+
 ```graphql
 query GetViewer {
   viewer {
@@ -64,6 +68,7 @@ query GetViewer {
 ```
 
 #### List Contacts
+
 ```graphql
 query ListContacts($first: Int!, $after: String) {
   contacts(first: $first, after: $after) {
@@ -91,6 +96,7 @@ query ListContacts($first: Int!, $after: String) {
 ### Common Mutations
 
 #### Create Contact
+
 ```graphql
 mutation CreateContact($input: CreateContactInput!) {
   createContact(input: $input) {
@@ -120,6 +126,7 @@ variables: {
 ### Subscriptions
 
 #### Real-time Contact Updates
+
 ```graphql
 subscription OnContactCreated($workspaceId: ID!) {
   contactCreated(workspaceId: $workspaceId) {
@@ -135,11 +142,13 @@ subscription OnContactCreated($workspaceId: ID!) {
 ## REST API
 
 ### Base URL
+
 ```
 https://api.haste.nyc/v1
 ```
 
 ### File Upload
+
 ```bash
 POST /v1/files/upload
 Content-Type: multipart/form-data
@@ -148,6 +157,7 @@ file: <binary>
 ```
 
 ### Export Contacts
+
 ```bash
 POST /v1/contacts/export
 {
@@ -161,6 +171,7 @@ POST /v1/contacts/export
 ### Webhooks
 
 #### Gmail Push Notifications
+
 ```bash
 POST /v1/webhooks/gmail
 {
@@ -174,6 +185,7 @@ POST /v1/webhooks/gmail
 ## Error Handling
 
 ### Error Format
+
 ```json
 {
   "error": {
@@ -190,6 +202,7 @@ POST /v1/webhooks/gmail
 ```
 
 ### Common Error Codes
+
 - `UNAUTHORIZED` - Invalid or missing token
 - `FORBIDDEN` - Insufficient permissions
 - `NOT_FOUND` - Resource not found
@@ -198,15 +211,16 @@ POST /v1/webhooks/gmail
 
 ## Rate Limiting
 
-| Endpoint | Authenticated | Limit |
-|----------|---------------|-------|
-| GraphQL | Yes | 1000/min |
-| REST API | Yes | 500/min |
-| File Upload | Yes | 10/min |
+| Endpoint    | Authenticated | Limit    |
+| ----------- | ------------- | -------- |
+| GraphQL     | Yes           | 1000/min |
+| REST API    | Yes           | 500/min  |
+| File Upload | Yes           | 10/min   |
 
 ## Pagination
 
 ### Cursor-based (GraphQL)
+
 ```graphql
 contacts(first: 20, after: "cursor123") {
   edges {
@@ -221,6 +235,7 @@ contacts(first: 20, after: "cursor123") {
 ```
 
 ### Offset-based (REST)
+
 ```bash
 GET /v1/contacts?page=2&limit=20
 ```
@@ -228,11 +243,13 @@ GET /v1/contacts?page=2&limit=20
 ## Best Practices
 
 1. **Use GraphQL for**:
+
    - Fetching related data
    - Real-time updates
    - Complex queries
 
 2. **Use REST for**:
+
    - File operations
    - Webhooks
    - Simple CRUD operations

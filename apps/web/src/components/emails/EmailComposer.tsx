@@ -1,7 +1,16 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { X, Send, Paperclip, Image, Link, Bold, Italic, List } from "lucide-react";
+import {
+  X,
+  Send,
+  Paperclip,
+  Image,
+  Link,
+  Bold,
+  Italic,
+  List,
+} from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -67,7 +76,7 @@ export function EmailComposer({
   const [sending, setSending] = useState(false);
   const [currentRecipient, setCurrentRecipient] = useState("");
   const [recipientType, setRecipientType] = useState<"to" | "cc" | "bcc">("to");
-  
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
 
@@ -75,18 +84,22 @@ export function EmailComposer({
     if (replyTo) {
       if (forward) {
         setSubject(`Fwd: ${replyTo.subject}`);
-        setBody(`\n\n---------- Forwarded message ----------\nFrom: ${replyTo.fromName || replyTo.fromEmail}\nDate: ${new Date(replyTo.sentAt).toLocaleString()}\nSubject: ${replyTo.subject}\nTo: ${replyTo.toEmails.join(", ")}\n\n${replyTo.bodyText || replyTo.snippet}`);
+        setBody(
+          `\n\n---------- Forwarded message ----------\nFrom: ${replyTo.fromName || replyTo.fromEmail}\nDate: ${new Date(replyTo.sentAt).toLocaleString()}\nSubject: ${replyTo.subject}\nTo: ${replyTo.toEmails.join(", ")}\n\n${replyTo.bodyText || replyTo.snippet}`,
+        );
       } else {
         setTo([replyTo.fromEmail]);
         if (replyAll) {
           const additionalRecipients = replyTo.toEmails
-            .filter(email => email !== replyTo.fromEmail)
+            .filter((email) => email !== replyTo.fromEmail)
             .concat(replyTo.ccEmails);
           setCc(additionalRecipients);
           setShowCc(additionalRecipients.length > 0);
         }
         setSubject(`Re: ${replyTo.subject.replace(/^Re:\s*/i, "")}`);
-        setBody(`\n\nOn ${new Date(replyTo.sentAt).toLocaleString()}, ${replyTo.fromName || replyTo.fromEmail} wrote:\n> ${(replyTo.bodyText || replyTo.snippet).split("\n").join("\n> ")}`);
+        setBody(
+          `\n\nOn ${new Date(replyTo.sentAt).toLocaleString()}, ${replyTo.fromName || replyTo.fromEmail} wrote:\n> ${(replyTo.bodyText || replyTo.snippet).split("\n").join("\n> ")}`,
+        );
       }
     }
   }, [replyTo, replyAll, forward]);
@@ -115,13 +128,13 @@ export function EmailComposer({
   const removeRecipient = (email: string, type: "to" | "cc" | "bcc") => {
     switch (type) {
       case "to":
-        setTo(to.filter(e => e !== email));
+        setTo(to.filter((e) => e !== email));
         break;
       case "cc":
-        setCc(cc.filter(e => e !== email));
+        setCc(cc.filter((e) => e !== email));
         break;
       case "bcc":
-        setBcc(bcc.filter(e => e !== email));
+        setBcc(bcc.filter((e) => e !== email));
         break;
     }
   };
@@ -139,7 +152,7 @@ export function EmailComposer({
     const sizes = ["Bytes", "KB", "MB", "GB"];
     if (bytes === 0) return "0 Bytes";
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + " " + sizes[i];
+    return Math.round((bytes / Math.pow(1024, i)) * 100) / 100 + " " + sizes[i];
   };
 
   const handleSend = async () => {
@@ -168,11 +181,11 @@ export function EmailComposer({
 
   const formatText = (style: string) => {
     if (!bodyRef.current) return;
-    
+
     const start = bodyRef.current.selectionStart;
     const end = bodyRef.current.selectionEnd;
     const selectedText = body.substring(start, end);
-    
+
     let newText = "";
     switch (style) {
       case "bold":
@@ -185,15 +198,18 @@ export function EmailComposer({
         newText = `\n- ${selectedText}`;
         break;
     }
-    
+
     const newBody = body.substring(0, start) + newText + body.substring(end);
     setBody(newBody);
-    
+
     // Restore cursor position
     setTimeout(() => {
       if (bodyRef.current) {
         bodyRef.current.focus();
-        bodyRef.current.setSelectionRange(start + newText.length, start + newText.length);
+        bodyRef.current.setSelectionRange(
+          start + newText.length,
+          start + newText.length,
+        );
       }
     }, 0);
   };
@@ -378,7 +394,7 @@ export function EmailComposer({
                   className="hidden"
                 />
               </div>
-              
+
               <Textarea
                 ref={bodyRef}
                 value={body}
@@ -427,12 +443,12 @@ export function EmailComposer({
               Discard
             </Button>
             <div className="flex space-x-2">
-              <Button variant="outline">
-                Save Draft
-              </Button>
+              <Button variant="outline">Save Draft</Button>
               <Button
                 onClick={handleSend}
-                disabled={sending || to.length === 0 || !subject || !body.trim()}
+                disabled={
+                  sending || to.length === 0 || !subject || !body.trim()
+                }
               >
                 <Send className="h-4 w-4 mr-2" />
                 {sending ? "Sending..." : "Send"}

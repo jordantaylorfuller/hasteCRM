@@ -5,6 +5,7 @@
 The hasteCRM uses GraphQL as its primary API interface, providing a flexible and efficient way to query and mutate data. This document details the complete GraphQL schema, best practices, and implementation guidelines.
 
 > **Quick Links:**
+>
 > - 🚀 [GraphQL Basics Guide](/docs/api/graphql/basics.md) - New to GraphQL? Start here
 > - 🔐 [Authentication Guide](/docs/api/auth-guide.md) - JWT, OAuth, and security
 > - ❌ [Error Handling Guide](/docs/api/errors.md) - Unified error codes and handling
@@ -117,18 +118,18 @@ type Contact implements Node & Timestamped & SoftDeletable {
   customFields: JSON
   source: String
   sourceDetails: JSON
-  
+
   # Relationships
   activities: [Activity!]!
   emails: [Email!]!
   deals: [Deal!]!
   notes: [Note!]!
   tasks: [Task!]!
-  
+
   # AI Features
   aiInsights: ContactInsights
   enrichmentData: EnrichmentData
-  
+
   # Metadata
   owner: User!
   workspace: Workspace!
@@ -171,18 +172,18 @@ type Deal implements Node & Timestamped & SoftDeletable {
   expectedCloseDate: DateTime
   stage: DealStage!
   pipeline: Pipeline!
-  
+
   # Relationships
   contacts: [Contact!]!
   company: Company
   activities: [Activity!]!
   notes: [Note!]!
   tasks: [Task!]!
-  
+
   # AI Features
   aiAnalysis: DealAnalysis
   predictedOutcome: PredictedOutcome
-  
+
   # Metadata
   owner: User!
   workspace: Workspace!
@@ -225,31 +226,31 @@ type Email implements Node & Timestamped {
   body: String!
   bodyText: String!
   snippet: String!
-  
+
   # Email metadata
   sentAt: DateTime!
   receivedAt: DateTime!
   isRead: Boolean!
   isStarred: Boolean!
   labels: [String!]!
-  
+
   # Tracking
   openedAt: DateTime
   clickedAt: DateTime
   repliedAt: DateTime
   bouncedAt: DateTime
-  
+
   # Relationships
   contact: Contact
   deal: Deal
   thread: EmailThread
   attachments: [Attachment!]!
-  
+
   # AI Features
   aiSummary: String
   sentiment: SentimentAnalysis
   actionItems: [ActionItem!]!
-  
+
   # Metadata
   workspace: Workspace!
   createdAt: DateTime!
@@ -278,12 +279,12 @@ type Activity implements Node & Timestamped {
   startTime: DateTime!
   endTime: DateTime
   duration: Int
-  
+
   # Relationships
   contact: Contact
   deal: Deal
   participants: [User!]!
-  
+
   # Metadata
   owner: User!
   workspace: Workspace!
@@ -306,12 +307,12 @@ type Task implements Node & Timestamped {
   dueDate: DateTime!
   priority: TaskPriority!
   status: TaskStatus!
-  
+
   # Relationships
   contact: Contact
   deal: Deal
   assignee: User!
-  
+
   # Metadata
   workspace: Workspace!
   createdAt: DateTime!
@@ -342,29 +343,26 @@ enum TaskStatus {
 type Query {
   # Get single contact
   contact(id: ID!): Contact
-  
+
   # List contacts with filtering and pagination
   contacts(
     filter: ContactFilter
     sort: ContactSort
     pagination: PaginationInput
   ): ContactConnection!
-  
+
   # Search contacts
   searchContacts(
     query: String!
     filters: ContactFilter
     limit: Int = 10
   ): [Contact!]!
-  
+
   # Get contact insights
   contactInsights(id: ID!): ContactInsights
-  
+
   # Get similar contacts
-  similarContacts(
-    contactId: ID!
-    limit: Int = 5
-  ): [Contact!]!
+  similarContacts(contactId: ID!, limit: Int = 5): [Contact!]!
 }
 
 input ContactFilter {
@@ -405,25 +403,22 @@ enum SortDirection {
 type Query {
   # Get single deal
   deal(id: ID!): Deal
-  
+
   # List deals with filtering
   deals(
     filter: DealFilter
     sort: DealSort
     pagination: PaginationInput
   ): DealConnection!
-  
+
   # Get pipeline
   pipeline(id: ID!): Pipeline
-  
+
   # List pipelines
   pipelines: [Pipeline!]!
-  
+
   # Deal analytics
-  dealAnalytics(
-    pipelineId: ID
-    dateRange: DateRangeInput!
-  ): DealAnalytics!
+  dealAnalytics(pipelineId: ID, dateRange: DateRangeInput!): DealAnalytics!
 }
 
 input DealFilter {
@@ -444,23 +439,19 @@ input DealFilter {
 type Query {
   # Get single email
   email(id: ID!): Email
-  
+
   # List emails
   emails(
     filter: EmailFilter
     sort: EmailSort
     pagination: PaginationInput
   ): EmailConnection!
-  
+
   # Get email thread
   emailThread(id: ID!): EmailThread
-  
+
   # Search emails
-  searchEmails(
-    query: String!
-    filters: EmailFilter
-    limit: Int = 20
-  ): [Email!]!
+  searchEmails(query: String!, filters: EmailFilter, limit: Int = 20): [Email!]!
 }
 
 input EmailFilter {
@@ -484,25 +475,22 @@ input EmailFilter {
 type Mutation {
   # Create contact
   createContact(input: CreateContactInput!): Contact!
-  
+
   # Update contact
   updateContact(id: ID!, input: UpdateContactInput!): Contact!
-  
+
   # Delete contact (soft delete)
   deleteContact(id: ID!): DeleteResult!
-  
+
   # Merge contacts
-  mergeContacts(
-    primaryId: ID!
-    mergeIds: [ID!]!
-  ): Contact!
-  
+  mergeContacts(primaryId: ID!, mergeIds: [ID!]!): Contact!
+
   # Bulk operations
   bulkUpdateContacts(
     ids: [ID!]!
     input: BulkUpdateContactInput!
   ): BulkUpdateResult!
-  
+
   # AI operations
   enrichContact(id: ID!): Contact!
   generateContactInsights(id: ID!): ContactInsights!
@@ -543,26 +531,19 @@ input UpdateContactInput {
 type Mutation {
   # Create deal
   createDeal(input: CreateDealInput!): Deal!
-  
+
   # Update deal
   updateDeal(id: ID!, input: UpdateDealInput!): Deal!
-  
+
   # Move deal stage
-  moveDealStage(
-    dealId: ID!
-    stageId: ID!
-  ): Deal!
-  
+  moveDealStage(dealId: ID!, stageId: ID!): Deal!
+
   # Close deal
-  closeDeal(
-    id: ID!
-    won: Boolean!
-    reason: String
-  ): Deal!
-  
+  closeDeal(id: ID!, won: Boolean!, reason: String): Deal!
+
   # Delete deal
   deleteDeal(id: ID!): DeleteResult!
-  
+
   # AI operations
   analyzeDeal(id: ID!): DealAnalysis!
   predictDealOutcome(id: ID!): PredictedOutcome!
@@ -587,31 +568,23 @@ input CreateDealInput {
 type Mutation {
   # Send email
   sendEmail(input: SendEmailInput!): Email!
-  
+
   # Save draft
   saveDraft(input: DraftEmailInput!): Email!
-  
+
   # Update email
-  updateEmail(
-    id: ID!
-    input: UpdateEmailInput!
-  ): Email!
-  
+  updateEmail(id: ID!, input: UpdateEmailInput!): Email!
+
   # Mark as read/unread
   markEmailRead(id: ID!, read: Boolean!): Email!
-  
+
   # Star/unstar email
   starEmail(id: ID!, starred: Boolean!): Email!
-  
+
   # AI operations
-  generateEmailContent(
-    input: GenerateEmailInput!
-  ): GeneratedEmail!
-  
-  enhanceEmailContent(
-    content: String!
-    style: EmailStyle!
-  ): String!
+  generateEmailContent(input: GenerateEmailInput!): GeneratedEmail!
+
+  enhanceEmailContent(content: String!, style: EmailStyle!): String!
 }
 
 input SendEmailInput {
@@ -635,17 +608,17 @@ type Subscription {
   contactUpdated(id: ID!): Contact!
   contactCreated(workspaceId: ID!): Contact!
   contactDeleted(workspaceId: ID!): ID!
-  
+
   # Deal updates
   dealUpdated(id: ID!): Deal!
   dealStageChanged(pipelineId: ID!): DealStageChange!
   dealClosed(workspaceId: ID!): Deal!
-  
+
   # Email updates
   emailReceived(workspaceId: ID!): Email!
   emailSent(workspaceId: ID!): Email!
   emailStatusChanged(id: ID!): EmailStatusChange!
-  
+
   # Real-time notifications
   notification(userId: ID!): Notification!
 }
@@ -690,13 +663,13 @@ directive @workspace on FIELD_DEFINITION
 type Query {
   # Requires authentication
   me: User! @auth
-  
+
   # Requires specific roles
   workspaceSettings: WorkspaceSettings! @auth @hasRole(roles: [OWNER, ADMIN])
-  
+
   # Owner-only access
   myContacts: [Contact!]! @auth @owner
-  
+
   # Workspace isolation
   contacts: [Contact!]! @auth @workspace
 }
@@ -756,7 +729,11 @@ type NotFoundError implements Error {
   id: ID!
 }
 
-union AppError = ValidationError | AuthenticationError | AuthorizationError | NotFoundError
+union AppError =
+  | ValidationError
+  | AuthenticationError
+  | AuthorizationError
+  | NotFoundError
 ```
 
 ### Error Codes
@@ -764,29 +741,29 @@ union AppError = ValidationError | AuthenticationError | AuthorizationError | No
 ```typescript
 enum ErrorCode {
   // Authentication
-  UNAUTHENTICATED = 'UNAUTHENTICATED',
-  INVALID_TOKEN = 'INVALID_TOKEN',
-  TOKEN_EXPIRED = 'TOKEN_EXPIRED',
-  
+  UNAUTHENTICATED = "UNAUTHENTICATED",
+  INVALID_TOKEN = "INVALID_TOKEN",
+  TOKEN_EXPIRED = "TOKEN_EXPIRED",
+
   // Authorization
-  FORBIDDEN = 'FORBIDDEN',
-  INSUFFICIENT_PERMISSIONS = 'INSUFFICIENT_PERMISSIONS',
-  
+  FORBIDDEN = "FORBIDDEN",
+  INSUFFICIENT_PERMISSIONS = "INSUFFICIENT_PERMISSIONS",
+
   // Validation
-  VALIDATION_ERROR = 'VALIDATION_ERROR',
-  INVALID_INPUT = 'INVALID_INPUT',
-  
+  VALIDATION_ERROR = "VALIDATION_ERROR",
+  INVALID_INPUT = "INVALID_INPUT",
+
   // Resources
-  NOT_FOUND = 'NOT_FOUND',
-  ALREADY_EXISTS = 'ALREADY_EXISTS',
-  
+  NOT_FOUND = "NOT_FOUND",
+  ALREADY_EXISTS = "ALREADY_EXISTS",
+
   // Rate limiting
-  RATE_LIMITED = 'RATE_LIMITED',
-  QUOTA_EXCEEDED = 'QUOTA_EXCEEDED',
-  
+  RATE_LIMITED = "RATE_LIMITED",
+  QUOTA_EXCEEDED = "QUOTA_EXCEEDED",
+
   // Server errors
-  INTERNAL_ERROR = 'INTERNAL_ERROR',
-  SERVICE_UNAVAILABLE = 'SERVICE_UNAVAILABLE'
+  INTERNAL_ERROR = "INTERNAL_ERROR",
+  SERVICE_UNAVAILABLE = "SERVICE_UNAVAILABLE",
 }
 ```
 
@@ -800,15 +777,14 @@ enum ErrorCode {
 # Query complexity calculation
 type Query {
   # Complexity: 1 + (10 * limit)
-  contacts(limit: Int = 20): [Contact!]! 
+  contacts(limit: Int = 20): [Contact!]!
     @complexity(value: 1, multipliers: ["limit"])
-  
+
   # Complexity: 1 + nested field complexity
-  contact(id: ID!): Contact 
-    @complexity(value: 1)
-  
+  contact(id: ID!): Contact @complexity(value: 1)
+
   # Complexity: 10 + (5 * limit)
-  searchContacts(query: String!, limit: Int = 10): [Contact!]! 
+  searchContacts(query: String!, limit: Int = 10): [Contact!]!
     @complexity(value: 10, multipliers: ["limit"])
 }
 
@@ -816,12 +792,12 @@ type Contact {
   # Simple fields: complexity 1
   id: ID! @complexity(value: 1)
   email: String! @complexity(value: 1)
-  
+
   # Computed fields: higher complexity
   aiInsights: ContactInsights @complexity(value: 5)
-  
+
   # Nested queries: multiplied complexity
-  activities(limit: Int = 10): [Activity!]! 
+  activities(limit: Int = 10): [Activity!]!
     @complexity(value: 1, multipliers: ["limit"])
 }
 
@@ -835,29 +811,27 @@ type Contact {
 const createDataLoaders = () => ({
   userLoader: new DataLoader(async (ids: string[]) => {
     const users = await prisma.user.findMany({
-      where: { id: { in: ids } }
+      where: { id: { in: ids } },
     });
-    return ids.map(id => users.find(u => u.id === id));
+    return ids.map((id) => users.find((u) => u.id === id));
   }),
-  
+
   contactLoader: new DataLoader(async (ids: string[]) => {
     const contacts = await prisma.contact.findMany({
-      where: { id: { in: ids } }
+      where: { id: { in: ids } },
     });
-    return ids.map(id => contacts.find(c => c.id === id));
+    return ids.map((id) => contacts.find((c) => c.id === id));
   }),
-  
+
   // Nested relationship loader
   contactActivitiesLoader: new DataLoader(async (contactIds: string[]) => {
     const activities = await prisma.activity.findMany({
       where: { contactId: { in: contactIds } },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: "desc" },
     });
-    
-    return contactIds.map(id => 
-      activities.filter(a => a.contactId === id)
-    );
-  })
+
+    return contactIds.map((id) => activities.filter((a) => a.contactId === id));
+  }),
 });
 ```
 
@@ -867,10 +841,10 @@ const createDataLoaders = () => ({
 type Query {
   # Cache for 5 minutes
   currentUser: User! @cacheControl(maxAge: 300)
-  
+
   # Cache for 1 hour
   workspaceSettings: WorkspaceSettings! @cacheControl(maxAge: 3600)
-  
+
   # No cache for real-time data
   recentActivities: [Activity!]! @cacheControl(maxAge: 0)
 }
@@ -1000,10 +974,10 @@ Use deprecation for backward compatibility:
 type Contact {
   # Deprecated field
   name: String @deprecated(reason: "Use fullName instead")
-  
+
   # New field
   fullName: String!
-  
+
   # Deprecated enum value
   lifecycleStage: LifecycleStage!
 }
@@ -1024,8 +998,8 @@ enum LifecycleStage {
 ### Query Testing
 
 ```typescript
-describe('Contact Queries', () => {
-  it('should fetch contact with nested data', async () => {
+describe("Contact Queries", () => {
+  it("should fetch contact with nested data", async () => {
     const query = `
       query GetContact($id: ID!) {
         contact(id: $id) {
@@ -1038,11 +1012,11 @@ describe('Contact Queries', () => {
         }
       }
     `;
-    
-    const result = await graphqlRequest(query, { id: 'contact_123' });
-    
+
+    const result = await graphqlRequest(query, { id: "contact_123" });
+
     expect(result.data.contact).toBeDefined();
-    expect(result.data.contact.email).toBe('test@haste.nyc');
+    expect(result.data.contact.email).toBe("test@haste.nyc");
     expect(result.data.contact.aiInsights).toBeDefined();
   });
 });

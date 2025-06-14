@@ -84,7 +84,7 @@ export function EmailFilters({
   };
 
   const hasActiveFilters = Object.keys(filters).some(
-    (key) => key !== "folder" && filters[key as keyof EmailFilter]
+    (key) => key !== "folder" && filters[key as keyof EmailFilter],
   );
 
   const folders = [
@@ -114,7 +114,10 @@ export function EmailFilters({
           <Filter className="h-4 w-4 mr-2" />
           Filters
           {hasActiveFilters && (
-            <Badge variant="destructive" className="ml-2 h-5 w-5 p-0 rounded-full">
+            <Badge
+              variant="destructive"
+              className="ml-2 h-5 w-5 p-0 rounded-full"
+            >
               {Object.keys(filters).filter((k) => k !== "folder").length}
             </Badge>
           )}
@@ -135,11 +138,13 @@ export function EmailFilters({
             >
               <Icon className="h-4 w-4 mr-2" />
               {folder.label}
-              {emailCounts && folder.id === "inbox" && emailCounts.unread > 0 && (
-                <Badge variant="secondary" className="ml-2">
-                  {emailCounts.unread}
-                </Badge>
-              )}
+              {emailCounts &&
+                folder.id === "inbox" &&
+                emailCounts.unread > 0 && (
+                  <Badge variant="secondary" className="ml-2">
+                    {emailCounts.unread}
+                  </Badge>
+                )}
             </Button>
           );
         })}
@@ -199,7 +204,7 @@ export function EmailFilters({
                     variant="outline"
                     className={cn(
                       "w-full justify-start text-left font-normal",
-                      !filters.dateRange && "text-muted-foreground"
+                      !filters.dateRange && "text-muted-foreground",
                     )}
                   >
                     <Calendar className="mr-2 h-4 w-4" />
@@ -271,7 +276,7 @@ export function EmailFilters({
                           if (isSelected) {
                             updateFilter(
                               "labels",
-                              currentLabels.filter((l) => l !== label)
+                              currentLabels.filter((l) => l !== label),
                             );
                           } else {
                             updateFilter("labels", [...currentLabels, label]);
@@ -362,7 +367,8 @@ export function EmailFilters({
           {filters.dateRange && (
             <Badge variant="secondary">
               Date: {format(filters.dateRange.from!, "MMM d")}
-              {filters.dateRange.to && ` - ${format(filters.dateRange.to, "MMM d")}`}
+              {filters.dateRange.to &&
+                ` - ${format(filters.dateRange.to, "MMM d")}`}
               <button
                 onClick={() => clearFilter("dateRange")}
                 className="ml-1 hover:text-destructive"
@@ -378,7 +384,7 @@ export function EmailFilters({
                 onClick={() => {
                   updateFilter(
                     "labels",
-                    filters.labels?.filter((l) => l !== label) || []
+                    filters.labels?.filter((l) => l !== label) || [],
                   );
                 }}
                 className="ml-1 hover:text-destructive"

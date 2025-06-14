@@ -77,7 +77,7 @@ export function EmailViewer({
     const sizes = ["Bytes", "KB", "MB", "GB"];
     if (bytes === 0) return "0 Bytes";
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + " " + sizes[i];
+    return Math.round((bytes / Math.pow(1024, i)) * 100) / 100 + " " + sizes[i];
   };
 
   return (
@@ -101,11 +101,19 @@ export function EmailViewer({
             <Reply className="h-4 w-4 mr-2" />
             Reply
           </Button>
-          <Button variant="outline" size="sm" onClick={() => onReplyAll?.(email)}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onReplyAll?.(email)}
+          >
             <ReplyAll className="h-4 w-4 mr-2" />
             Reply All
           </Button>
-          <Button variant="outline" size="sm" onClick={() => onForward?.(email)}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onForward?.(email)}
+          >
             <Forward className="h-4 w-4 mr-2" />
             Forward
           </Button>
@@ -167,7 +175,9 @@ export function EmailViewer({
           {/* Sender Info */}
           <div className="flex items-start space-x-4 mb-6">
             <Avatar>
-              <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${email.fromEmail}`} />
+              <AvatarImage
+                src={`https://api.dicebear.com/7.x/initials/svg?seed=${email.fromEmail}`}
+              />
               <AvatarFallback>
                 {getInitials(email.fromName, email.fromEmail)}
               </AvatarFallback>
@@ -176,8 +186,12 @@ export function EmailViewer({
             <div className="flex-1">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-medium">{email.fromName || email.fromEmail}</h4>
-                  <p className="text-sm text-muted-foreground">{email.fromEmail}</p>
+                  <h4 className="font-medium">
+                    {email.fromName || email.fromEmail}
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    {email.fromEmail}
+                  </p>
                 </div>
                 <time className="text-sm text-muted-foreground">
                   {format(new Date(email.sentAt), "PPpp")}
@@ -240,7 +254,9 @@ export function EmailViewer({
                       <div className="flex items-center space-x-3">
                         <Paperclip className="h-4 w-4 text-muted-foreground" />
                         <div>
-                          <p className="text-sm font-medium">{attachment.filename}</p>
+                          <p className="text-sm font-medium">
+                            {attachment.filename}
+                          </p>
                           <p className="text-xs text-muted-foreground">
                             {formatFileSize(attachment.size)}
                           </p>

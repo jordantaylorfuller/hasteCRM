@@ -11,6 +11,7 @@ Get hasteCRM running locally in 5 minutes.
 ## Setup
 
 1. **Clone and Install**
+
    ```bash
    git clone https://github.com/hasteNYC/hasteCRM.git
    cd hasteCRM
@@ -18,6 +19,7 @@ Get hasteCRM running locally in 5 minutes.
    ```
 
 2. **Configure Environment**
+
    ```bash
    # Edit .env with your API keys
    ANTHROPIC_API_KEY=your-key-here
@@ -50,6 +52,7 @@ Get hasteCRM running locally in 5 minutes.
 ## Common Issues
 
 ### Ports Already in Use
+
 ```bash
 # Kill processes on required ports
 lsof -ti:3000 | xargs kill -9
@@ -58,9 +61,11 @@ lsof -ti:5432 | xargs kill -9
 ```
 
 ### Docker Not Running
+
 Ensure Docker Desktop is running before starting services.
 
 ### Database Connection Failed
+
 ```bash
 # Restart database container
 docker-compose restart postgres

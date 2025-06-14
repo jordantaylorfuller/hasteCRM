@@ -7,16 +7,19 @@ The hasteCRM GraphQL API follows a schema-first design approach with strong typi
 ## Design Principles
 
 ### 1. Domain-Driven Design
+
 - Each domain (contacts, deals, emails) has its own module
 - Clear boundaries between domains
 - Shared types in common module
 
 ### 2. Relay Specification
+
 - Implements Node interface for all entities
 - Cursor-based pagination for lists
 - Global object identification
 
 ### 3. Strong Typing
+
 - No nullable fields without reason
 - Clear input/output type separation
 - Comprehensive enum types
@@ -109,33 +112,25 @@ type Contact implements Node {
   title: String
   company: Company
   avatarUrl: String
-  
+
   # Metadata
   source: ContactSource!
   status: ContactStatus!
   score: Int!
   tags: [Tag!]!
   customFields: [CustomField!]!
-  
+
   # Related data
   activities(
     first: Int
     after: String
     filter: ActivityFilter
   ): ActivityConnection!
-  
-  deals(
-    first: Int
-    after: String
-    filter: DealFilter
-  ): DealConnection!
-  
-  emails(
-    first: Int
-    after: String
-    filter: EmailFilter
-  ): EmailConnection!
-  
+
+  deals(first: Int, after: String, filter: DealFilter): DealConnection!
+
+  emails(first: Int, after: String, filter: EmailFilter): EmailConnection!
+
   # Timestamps
   lastActivityAt: DateTime
   createdAt: DateTime!
@@ -174,26 +169,18 @@ type Company implements Node {
   website: String
   logoUrl: String
   description: String
-  
+
   # Details
   industry: String
   size: String
   revenue: BigInt
   foundedYear: Int
-  
+
   # Related data
-  contacts(
-    first: Int
-    after: String
-    filter: ContactFilter
-  ): ContactConnection!
-  
-  deals(
-    first: Int
-    after: String
-    filter: DealFilter
-  ): DealConnection!
-  
+  contacts(first: Int, after: String, filter: ContactFilter): ContactConnection!
+
+  deals(first: Int, after: String, filter: DealFilter): DealConnection!
+
   # Timestamps
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -210,13 +197,9 @@ type Pipeline implements Node {
   stages: [Stage!]!
   isDefault: Boolean!
   color: String!
-  
-  deals(
-    first: Int
-    after: String
-    filter: DealFilter
-  ): DealConnection!
-  
+
+  deals(first: Int, after: String, filter: DealFilter): DealConnection!
+
   statistics: PipelineStatistics!
 }
 
@@ -227,11 +210,8 @@ type Stage implements Node {
   probability: Int!
   color: String!
   pipeline: Pipeline!
-  
-  deals(
-    first: Int
-    after: String
-  ): DealConnection!
+
+  deals(first: Int, after: String): DealConnection!
 }
 
 type Deal implements Node {
@@ -241,20 +221,17 @@ type Deal implements Node {
   probability: Int!
   closeDate: DateTime
   status: DealStatus!
-  
+
   # Relationships
   pipeline: Pipeline!
   stage: Stage!
   owner: User!
   company: Company
   contacts: [Contact!]!
-  
+
   # Activity
-  activities(
-    first: Int
-    after: String
-  ): ActivityConnection!
-  
+  activities(first: Int, after: String): ActivityConnection!
+
   # Timestamps
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -274,13 +251,13 @@ type Activity implements Node {
   title: String!
   description: String
   metadata: JSON!
-  
+
   # Relationships
   user: User!
   contact: Contact
   company: Company
   deal: Deal
-  
+
   # Timestamp
   createdAt: DateTime!
 }
@@ -316,6 +293,7 @@ type ActivityEdge implements Edge {
 ## Query Patterns
 
 ### Viewer Pattern
+
 ```graphql
 query GetViewer {
   viewer {
@@ -336,6 +314,7 @@ query GetViewer {
 ```
 
 ### Connection Queries
+
 ```graphql
 query GetContacts($first: Int!, $after: String, $filter: ContactFilter) {
   viewer {
@@ -364,6 +343,7 @@ query GetContacts($first: Int!, $after: String, $filter: ContactFilter) {
 ```
 
 ### Node Query
+
 ```graphql
 query GetNode($id: ID!) {
   node(id: $id) {
@@ -386,6 +366,7 @@ query GetNode($id: ID!) {
 ## Mutation Patterns
 
 ### Create Mutations
+
 ```graphql
 mutation CreateContact($input: CreateContactInput!) {
   createContact(input: $input) {
@@ -403,6 +384,7 @@ mutation CreateContact($input: CreateContactInput!) {
 ```
 
 ### Update Mutations
+
 ```graphql
 mutation UpdateContact($input: UpdateContactInput!) {
   updateContact(input: $input) {
@@ -420,6 +402,7 @@ mutation UpdateContact($input: UpdateContactInput!) {
 ```
 
 ### Batch Operations
+
 ```graphql
 mutation BatchUpdateContacts($ids: [ID!]!, $data: UpdateContactData!) {
   batchUpdateContacts(ids: $ids, data: $data) {
@@ -439,6 +422,7 @@ mutation BatchUpdateContacts($ids: [ID!]!, $data: UpdateContactData!) {
 ## Subscription Patterns
 
 ### Entity Updates
+
 ```graphql
 subscription OnContactUpdated($contactId: ID!) {
   contactUpdated(contactId: $contactId) {
@@ -451,6 +435,7 @@ subscription OnContactUpdated($contactId: ID!) {
 ```
 
 ### Activity Feed
+
 ```graphql
 subscription OnActivity($workspaceId: ID!) {
   activityCreated(workspaceId: $workspaceId) {
@@ -468,6 +453,7 @@ subscription OnActivity($workspaceId: ID!) {
 ## Error Handling
 
 ### Field Errors
+
 ```graphql
 type FieldError {
   field: String!
@@ -486,6 +472,7 @@ enum ErrorCode {
 ```
 
 ### Mutation Response Pattern
+
 ```graphql
 type ContactMutationPayload {
   contact: Contact
@@ -520,6 +507,7 @@ directive @workspace on FIELD_DEFINITION
 ## Best Practices
 
 ### 1. Naming Conventions
+
 - Types: PascalCase
 - Fields: camelCase
 - Enums: SCREAMING_SNAKE_CASE
@@ -527,21 +515,25 @@ directive @workspace on FIELD_DEFINITION
 - Payloads: suffix with "Payload"
 
 ### 2. Nullability
+
 - Required fields are non-null
 - Lists are non-null but can be empty
 - Error fields are nullable
 
 ### 3. Pagination
+
 - Always use cursor-based pagination
 - Default page size: 20
 - Maximum page size: 100
 
 ### 4. Filtering
+
 - Use input objects for complex filters
 - Support common operators (eq, contains, gt, lt)
 - Allow combining filters with AND/OR
 
 ### 5. Security
+
 - Always check workspace context
 - Implement field-level permissions
 - Rate limit expensive queries

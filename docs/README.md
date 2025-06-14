@@ -3,15 +3,18 @@
 ## Essential Guides
 
 ### Getting Started
+
 - [Quick Start](./getting-started/quick-start.md) - Get running in 5 minutes
 - [Development Guide](./development-guide.md) - Development workflow and commands
 - [Architecture](./architecture.md) - System design and technology choices
 
 ### Building the MVP
+
 - [Implementation Phases](./claude-tasks.md) - Step-by-step build guide
 - [API Guide](./api-guide.md) - GraphQL and REST API reference
 
 ### Configuration
+
 - [Master Config](./MASTER-CONFIG.md) - All version numbers and standards
 - [Environment Setup](./.env.example) - Required environment variables
 
@@ -21,7 +24,7 @@
 hasteCRM/
 ├── apps/
 │   ├── web/          # Next.js frontend
-│   ├── api/          # NestJS backend  
+│   ├── api/          # NestJS backend
 │   └── worker/       # Background jobs
 ├── packages/
 │   ├── database/     # Prisma schema
@@ -53,6 +56,7 @@ pnpm db:studio       # Open Prisma Studio
 ## For Claude Code
 
 This project is optimized for Claude Code with auto-accept enabled:
+
 1. All configurations are in place
 2. Mock services available for development
 3. Clear implementation phases in [claude-tasks.md](./claude-tasks.md)

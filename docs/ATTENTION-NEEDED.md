@@ -15,16 +15,19 @@ I'll use these clear visual indicators:
 ## Common Situations Where I Need Input:
 
 1. **Clarification Needed**
+
    - Ambiguous requirements
    - Multiple implementation options
    - Missing configuration details
 
 2. **Approval Required**
+
    - Before making significant changes
    - Before running potentially destructive commands
    - Before proceeding to next phase
 
 3. **Error Resolution**
+
    - When encountering unexpected errors
    - When tests fail repeatedly
    - When missing dependencies or access

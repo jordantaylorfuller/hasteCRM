@@ -6,7 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Loader2, Sparkles, Send, RefreshCw } from "lucide-react";
 import { GENERATE_SMART_COMPOSE } from "@/graphql/mutations/ai";
 
@@ -191,11 +197,7 @@ export function SmartEmailComposer({
             <h4 className="font-medium text-sm text-muted-foreground">
               Full Draft
             </h4>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleGenerate}
-            >
+            <Button variant="ghost" size="sm" onClick={handleGenerate}>
               <RefreshCw className="h-4 w-4 mr-1" />
               Regenerate
             </Button>
@@ -204,11 +206,7 @@ export function SmartEmailComposer({
             <pre className="whitespace-pre-wrap text-sm font-sans">
               {fullDraft}
             </pre>
-            <Button
-              onClick={handleUseFullDraft}
-              size="sm"
-              className="mt-4"
-            >
+            <Button onClick={handleUseFullDraft} size="sm" className="mt-4">
               <Send className="h-4 w-4 mr-2" />
               Use This Draft
             </Button>

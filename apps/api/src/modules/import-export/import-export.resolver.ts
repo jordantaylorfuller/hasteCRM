@@ -49,13 +49,19 @@ export class ImportExportResolver {
   }
 
   @Query(() => ImportStatus)
-  async importStatus(@Args("importId") importId: string, @Context() ctx: any) {
+  async importStatus(
+    @Args("importId") importId: string,
+    @Context() ctx: any,
+  ): Promise<any> {
     const { workspaceId } = ctx.req.user;
     return this.importService.getImportStatus(importId, workspaceId);
   }
 
   @Query(() => ExportStatus)
-  async exportStatus(@Args("exportId") exportId: string, @Context() ctx: any) {
+  async exportStatus(
+    @Args("exportId") exportId: string,
+    @Context() ctx: any,
+  ): Promise<any> {
     const { workspaceId } = ctx.req.user;
     return this.exportService.getExportStatus(exportId, workspaceId);
   }

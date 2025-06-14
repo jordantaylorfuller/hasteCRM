@@ -8,6 +8,7 @@ A next-generation Customer Relationship Management system powered by AI at every
 ## ✅ AUTO-ACCEPTS READY
 
 **This project is 100% configured for Claude Code with auto-accepts enabled:**
+
 - Complete setup wizard included
 - All configuration files pre-generated
 - Mock services for development (no API keys needed)
@@ -27,6 +28,7 @@ A next-generation Customer Relationship Management system powered by AI at every
 ## 🚀 Getting Started
 
 ### Quick Start (2 minutes):
+
 ```bash
 # 1. Run the setup wizard
 ./setup-wizard.sh
@@ -36,13 +38,14 @@ make start
 ```
 
 ### Enable Auto-Accepts in Cursor:
+
 1. Press `Cmd+Shift+A` (Mac) or `Ctrl+Shift+A` (Windows/Linux)
 2. Look for green checkmark in status bar
 3. Claude Code can now work autonomously!
 
-1. **Review the Documentation** - Understand the planned architecture and features
-2. **Contribute to Planning** - Help refine the specifications
-3. **Start Implementation** - Use the documentation as a blueprint to begin development
+4. **Review the Documentation** - Understand the planned architecture and features
+5. **Contribute to Planning** - Help refine the specifications
+6. **Start Implementation** - Use the documentation as a blueprint to begin development
 
 ### To Start Implementation:
 
@@ -70,11 +73,13 @@ The following features are documented and planned for implementation:
 ## 📖 Documentation
 
 ### Getting Started
+
 - [Documentation Overview](./docs/documentation-overview.md) - Complete platform documentation
 - [Development Setup](./docs/development/setup.md) - Local environment setup
 - [Architecture](./docs/architecture/overview.md) - System design and patterns
 
 ### Feature Documentation
+
 - [Features Overview](./docs/features/features-overview.md) - All platform features
 - [AI Integration](./docs/features/ai-integration.md) - AI capabilities
 - [Contact Management](./docs/features/contacts.md) - Contact and company management
@@ -82,12 +87,14 @@ The following features are documented and planned for implementation:
 - [Pipeline Management](./docs/features/pipelines.md) - Sales pipeline features
 
 ### API Documentation
+
 - [API Overview](./docs/api/api-overview.md) - API interfaces guide
 - [GraphQL Schema](./docs/api/graphql-schema.md) - GraphQL API reference
 - [REST API](./docs/api/rest-api.md) - REST endpoints
 - [WebSockets](./docs/api/websockets.md) - Real-time communication
 
 ### Deployment
+
 - [Deployment Guide](./docs/deployment/environments.md) - Environment setup
 - [Docker Setup](./docs/deployment/docker.md) - Container deployment
 - [Kubernetes](./docs/deployment/kubernetes.md) - K8s deployment

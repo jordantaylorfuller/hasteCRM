@@ -1,0 +1,220 @@
+type Pipeline {
+  id: ID!
+  workspaceId: String!
+  name: String!
+  type: PipelineType!
+  isDefault: Boolean!
+  order: Int!
+  color: String!
+  settings: JSON
+  stages: [Stage!]!
+  deals: [Deal!]!
+  _count: PipelineCount
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+}
+
+type Stage {
+  id: ID!
+  pipelineId: String!
+  name: String!
+  order: Int!
+  color: String!
+  probability: Int!
+  deals: [Deal!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Deal {
+  id: ID!
+  workspaceId: String!
+  pipeline: Pipeline!
+  stage: Stage!
+  title: String!
+  value: Float!
+  currency: String!
+  probability: Int!
+  description: String
+  closeDate: DateTime
+  status: DealStatus!
+  wonReason: String
+  lostReason: String
+  stageEnteredAt: DateTime!
+  daysInStage: Int!
+  totalDaysOpen: Int!
+  owner: User!
+  company: Company
+  contacts: [Contact!]!
+  activities: [Activity!]!
+  tasks: [Task!]!
+  notes: [Note!]!
+  emails: [Email!]!
+  tags: [Tag!]!
+  customFields: [CustomFieldValue!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  closedAt: DateTime
+}
+
+type DealStageTransition {
+  id: ID!
+  deal: Deal!
+  fromStage: Stage!
+  toStage: Stage!
+  transitionTime: DateTime!
+  timeInStage: Int!
+  transitionedBy: User!
+  reason: String
+}
+
+type PipelineCount {
+  deals: Int!
+  stages: Int!
+}
+
+type PipelineMetrics {
+  pipeline: Pipeline!
+  metrics: PipelineStats!
+  stages: [StageMetrics!]!
+}
+
+type PipelineStats {
+  total: Int!
+  won: Int!
+  lost: Int!
+  open: Int!
+  conversionRate: Float!
+  avgDealSize: Float!
+}
+
+type StageMetrics {
+  id: ID!
+  name: String!
+  count: Int!
+  value: Float!
+  probability: Int!
+}
+
+enum PipelineType {
+  SALES
+  INVESTOR
+  RECRUITING
+  VENDOR
+  PARTNER
+  CUSTOM
+}
+
+enum DealStatus {
+  OPEN
+  WON
+  LOST
+  STALLED
+}
+
+input CreatePipelineInput {
+  name: String!
+  type: PipelineType
+  color: String
+  stages: [CreateStageInput!]
+}
+
+input CreateStageInput {
+  name: String!
+  order: Int!
+  color: String
+  probability: Int
+}
+
+input UpdatePipelineInput {
+  name: String
+  color: String
+  settings: JSON
+}
+
+input CreateDealInput {
+  pipelineId: ID!
+  stageId: ID!
+  title: String!
+  value: Float!
+  currency: String
+  probability: Int
+  description: String
+  closeDate: DateTime
+  ownerId: ID!
+  companyId: ID
+  contactIds: [ID!]
+}
+
+input UpdateDealInput {
+  title: String
+  value: Float
+  currency: String
+  probability: Int
+  description: String
+  closeDate: DateTime
+  ownerId: ID
+  companyId: ID
+  status: DealStatus
+  wonReason: String
+  lostReason: String
+}
+
+input MoveDealInput {
+  dealId: ID!
+  stageId: ID!
+  reason: String
+}
+
+input ReorderInput {
+  ids: [ID!]!
+}
+
+type Query {
+  pipelines: [Pipeline!]!
+  pipeline(id: ID!): Pipeline
+  pipelineMetrics(id: ID!, startDate: DateTime, endDate: DateTime): PipelineMetrics!
+  
+  deals(
+    pipelineId: ID
+    stageId: ID
+    status: DealStatus
+    ownerId: ID
+    skip: Int
+    take: Int
+  ): DealConnection!
+  
+  deal(id: ID!): Deal
+  dealHistory(id: ID!): [DealStageTransition!]!
+}
+
+type DealConnection {
+  deals: [Deal!]!
+  total: Int!
+  hasMore: Boolean!
+}
+
+type Mutation {
+  # Pipeline mutations
+  createPipeline(input: CreatePipelineInput!): Pipeline!
+  updatePipeline(id: ID!, input: UpdatePipelineInput!): Pipeline!
+  deletePipeline(id: ID!): Pipeline!
+  reorderPipelines(input: ReorderInput!): [Pipeline!]!
+  
+  # Stage mutations
+  createStage(pipelineId: ID!, name: String!, color: String, probability: Int): Stage!
+  updateStage(id: ID!, name: String, color: String, probability: Int): Stage!
+  deleteStage(id: ID!): Stage!
+  reorderStages(pipelineId: ID!, input: ReorderInput!): [Stage!]!
+  
+  # Deal mutations
+  createDeal(input: CreateDealInput!): Deal!
+  updateDeal(id: ID!, input: UpdateDealInput!): Deal!
+  moveDeal(input: MoveDealInput!): Deal!
+  deleteDeal(id: ID!): Deal!
+  
+  # Deal bulk operations
+  bulkMoveDeal(dealIds: [ID!]!, stageId: ID!): [Deal!]!
+  bulkUpdateDealOwner(dealIds: [ID!]!, ownerId: ID!): [Deal!]!
+}

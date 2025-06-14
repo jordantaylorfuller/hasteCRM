@@ -19,10 +19,10 @@ This document provides complete implementation details for Gmail push notificati
 
 ```typescript
 // packages/api/src/gmail/pubsub/pubsub-setup.service.ts
-import { Injectable, Logger } from '@nestjs/common';
-import { PubSub } from '@google-cloud/pubsub';
-import { google } from 'googleapis';
-import { ConfigService } from '@nestjs/config';
+import { Injectable, Logger } from "@nestjs/common";
+import { PubSub } from "@google-cloud/pubsub";
+import { google } from "googleapis";
+import { ConfigService } from "@nestjs/config";
 
 @Injectable()
 export class PubSubSetupService {
@@ -32,20 +32,23 @@ export class PubSubSetupService {
 
   constructor(private configService: ConfigService) {
     this.pubsub = new PubSub({
-      projectId: this.configService.get('GOOGLE_CLOUD_PROJECT_ID'),
-      keyFilename: this.configService.get('GOOGLE_CLOUD_KEYFILE'),
+      projectId: this.configService.get("GOOGLE_CLOUD_PROJECT_ID"),
+      keyFilename: this.configService.get("GOOGLE_CLOUD_KEYFILE"),
     });
   }
 
   async setupPushNotifications(userEmail: string, accessToken: string) {
     try {
       // 1. Create or verify Pub/Sub topic
-      const topicName = `projects/${this.configService.get('GOOGLE_CLOUD_PROJECT_ID')}/topics/gmail-push`;
+      const topicName = `projects/${this.configService.get("GOOGLE_CLOUD_PROJECT_ID")}/topics/gmail-push`;
       const topic = await this.ensureTopic(topicName);
 
       // 2. Create or verify subscription
-      const subscriptionName = `gmail-push-${userEmail.replace('@', '-at-').replace('.', '-')}`;
-      const subscription = await this.ensureSubscription(topicName, subscriptionName);
+      const subscriptionName = `gmail-push-${userEmail.replace("@", "-at-").replace(".", "-")}`;
+      const subscription = await this.ensureSubscription(
+        topicName,
+        subscriptionName,
+      );
 
       // 3. Grant Gmail publish rights
       await this.grantGmailPublishRights(topicName);
@@ -53,19 +56,21 @@ export class PubSubSetupService {
       // 4. Set up Gmail watch
       const auth = new google.auth.OAuth2();
       auth.setCredentials({ access_token: accessToken });
-      
-      this.gmail = google.gmail({ version: 'v1', auth });
-      
+
+      this.gmail = google.gmail({ version: "v1", auth });
+
       const watchResponse = await this.gmail.users.watch({
-        userId: 'me',
+        userId: "me",
         requestBody: {
           topicName,
-          labelIds: ['INBOX', 'SENT'],
-          labelFilterAction: 'include',
+          labelIds: ["INBOX", "SENT"],
+          labelFilterAction: "include",
         },
       });
 
-      this.logger.log(`Gmail watch setup for ${userEmail}, expires: ${new Date(watchResponse.data.expiration)}`);
+      this.logger.log(
+        `Gmail watch setup for ${userEmail}, expires: ${new Date(watchResponse.data.expiration)}`,
+      );
 
       return {
         historyId: watchResponse.data.historyId,
@@ -74,7 +79,7 @@ export class PubSubSetupService {
         subscriptionName,
       };
     } catch (error) {
-      this.logger.error('Failed to setup push notifications', error);
+      this.logger.error("Failed to setup push notifications", error);
       throw error;
     }
   }
@@ -84,7 +89,8 @@ export class PubSubSetupService {
       const [topic] = await this.pubsub.topic(topicName).get();
       return topic;
     } catch (error) {
-      if (error.code === 5) { // NOT_FOUND
+      if (error.code === 5) {
+        // NOT_FOUND
         const [topic] = await this.pubsub.createTopic(topicName);
         this.logger.log(`Created topic: ${topicName}`);
         return topic;
@@ -93,34 +99,42 @@ export class PubSubSetupService {
     }
   }
 
-  private async ensureSubscription(topicName: string, subscriptionName: string) {
-    const pushEndpoint = `${this.configService.get('API_BASE_URL')}/webhooks/gmail`;
-    
+  private async ensureSubscription(
+    topicName: string,
+    subscriptionName: string,
+  ) {
+    const pushEndpoint = `${this.configService.get("API_BASE_URL")}/webhooks/gmail`;
+
     try {
-      const [subscription] = await this.pubsub.subscription(subscriptionName).get();
+      const [subscription] = await this.pubsub
+        .subscription(subscriptionName)
+        .get();
       return subscription;
     } catch (error) {
-      if (error.code === 5) { // NOT_FOUND
-        const [subscription] = await this.pubsub.topic(topicName).createSubscription(subscriptionName, {
-          pushConfig: {
-            pushEndpoint,
-            attributes: {
-              'x-goog-version': 'v1',
+      if (error.code === 5) {
+        // NOT_FOUND
+        const [subscription] = await this.pubsub
+          .topic(topicName)
+          .createSubscription(subscriptionName, {
+            pushConfig: {
+              pushEndpoint,
+              attributes: {
+                "x-goog-version": "v1",
+              },
             },
-          },
-          ackDeadlineSeconds: 600, // 10 minutes
-          messageRetentionDuration: {
-            seconds: 604800, // 7 days
-          },
-          retryPolicy: {
-            minimumBackoff: {
-              seconds: 10,
+            ackDeadlineSeconds: 600, // 10 minutes
+            messageRetentionDuration: {
+              seconds: 604800, // 7 days
             },
-            maximumBackoff: {
-              seconds: 600,
+            retryPolicy: {
+              minimumBackoff: {
+                seconds: 10,
+              },
+              maximumBackoff: {
+                seconds: 600,
+              },
             },
-          },
-        });
+          });
         this.logger.log(`Created subscription: ${subscriptionName}`);
         return subscription;
       }
@@ -131,11 +145,12 @@ export class PubSubSetupService {
   private async grantGmailPublishRights(topicName: string) {
     const topic = this.pubsub.topic(topicName);
     const [policy] = await topic.iam.getPolicy();
-    
-    const gmailPublisher = 'serviceAccount:gmail-api-push@system.gserviceaccount.com';
-    const role = 'roles/pubsub.publisher';
-    
-    const binding = policy.bindings.find(b => b.role === role);
+
+    const gmailPublisher =
+      "serviceAccount:gmail-api-push@system.gserviceaccount.com";
+    const role = "roles/pubsub.publisher";
+
+    const binding = policy.bindings.find((b) => b.role === role);
     if (binding && !binding.members.includes(gmailPublisher)) {
       binding.members.push(gmailPublisher);
     } else if (!binding) {
@@ -144,29 +159,34 @@ export class PubSubSetupService {
         members: [gmailPublisher],
       });
     }
-    
+
     await topic.iam.setPolicy(policy);
-    this.logger.log('Granted Gmail publish rights to topic');
+    this.logger.log("Granted Gmail publish rights to topic");
   }
 
   async renewWatch(emailAccountId: string) {
     const account = await this.emailAccountService.findOne(emailAccountId);
     if (!account) {
-      throw new Error('Email account not found');
+      throw new Error("Email account not found");
     }
 
     // Refresh token if needed
-    const accessToken = await this.authService.refreshGoogleToken(account.refreshToken);
-    
+    const accessToken = await this.authService.refreshGoogleToken(
+      account.refreshToken,
+    );
+
     // Set up new watch
-    const watchData = await this.setupPushNotifications(account.email, accessToken);
-    
+    const watchData = await this.setupPushNotifications(
+      account.email,
+      accessToken,
+    );
+
     // Update account with new watch data
     await this.emailAccountService.update(emailAccountId, {
       watchExpiration: new Date(parseInt(watchData.expiration)),
       historyId: watchData.historyId,
     });
-    
+
     return watchData;
   }
 }
@@ -176,10 +196,10 @@ export class PubSubSetupService {
 
 ```typescript
 // packages/api/src/gmail/schedulers/watch-renewal.scheduler.ts
-import { Injectable, Logger } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
-import { EmailAccountService } from '../email-account.service';
-import { PubSubSetupService } from '../pubsub/pubsub-setup.service';
+import { Injectable, Logger } from "@nestjs/common";
+import { Cron, CronExpression } from "@nestjs/schedule";
+import { EmailAccountService } from "../email-account.service";
+import { PubSubSetupService } from "../pubsub/pubsub-setup.service";
 
 @Injectable()
 export class WatchRenewalScheduler {
@@ -192,21 +212,22 @@ export class WatchRenewalScheduler {
 
   @Cron(CronExpression.EVERY_HOUR)
   async renewExpiringWatches() {
-    this.logger.log('Checking for expiring Gmail watches...');
-    
+    this.logger.log("Checking for expiring Gmail watches...");
+
     // Find watches expiring in the next 24 hours
-    const expiringAccounts = await this.emailAccountService.findExpiringWatches(24);
-    
+    const expiringAccounts =
+      await this.emailAccountService.findExpiringWatches(24);
+
     for (const account of expiringAccounts) {
       try {
         await this.pubSubSetupService.renewWatch(account.id);
         this.logger.log(`Renewed watch for account: ${account.email}`);
       } catch (error) {
         this.logger.error(`Failed to renew watch for ${account.email}:`, error);
-        
+
         // Mark account as needing attention
         await this.emailAccountService.update(account.id, {
-          syncStatus: 'ERROR',
+          syncStatus: "ERROR",
           lastError: `Watch renewal failed: ${error.message}`,
         });
       }
@@ -217,20 +238,28 @@ export class WatchRenewalScheduler {
   async cleanupExpiredWatches() {
     // Remove old watch data
     const expiredAccounts = await this.emailAccountService.findExpiredWatches();
-    
+
     for (const account of expiredAccounts) {
       try {
         // Try to set up a new watch
-        const accessToken = await this.authService.refreshGoogleToken(account.refreshToken);
-        await this.pubSubSetupService.setupPushNotifications(account.email, accessToken);
+        const accessToken = await this.authService.refreshGoogleToken(
+          account.refreshToken,
+        );
+        await this.pubSubSetupService.setupPushNotifications(
+          account.email,
+          accessToken,
+        );
       } catch (error) {
-        this.logger.error(`Failed to re-establish watch for ${account.email}:`, error);
-        
+        this.logger.error(
+          `Failed to re-establish watch for ${account.email}:`,
+          error,
+        );
+
         // Fall back to polling mode
         await this.emailAccountService.update(account.id, {
-          syncMode: 'POLLING',
-          syncStatus: 'ERROR',
-          lastError: 'Watch expired, falling back to polling mode',
+          syncMode: "POLLING",
+          syncStatus: "ERROR",
+          lastError: "Watch expired, falling back to polling mode",
         });
       }
     }
@@ -244,27 +273,27 @@ export class WatchRenewalScheduler {
 
 ```typescript
 // packages/api/src/webhooks/gmail-webhook.controller.ts
-import { 
-  Controller, 
-  Post, 
-  Body, 
-  Headers, 
-  HttpCode, 
+import {
+  Controller,
+  Post,
+  Body,
+  Headers,
+  HttpCode,
   HttpStatus,
   UseGuards,
   BadRequestException,
-} from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiExcludeEndpoint } from '@nestjs/swagger';
-import { GmailWebhookService } from './gmail-webhook.service';
-import { PubSubAuthGuard } from './guards/pubsub-auth.guard';
-import { GmailPushNotification } from './dto/gmail-push-notification.dto';
+} from "@nestjs/common";
+import { ApiTags, ApiOperation, ApiExcludeEndpoint } from "@nestjs/swagger";
+import { GmailWebhookService } from "./gmail-webhook.service";
+import { PubSubAuthGuard } from "./guards/pubsub-auth.guard";
+import { GmailPushNotification } from "./dto/gmail-push-notification.dto";
 
-@ApiTags('webhooks')
-@Controller('webhooks')
+@ApiTags("webhooks")
+@Controller("webhooks")
 export class GmailWebhookController {
   constructor(private gmailWebhookService: GmailWebhookService) {}
 
-  @Post('gmail')
+  @Post("gmail")
   @HttpCode(HttpStatus.OK)
   @UseGuards(PubSubAuthGuard)
   @ApiExcludeEndpoint() // Hide from public API docs
@@ -275,18 +304,18 @@ export class GmailWebhookController {
     // Parse Pub/Sub message
     const message = this.parsePubSubMessage(body);
     if (!message) {
-      throw new BadRequestException('Invalid Pub/Sub message');
+      throw new BadRequestException("Invalid Pub/Sub message");
     }
 
     // Process asynchronously
     setImmediate(() => {
-      this.gmailWebhookService.processNotification(message).catch(error => {
-        console.error('Failed to process Gmail notification:', error);
+      this.gmailWebhookService.processNotification(message).catch((error) => {
+        console.error("Failed to process Gmail notification:", error);
       });
     });
 
     // Acknowledge immediately
-    return { status: 'ok' };
+    return { status: "ok" };
   }
 
   private parsePubSubMessage(body: any): GmailPushNotification | null {
@@ -297,7 +326,7 @@ export class GmailWebhookController {
       }
 
       // Decode base64 data
-      const decodedData = Buffer.from(message.data, 'base64').toString('utf-8');
+      const decodedData = Buffer.from(message.data, "base64").toString("utf-8");
       const data = JSON.parse(decodedData);
 
       return {
@@ -308,7 +337,7 @@ export class GmailWebhookController {
         attributes: message.attributes || {},
       };
     } catch (error) {
-      console.error('Failed to parse Pub/Sub message:', error);
+      console.error("Failed to parse Pub/Sub message:", error);
       return null;
     }
   }
@@ -319,20 +348,20 @@ export class GmailWebhookController {
 
 ```typescript
 // packages/api/src/webhooks/gmail-webhook.service.ts
-import { Injectable, Logger } from '@nestjs/common';
-import { Queue } from 'bullmq';
-import { InjectQueue } from '@nestjs/bullmq';
-import { EmailAccountService } from '../email-accounts/email-account.service';
-import { GmailSyncService } from '../gmail/gmail-sync.service';
-import { GmailPushNotification } from './dto/gmail-push-notification.dto';
-import { RedisService } from '../redis/redis.service';
+import { Injectable, Logger } from "@nestjs/common";
+import { Queue } from "bullmq";
+import { InjectQueue } from "@nestjs/bullmq";
+import { EmailAccountService } from "../email-accounts/email-account.service";
+import { GmailSyncService } from "../gmail/gmail-sync.service";
+import { GmailPushNotification } from "./dto/gmail-push-notification.dto";
+import { RedisService } from "../redis/redis.service";
 
 @Injectable()
 export class GmailWebhookService {
   private readonly logger = new Logger(GmailWebhookService.name);
 
   constructor(
-    @InjectQueue('gmail-sync') private gmailSyncQueue: Queue,
+    @InjectQueue("gmail-sync") private gmailSyncQueue: Queue,
     private emailAccountService: EmailAccountService,
     private gmailSyncService: GmailSyncService,
     private redisService: RedisService,
@@ -340,7 +369,7 @@ export class GmailWebhookService {
 
   async processNotification(notification: GmailPushNotification) {
     const startTime = Date.now();
-    
+
     try {
       // Deduplication check
       const isDuplicate = await this.checkDuplicate(notification.messageId);
@@ -350,35 +379,41 @@ export class GmailWebhookService {
       }
 
       // Find email account
-      const account = await this.emailAccountService.findByEmail(notification.emailAddress);
+      const account = await this.emailAccountService.findByEmail(
+        notification.emailAddress,
+      );
       if (!account) {
-        this.logger.error(`No account found for email: ${notification.emailAddress}`);
+        this.logger.error(
+          `No account found for email: ${notification.emailAddress}`,
+        );
         return;
       }
 
       // Check if historyId is newer
-      const currentHistoryId = BigInt(account.historyId || '0');
+      const currentHistoryId = BigInt(account.historyId || "0");
       const notificationHistoryId = BigInt(notification.historyId);
-      
+
       if (notificationHistoryId <= currentHistoryId) {
-        this.logger.log(`Skipping old history: ${notification.historyId} <= ${account.historyId}`);
+        this.logger.log(
+          `Skipping old history: ${notification.historyId} <= ${account.historyId}`,
+        );
         return;
       }
 
       // Queue sync job
       const job = await this.gmailSyncQueue.add(
-        'sync-history',
+        "sync-history",
         {
           accountId: account.id,
           startHistoryId: account.historyId,
           endHistoryId: notification.historyId,
-          trigger: 'webhook',
+          trigger: "webhook",
         },
         {
           priority: 1,
           attempts: 3,
           backoff: {
-            type: 'exponential',
+            type: "exponential",
             delay: 2000,
           },
         },
@@ -389,7 +424,7 @@ export class GmailWebhookService {
       // Update metrics
       await this.updateMetrics(account.id, Date.now() - startTime);
     } catch (error) {
-      this.logger.error('Failed to process Gmail notification:', error);
+      this.logger.error("Failed to process Gmail notification:", error);
       throw error;
     }
   }
@@ -397,23 +432,23 @@ export class GmailWebhookService {
   private async checkDuplicate(messageId: string): Promise<boolean> {
     const key = `gmail:notification:${messageId}`;
     const exists = await this.redisService.exists(key);
-    
+
     if (!exists) {
       // Set with 1 hour expiration
-      await this.redisService.setex(key, 3600, '1');
+      await this.redisService.setex(key, 3600, "1");
     }
-    
+
     return exists;
   }
 
   private async updateMetrics(accountId: string, processingTime: number) {
-    const date = new Date().toISOString().split('T')[0];
+    const date = new Date().toISOString().split("T")[0];
     const key = `metrics:gmail:webhooks:${date}`;
-    
-    await this.redisService.hincrby(key, 'total', 1);
+
+    await this.redisService.hincrby(key, "total", 1);
     await this.redisService.hincrby(key, `account:${accountId}`, 1);
-    await this.redisService.hincrby(key, 'processing_time', processingTime);
-    
+    await this.redisService.hincrby(key, "processing_time", processingTime);
+
     // Expire after 30 days
     await this.redisService.expire(key, 30 * 24 * 60 * 60);
   }
@@ -426,16 +461,16 @@ export class GmailWebhookService {
 
 ```typescript
 // packages/api/src/webhooks/guards/pubsub-auth.guard.ts
-import { 
-  Injectable, 
-  CanActivate, 
+import {
+  Injectable,
+  CanActivate,
   ExecutionContext,
   UnauthorizedException,
   Logger,
-} from '@nestjs/common';
-import { Request } from 'express';
-import { OAuth2Client } from 'google-auth-library';
-import { ConfigService } from '@nestjs/config';
+} from "@nestjs/common";
+import { Request } from "express";
+import { OAuth2Client } from "google-auth-library";
+import { ConfigService } from "@nestjs/config";
 
 @Injectable()
 export class PubSubAuthGuard implements CanActivate {
@@ -448,53 +483,53 @@ export class PubSubAuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
-    
+
     // 1. Verify Bearer token
     const authHeader = request.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      this.logger.warn('Missing or invalid Authorization header');
-      throw new UnauthorizedException('Invalid authorization');
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      this.logger.warn("Missing or invalid Authorization header");
+      throw new UnauthorizedException("Invalid authorization");
     }
 
     const token = authHeader.substring(7);
-    
+
     try {
       // 2. Verify token with Google
       const ticket = await this.oauthClient.verifyIdToken({
         idToken: token,
-        audience: this.configService.get('GOOGLE_CLOUD_PROJECT_ID'),
+        audience: this.configService.get("GOOGLE_CLOUD_PROJECT_ID"),
       });
-      
+
       const payload = ticket.getPayload();
       if (!payload) {
-        throw new UnauthorizedException('Invalid token payload');
+        throw new UnauthorizedException("Invalid token payload");
       }
 
       // 3. Verify email and issuer
       const validIssuers = [
-        'https://accounts.google.com',
-        'accounts.google.com',
+        "https://accounts.google.com",
+        "accounts.google.com",
       ];
-      
+
       if (!validIssuers.includes(payload.iss)) {
         this.logger.warn(`Invalid token issuer: ${payload.iss}`);
-        throw new UnauthorizedException('Invalid token issuer');
+        throw new UnauthorizedException("Invalid token issuer");
       }
 
       // 4. Verify service account
-      const expectedEmail = 'gmail-api-push@system.gserviceaccount.com';
+      const expectedEmail = "gmail-api-push@system.gserviceaccount.com";
       if (payload.email !== expectedEmail) {
         this.logger.warn(`Invalid service account: ${payload.email}`);
-        throw new UnauthorizedException('Invalid service account');
+        throw new UnauthorizedException("Invalid service account");
       }
 
       // Add verified claims to request
       (request as any).pubsubClaims = payload;
-      
+
       return true;
     } catch (error) {
-      this.logger.error('Token verification failed:', error);
-      throw new UnauthorizedException('Token verification failed');
+      this.logger.error("Token verification failed:", error);
+      throw new UnauthorizedException("Token verification failed");
     }
   }
 }
@@ -504,8 +539,8 @@ export class PubSubAuthGuard implements CanActivate {
 
 ```typescript
 // packages/api/src/webhooks/dto/gmail-push-notification.dto.ts
-import { IsString, IsNumber, IsObject, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsString, IsNumber, IsObject, ValidateNested } from "class-validator";
+import { Type } from "class-transformer";
 
 export class PubSubMessage {
   @IsString()
@@ -560,21 +595,21 @@ export class GmailPushNotification {
 
 ```typescript
 // packages/api/src/gmail/processors/history-sync.processor.ts
-import { Processor, Process } from '@nestjs/bullmq';
-import { Job } from 'bullmq';
-import { Injectable, Logger } from '@nestjs/common';
-import { google } from 'googleapis';
-import { GmailHistoryService } from '../gmail-history.service';
-import { EmailAccountService } from '../../email-accounts/email-account.service';
+import { Processor, Process } from "@nestjs/bullmq";
+import { Job } from "bullmq";
+import { Injectable, Logger } from "@nestjs/common";
+import { google } from "googleapis";
+import { GmailHistoryService } from "../gmail-history.service";
+import { EmailAccountService } from "../../email-accounts/email-account.service";
 
 interface HistorySyncJob {
   accountId: string;
   startHistoryId: string;
   endHistoryId: string;
-  trigger: 'webhook' | 'manual' | 'scheduled';
+  trigger: "webhook" | "manual" | "scheduled";
 }
 
-@Processor('gmail-sync')
+@Processor("gmail-sync")
 @Injectable()
 export class HistorySyncProcessor {
   private readonly logger = new Logger(HistorySyncProcessor.name);
@@ -584,66 +619,79 @@ export class HistorySyncProcessor {
     private emailAccountService: EmailAccountService,
   ) {}
 
-  @Process('sync-history')
+  @Process("sync-history")
   async processHistorySync(job: Job<HistorySyncJob>) {
     const { accountId, startHistoryId, endHistoryId, trigger } = job.data;
-    
+
     this.logger.log(
-      `Processing history sync for account ${accountId}: ${startHistoryId} -> ${endHistoryId}`
+      `Processing history sync for account ${accountId}: ${startHistoryId} -> ${endHistoryId}`,
     );
 
     try {
       // Get account and auth
       const account = await this.emailAccountService.findOne(accountId);
       if (!account) {
-        throw new Error('Account not found');
+        throw new Error("Account not found");
       }
 
       const auth = await this.getAuth(account);
-      const gmail = google.gmail({ version: 'v1', auth });
+      const gmail = google.gmail({ version: "v1", auth });
 
       // Fetch history
-      const history = await this.fetchHistory(gmail, startHistoryId, endHistoryId);
-      
+      const history = await this.fetchHistory(
+        gmail,
+        startHistoryId,
+        endHistoryId,
+      );
+
       // Process changes
       const results = await this.processHistory(account, history);
-      
+
       // Update account
       await this.emailAccountService.update(accountId, {
         historyId: endHistoryId,
         lastSyncAt: new Date(),
-        syncStatus: 'ACTIVE',
+        syncStatus: "ACTIVE",
       });
 
       this.logger.log(
         `Completed history sync for ${account.email}: ` +
-        `${results.messagesAdded} added, ${results.messagesDeleted} deleted, ` +
-        `${results.labelsChanged} label changes`
+          `${results.messagesAdded} added, ${results.messagesDeleted} deleted, ` +
+          `${results.labelsChanged} label changes`,
       );
 
       return results;
     } catch (error) {
       this.logger.error(`History sync failed for account ${accountId}:`, error);
-      
+
       // Update account status
       await this.emailAccountService.update(accountId, {
-        syncStatus: 'ERROR',
+        syncStatus: "ERROR",
         lastError: error.message,
       });
-      
+
       throw error;
     }
   }
 
-  private async fetchHistory(gmail: any, startHistoryId: string, endHistoryId?: string) {
+  private async fetchHistory(
+    gmail: any,
+    startHistoryId: string,
+    endHistoryId?: string,
+  ) {
     const history = [];
     let pageToken: string | undefined;
-    
+
     do {
       const response = await gmail.users.history.list({
-        userId: 'me',
+        userId: "me",
         startHistoryId,
-        historyTypes: ['messageAdded', 'messageDeleted', 'labelAdded', 'labelRemoved'],
+        historyTypes: [
+          "messageAdded",
+          "messageDeleted",
+          "labelAdded",
+          "labelRemoved",
+        ],
         pageToken,
       });
 
@@ -652,7 +700,7 @@ export class HistorySyncProcessor {
       }
 
       pageToken = response.data.nextPageToken;
-      
+
       // Check if we've reached the end history ID
       if (endHistoryId && response.data.historyId >= endHistoryId) {
         break;
@@ -692,10 +740,14 @@ export class HistorySyncProcessor {
           ...(record.labelsAdded || []),
           ...(record.labelsRemoved || []),
         ];
-        
+
         for (const item of labelChanges) {
-          await this.processLabelChange(account, item.message, item.labelIds, 
-            record.labelsAdded ? 'added' : 'removed');
+          await this.processLabelChange(
+            account,
+            item.message,
+            item.labelIds,
+            record.labelsAdded ? "added" : "removed",
+          );
           results.labelsChanged++;
         }
       }
@@ -706,7 +758,7 @@ export class HistorySyncProcessor {
 
   private async processAddedMessage(account: any, message: any) {
     // Queue job to fetch and store full message
-    await this.emailSyncQueue.add('fetch-message', {
+    await this.emailSyncQueue.add("fetch-message", {
       accountId: account.id,
       messageId: message.id,
       threadId: message.threadId,
@@ -719,30 +771,40 @@ export class HistorySyncProcessor {
   }
 
   private async processLabelChange(
-    account: any, 
-    message: any, 
-    labelIds: string[], 
-    action: 'added' | 'removed'
+    account: any,
+    message: any,
+    labelIds: string[],
+    action: "added" | "removed",
   ) {
     // Update message labels in database
-    if (action === 'added') {
-      await this.emailService.addLabels(account.workspaceId, message.id, labelIds);
+    if (action === "added") {
+      await this.emailService.addLabels(
+        account.workspaceId,
+        message.id,
+        labelIds,
+      );
     } else {
-      await this.emailService.removeLabels(account.workspaceId, message.id, labelIds);
+      await this.emailService.removeLabels(
+        account.workspaceId,
+        message.id,
+        labelIds,
+      );
     }
   }
 
   private async getAuth(account: any) {
     const oauth2Client = new google.auth.OAuth2(
-      this.configService.get('GOOGLE_CLIENT_ID'),
-      this.configService.get('GOOGLE_CLIENT_SECRET'),
-      this.configService.get('GOOGLE_REDIRECT_URI'),
+      this.configService.get("GOOGLE_CLIENT_ID"),
+      this.configService.get("GOOGLE_CLIENT_SECRET"),
+      this.configService.get("GOOGLE_REDIRECT_URI"),
     );
 
     // Refresh token if needed
-    const tokens = await this.authService.refreshGoogleToken(account.refreshToken);
+    const tokens = await this.authService.refreshGoogleToken(
+      account.refreshToken,
+    );
     oauth2Client.setCredentials(tokens);
-    
+
     return oauth2Client;
   }
 }
@@ -752,12 +814,12 @@ export class HistorySyncProcessor {
 
 ```typescript
 // packages/api/src/gmail/processors/message-fetch.processor.ts
-import { Processor, Process } from '@nestjs/bullmq';
-import { Job } from 'bullmq';
-import { Injectable, Logger } from '@nestjs/common';
-import { google } from 'googleapis';
-import { EmailService } from '../../emails/email.service';
-import { EmailParserService } from '../email-parser.service';
+import { Processor, Process } from "@nestjs/bullmq";
+import { Job } from "bullmq";
+import { Injectable, Logger } from "@nestjs/common";
+import { google } from "googleapis";
+import { EmailService } from "../../emails/email.service";
+import { EmailParserService } from "../email-parser.service";
 
 interface MessageFetchJob {
   accountId: string;
@@ -765,7 +827,7 @@ interface MessageFetchJob {
   threadId: string;
 }
 
-@Processor('gmail-sync')
+@Processor("gmail-sync")
 @Injectable()
 export class MessageFetchProcessor {
   private readonly logger = new Logger(MessageFetchProcessor.name);
@@ -775,27 +837,27 @@ export class MessageFetchProcessor {
     private emailParserService: EmailParserService,
   ) {}
 
-  @Process('fetch-message')
+  @Process("fetch-message")
   async processFetchMessage(job: Job<MessageFetchJob>) {
     const { accountId, messageId, threadId } = job.data;
-    
+
     try {
       // Get auth and Gmail client
       const auth = await this.getAuth(accountId);
-      const gmail = google.gmail({ version: 'v1', auth });
+      const gmail = google.gmail({ version: "v1", auth });
 
       // Fetch full message
       const response = await gmail.users.messages.get({
-        userId: 'me',
+        userId: "me",
         id: messageId,
-        format: 'full',
+        format: "full",
       });
 
       const message = response.data;
-      
+
       // Parse message
       const parsedEmail = this.emailParserService.parseGmailMessage(message);
-      
+
       // Store in database
       await this.emailService.upsert({
         ...parsedEmail,
@@ -807,7 +869,11 @@ export class MessageFetchProcessor {
 
       // Process attachments if any
       if (parsedEmail.attachments?.length > 0) {
-        await this.processAttachments(accountId, messageId, parsedEmail.attachments);
+        await this.processAttachments(
+          accountId,
+          messageId,
+          parsedEmail.attachments,
+        );
       }
 
       // Extract and link contacts
@@ -821,17 +887,20 @@ export class MessageFetchProcessor {
   }
 
   private async processAttachments(
-    accountId: string, 
-    messageId: string, 
-    attachments: any[]
+    accountId: string,
+    messageId: string,
+    attachments: any[],
   ) {
     for (const attachment of attachments) {
-      if (attachment.size > 25 * 1024 * 1024) { // 25MB limit
-        this.logger.warn(`Skipping large attachment: ${attachment.filename} (${attachment.size} bytes)`);
+      if (attachment.size > 25 * 1024 * 1024) {
+        // 25MB limit
+        this.logger.warn(
+          `Skipping large attachment: ${attachment.filename} (${attachment.size} bytes)`,
+        );
         continue;
       }
 
-      await this.attachmentQueue.add('download-attachment', {
+      await this.attachmentQueue.add("download-attachment", {
         accountId,
         messageId,
         attachmentId: attachment.id,
@@ -844,12 +913,12 @@ export class MessageFetchProcessor {
 
   private async extractContacts(email: any) {
     const contacts = [];
-    
+
     // Extract from sender
     if (email.from) {
       contacts.push(email.from);
     }
-    
+
     // Extract from recipients
     if (email.to) {
       contacts.push(...email.to);
@@ -857,13 +926,13 @@ export class MessageFetchProcessor {
     if (email.cc) {
       contacts.push(...email.cc);
     }
-    
+
     // Queue contact enrichment
     for (const contact of contacts) {
-      await this.contactQueue.add('enrich-contact', {
+      await this.contactQueue.add("enrich-contact", {
         email: contact.email,
         name: contact.name,
-        source: 'GMAIL',
+        source: "GMAIL",
         workspaceId: email.workspaceId,
       });
     }
@@ -877,10 +946,10 @@ export class MessageFetchProcessor {
 
 ```typescript
 // packages/api/src/gmail/services/webhook-recovery.service.ts
-import { Injectable, Logger } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
-import { EmailAccountService } from '../../email-accounts/email-account.service';
-import { GmailSyncService } from '../gmail-sync.service';
+import { Injectable, Logger } from "@nestjs/common";
+import { Cron } from "@nestjs/schedule";
+import { EmailAccountService } from "../../email-accounts/email-account.service";
+import { GmailSyncService } from "../gmail-sync.service";
 
 @Injectable()
 export class WebhookRecoveryService {
@@ -891,17 +960,17 @@ export class WebhookRecoveryService {
     private gmailSyncService: GmailSyncService,
   ) {}
 
-  @Cron('*/30 * * * *') // Every 30 minutes
+  @Cron("*/30 * * * *") // Every 30 minutes
   async checkMissedUpdates() {
     const accounts = await this.emailAccountService.findActive();
-    
+
     for (const account of accounts) {
       try {
         await this.checkAccountForMissedUpdates(account);
       } catch (error) {
         this.logger.error(
-          `Failed to check missed updates for ${account.email}:`, 
-          error
+          `Failed to check missed updates for ${account.email}:`,
+          error,
         );
       }
     }
@@ -910,49 +979,52 @@ export class WebhookRecoveryService {
   private async checkAccountForMissedUpdates(account: any) {
     const lastSync = account.lastSyncAt || account.createdAt;
     const timeSinceSync = Date.now() - lastSync.getTime();
-    
+
     // If no sync in 2 hours, check for updates
     if (timeSinceSync > 2 * 60 * 60 * 1000) {
       this.logger.warn(
-        `Account ${account.email} hasn't synced in ${Math.round(timeSinceSync / 60000)} minutes`
+        `Account ${account.email} hasn't synced in ${Math.round(timeSinceSync / 60000)} minutes`,
       );
-      
+
       // Perform manual sync
       await this.gmailSyncService.syncAccount(account.id, {
         fullSync: false,
-        source: 'recovery',
+        source: "recovery",
       });
     }
   }
 
   async handleWebhookFailure(accountId: string, error: Error) {
-    this.logger.error(`Webhook processing failed for account ${accountId}:`, error);
-    
+    this.logger.error(
+      `Webhook processing failed for account ${accountId}:`,
+      error,
+    );
+
     // Increment failure count
     const account = await this.emailAccountService.findOne(accountId);
     const failureCount = (account.webhookFailureCount || 0) + 1;
-    
+
     await this.emailAccountService.update(accountId, {
       webhookFailureCount: failureCount,
       lastWebhookError: error.message,
       lastWebhookErrorAt: new Date(),
     });
-    
+
     // Switch to polling if too many failures
     if (failureCount >= 5) {
       this.logger.warn(
-        `Switching account ${account.email} to polling mode due to webhook failures`
+        `Switching account ${account.email} to polling mode due to webhook failures`,
       );
-      
+
       await this.emailAccountService.update(accountId, {
-        syncMode: 'POLLING',
+        syncMode: "POLLING",
         webhookFailureCount: 0,
       });
-      
+
       // Schedule polling job
-      await this.pollingQueue.add('poll-account', {
+      await this.pollingQueue.add("poll-account", {
         accountId,
-        interval: '5m',
+        interval: "5m",
       });
     }
   }
@@ -963,9 +1035,9 @@ export class WebhookRecoveryService {
 
 ```typescript
 // packages/api/src/gmail/queues/sync-queue.config.ts
-import { Queue, QueueOptions } from 'bullmq';
-import { Injectable } from '@nestjs/common';
-import { RedisService } from '../../redis/redis.service';
+import { Queue, QueueOptions } from "bullmq";
+import { Injectable } from "@nestjs/common";
+import { RedisService } from "../../redis/redis.service";
 
 @Injectable()
 export class SyncQueueConfig {
@@ -977,7 +1049,7 @@ export class SyncQueueConfig {
       defaultJobOptions: {
         attempts: 5,
         backoff: {
-          type: 'exponential',
+          type: "exponential",
           delay: 2000,
           maxDelay: 60000,
         },
@@ -992,15 +1064,15 @@ export class SyncQueueConfig {
       },
     };
 
-    const queue = new Queue('gmail-sync', queueOptions);
+    const queue = new Queue("gmail-sync", queueOptions);
 
     // Add event listeners
-    queue.on('failed', (job, error) => {
+    queue.on("failed", (job, error) => {
       console.error(`Job ${job.id} failed:`, error);
       this.handleJobFailure(job, error);
     });
 
-    queue.on('stalled', (jobId) => {
+    queue.on("stalled", (jobId) => {
       console.warn(`Job ${jobId} stalled`);
     });
 
@@ -1022,7 +1094,7 @@ export class SyncQueueConfig {
     if (job.attemptsMade >= job.opts.attempts) {
       await this.webhookRecoveryService.handleWebhookFailure(
         job.data.accountId,
-        error
+        error,
       );
     }
   }
@@ -1035,23 +1107,23 @@ export class SyncQueueConfig {
 
 ```typescript
 // packages/api/src/gmail/services/webhook-metrics.service.ts
-import { Injectable } from '@nestjs/common';
-import { InjectMetric } from '@willsoto/nestjs-prometheus';
-import { Counter, Histogram, Gauge } from 'prom-client';
+import { Injectable } from "@nestjs/common";
+import { InjectMetric } from "@willsoto/nestjs-prometheus";
+import { Counter, Histogram, Gauge } from "prom-client";
 
 @Injectable()
 export class WebhookMetricsService {
   constructor(
-    @InjectMetric('gmail_webhook_received_total')
+    @InjectMetric("gmail_webhook_received_total")
     private webhookReceivedCounter: Counter<string>,
-    
-    @InjectMetric('gmail_webhook_processing_duration_seconds')
+
+    @InjectMetric("gmail_webhook_processing_duration_seconds")
     private processingDurationHistogram: Histogram<string>,
-    
-    @InjectMetric('gmail_webhook_queue_size')
+
+    @InjectMetric("gmail_webhook_queue_size")
     private queueSizeGauge: Gauge<string>,
-    
-    @InjectMetric('gmail_webhook_errors_total')
+
+    @InjectMetric("gmail_webhook_errors_total")
     private errorCounter: Counter<string>,
   ) {}
 
@@ -1060,7 +1132,9 @@ export class WebhookMetricsService {
   }
 
   recordProcessingDuration(emailAddress: string, duration: number) {
-    this.processingDurationHistogram.labels(emailAddress).observe(duration / 1000);
+    this.processingDurationHistogram
+      .labels(emailAddress)
+      .observe(duration / 1000);
   }
 
   updateQueueSize(size: number) {
@@ -1086,37 +1160,37 @@ export class WebhookMetricsService {
 
 ```typescript
 // packages/api/src/gmail/controllers/webhook-debug.controller.ts
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { AdminGuard } from '../../auth/guards/admin.guard';
-import { WebhookDebugService } from '../services/webhook-debug.service';
+import { Controller, Get, Param, UseGuards } from "@nestjs/common";
+import { ApiTags, ApiOperation } from "@nestjs/swagger";
+import { AdminGuard } from "../../auth/guards/admin.guard";
+import { WebhookDebugService } from "../services/webhook-debug.service";
 
-@ApiTags('admin')
-@Controller('admin/webhooks/gmail')
+@ApiTags("admin")
+@Controller("admin/webhooks/gmail")
 @UseGuards(AdminGuard)
 export class WebhookDebugController {
   constructor(private webhookDebugService: WebhookDebugService) {}
 
-  @Get('status')
-  @ApiOperation({ summary: 'Get webhook system status' })
+  @Get("status")
+  @ApiOperation({ summary: "Get webhook system status" })
   async getStatus() {
     return this.webhookDebugService.getSystemStatus();
   }
 
-  @Get('accounts/:accountId/history')
-  @ApiOperation({ summary: 'Get webhook history for account' })
-  async getAccountHistory(@Param('accountId') accountId: string) {
+  @Get("accounts/:accountId/history")
+  @ApiOperation({ summary: "Get webhook history for account" })
+  async getAccountHistory(@Param("accountId") accountId: string) {
     return this.webhookDebugService.getAccountWebhookHistory(accountId);
   }
 
-  @Get('accounts/:accountId/test')
-  @ApiOperation({ summary: 'Send test webhook for account' })
-  async sendTestWebhook(@Param('accountId') accountId: string) {
+  @Get("accounts/:accountId/test")
+  @ApiOperation({ summary: "Send test webhook for account" })
+  async sendTestWebhook(@Param("accountId") accountId: string) {
     return this.webhookDebugService.sendTestWebhook(accountId);
   }
 
-  @Get('metrics')
-  @ApiOperation({ summary: 'Get webhook metrics' })
+  @Get("metrics")
+  @ApiOperation({ summary: "Get webhook metrics" })
   async getMetrics() {
     return this.webhookDebugService.getMetrics();
   }
@@ -1133,22 +1207,22 @@ import {
   ExecutionContext,
   CallHandler,
   Logger,
-} from '@nestjs/common';
-import { Observable } from 'rxjs';
-import { tap, catchError } from 'rxjs/operators';
-import { Request } from 'express';
+} from "@nestjs/common";
+import { Observable } from "rxjs";
+import { tap, catchError } from "rxjs/operators";
+import { Request } from "express";
 
 @Injectable()
 export class WebhookLoggingInterceptor implements NestInterceptor {
-  private readonly logger = new Logger('WebhookLogger');
+  private readonly logger = new Logger("WebhookLogger");
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest<Request>();
     const startTime = Date.now();
-    
+
     // Log incoming webhook
     this.logger.log({
-      message: 'Incoming Gmail webhook',
+      message: "Incoming Gmail webhook",
       headers: this.sanitizeHeaders(request.headers),
       body: this.sanitizeBody(request.body),
       timestamp: new Date().toISOString(),
@@ -1158,7 +1232,7 @@ export class WebhookLoggingInterceptor implements NestInterceptor {
       tap(() => {
         const duration = Date.now() - startTime;
         this.logger.log({
-          message: 'Webhook processed successfully',
+          message: "Webhook processed successfully",
           duration,
           timestamp: new Date().toISOString(),
         });
@@ -1166,7 +1240,7 @@ export class WebhookLoggingInterceptor implements NestInterceptor {
       catchError((error) => {
         const duration = Date.now() - startTime;
         this.logger.error({
-          message: 'Webhook processing failed',
+          message: "Webhook processing failed",
           error: error.message,
           stack: error.stack,
           duration,
@@ -1191,7 +1265,7 @@ export class WebhookLoggingInterceptor implements NestInterceptor {
     if (bodyStr.length > 1000) {
       return {
         truncated: true,
-        preview: bodyStr.substring(0, 1000) + '...',
+        preview: bodyStr.substring(0, 1000) + "...",
       };
     }
     return body;

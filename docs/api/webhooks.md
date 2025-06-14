@@ -21,6 +21,7 @@ Webhooks allow your application to receive real-time notifications when events o
 ```
 
 **Response**
+
 ```json
 {
   "id": "webhook_123",
@@ -87,7 +88,9 @@ Sends a test payload to verify your endpoint is working correctly.
 ### Contact Events
 
 #### contact.created
+
 Triggered when a new contact is created
+
 ```json
 {
   "event": "contact.created",
@@ -106,7 +109,9 @@ Triggered when a new contact is created
 ```
 
 #### contact.updated
+
 Triggered when a contact is updated
+
 ```json
 {
   "event": "contact.updated",
@@ -129,7 +134,9 @@ Triggered when a contact is updated
 ```
 
 #### contact.deleted
+
 Triggered when a contact is deleted
+
 ```json
 {
   "event": "contact.deleted",
@@ -142,7 +149,9 @@ Triggered when a contact is deleted
 ```
 
 #### contact.merged
+
 Triggered when contacts are merged
+
 ```json
 {
   "event": "contact.merged",
@@ -158,7 +167,9 @@ Triggered when contacts are merged
 ### Deal Events
 
 #### deal.created
+
 Triggered when a new deal is created
+
 ```json
 {
   "event": "deal.created",
@@ -178,7 +189,9 @@ Triggered when a new deal is created
 ```
 
 #### deal.updated
+
 Triggered when a deal is updated
+
 ```json
 {
   "event": "deal.updated",
@@ -201,7 +214,9 @@ Triggered when a deal is updated
 ```
 
 #### deal.stage_changed
+
 Triggered when a deal moves to a different stage
+
 ```json
 {
   "event": "deal.stage_changed",
@@ -218,7 +233,9 @@ Triggered when a deal moves to a different stage
 ```
 
 #### deal.won
+
 Triggered when a deal is marked as won
+
 ```json
 {
   "event": "deal.won",
@@ -234,7 +251,9 @@ Triggered when a deal is marked as won
 ```
 
 #### deal.lost
+
 Triggered when a deal is marked as lost
+
 ```json
 {
   "event": "deal.lost",
@@ -251,7 +270,9 @@ Triggered when a deal is marked as lost
 ### Email Events
 
 #### email.received
+
 Triggered when an email is received
+
 ```json
 {
   "event": "email.received",
@@ -270,7 +291,9 @@ Triggered when an email is received
 ```
 
 #### email.sent
+
 Triggered when an email is sent
+
 ```json
 {
   "event": "email.sent",
@@ -288,7 +311,9 @@ Triggered when an email is sent
 ```
 
 #### email.bounced
+
 Triggered when an email bounces
+
 ```json
 {
   "event": "email.bounced",
@@ -306,7 +331,9 @@ Triggered when an email bounces
 ### Activity Events
 
 #### activity.created
+
 Triggered when an activity is logged
+
 ```json
 {
   "event": "activity.created",
@@ -325,7 +352,9 @@ Triggered when an activity is logged
 ```
 
 #### meeting.scheduled
+
 Triggered when a meeting is scheduled
+
 ```json
 {
   "event": "meeting.scheduled",
@@ -345,7 +374,9 @@ Triggered when a meeting is scheduled
 ### Task Events
 
 #### task.created
+
 Triggered when a task is created
+
 ```json
 {
   "event": "task.created",
@@ -363,7 +394,9 @@ Triggered when a task is created
 ```
 
 #### task.completed
+
 Triggered when a task is completed
+
 ```json
 {
   "event": "task.completed",
@@ -383,6 +416,7 @@ Triggered when a task is completed
 All webhook payloads include a signature header for verification:
 
 **Headers**
+
 ```
 X-Webhook-Signature: sha256=3b24c5b8a9d0e2f1...
 X-Webhook-Timestamp: 1641825600
@@ -390,50 +424,51 @@ X-Webhook-Event: contact.created
 ```
 
 **Verification Example (Node.js)**
+
 ```javascript
-const crypto = require('crypto');
+const crypto = require("crypto");
 
 function verifyWebhookSignature(payload, signature, timestamp, secret) {
   // Prevent replay attacks (5 minute window)
   const currentTime = Math.floor(Date.now() / 1000);
   if (currentTime - parseInt(timestamp) > 300) {
-    throw new Error('Webhook timestamp too old');
+    throw new Error("Webhook timestamp too old");
   }
-  
+
   // Verify signature
   const message = `${timestamp}.${JSON.stringify(payload)}`;
   const expectedSignature = crypto
-    .createHmac('sha256', secret)
+    .createHmac("sha256", secret)
     .update(message)
-    .digest('hex');
-  
-  const actualSignature = signature.replace('sha256=', '');
-  
+    .digest("hex");
+
+  const actualSignature = signature.replace("sha256=", "");
+
   if (actualSignature !== expectedSignature) {
-    throw new Error('Invalid webhook signature');
+    throw new Error("Invalid webhook signature");
   }
-  
+
   return true;
 }
 
 // Express.js middleware
-app.post('/webhooks/crm', (req, res) => {
+app.post("/webhooks/crm", (req, res) => {
   try {
     verifyWebhookSignature(
       req.body,
-      req.headers['x-webhook-signature'],
-      req.headers['x-webhook-timestamp'],
-      process.env.WEBHOOK_SECRET
+      req.headers["x-webhook-signature"],
+      req.headers["x-webhook-timestamp"],
+      process.env.WEBHOOK_SECRET,
     );
-    
+
     // Process webhook
-    console.log('Webhook verified:', req.headers['x-webhook-event']);
-    
+    console.log("Webhook verified:", req.headers["x-webhook-event"]);
+
     // Acknowledge receipt
-    res.status(200).send('OK');
+    res.status(200).send("OK");
   } catch (error) {
-    console.error('Webhook verification failed:', error);
-    res.status(401).send('Unauthorized');
+    console.error("Webhook verification failed:", error);
+    res.status(401).send("Unauthorized");
   }
 });
 ```
@@ -441,6 +476,7 @@ app.post('/webhooks/crm', (req, res) => {
 ### IP Whitelisting
 
 Webhook requests originate from these IP addresses:
+
 - `52.89.214.238`
 - `34.212.75.30`
 - `54.218.53.128`
@@ -452,6 +488,7 @@ Configure your firewall to allow traffic from these IPs.
 ### Delivery Attempts
 
 Webhooks are delivered with the following retry policy:
+
 - Initial attempt: Immediate
 - 1st retry: 1 minute later
 - 2nd retry: 5 minutes later
@@ -462,12 +499,14 @@ Webhooks are delivered with the following retry policy:
 ### Success Criteria
 
 A webhook delivery is considered successful if:
+
 - HTTP status code is 2xx (200-299)
 - Response is received within 10 seconds
 
 ### Failure Handling
 
 After 5 failed attempts:
+
 - Webhook is marked as failing
 - Email notification sent to webhook owner
 - Webhook is automatically disabled after 3 consecutive days of failures
@@ -506,34 +545,38 @@ After 5 failed attempts:
 ### Endpoint Implementation
 
 1. **Acknowledge Quickly**
+
    - Return 200 OK immediately
    - Process webhook asynchronously
+
    ```javascript
-   app.post('/webhooks', (req, res) => {
+   app.post("/webhooks", (req, res) => {
      // Acknowledge receipt
-     res.status(200).send('OK');
-     
+     res.status(200).send("OK");
+
      // Process async
      processWebhookAsync(req.body);
    });
    ```
 
 2. **Idempotency**
+
    - Handle duplicate deliveries gracefully
    - Use event IDs to track processed events
+
    ```javascript
    async function processWebhook(event) {
      const eventId = event.id;
-     
+
      // Check if already processed
      if (await isEventProcessed(eventId)) {
-       console.log('Event already processed:', eventId);
+       console.log("Event already processed:", eventId);
        return;
      }
-     
+
      // Process event
      await handleEvent(event);
-     
+
      // Mark as processed
      await markEventProcessed(eventId);
    }
@@ -547,7 +590,7 @@ After 5 failed attempts:
      try {
        await processWebhook(payload);
      } catch (error) {
-       console.error('Webhook processing failed:', error);
+       console.error("Webhook processing failed:", error);
        await queueForRetry(payload);
      }
    }
@@ -556,14 +599,17 @@ After 5 failed attempts:
 ### Security Best Practices
 
 1. **Always Verify Signatures**
+
    - Never trust webhook data without verification
    - Use constant-time comparison for signatures
 
 2. **Use HTTPS**
+
    - Only register HTTPS endpoints
    - Ensure valid SSL certificates
 
 3. **Limit Access**
+
    - Restrict webhook endpoints to POST only
    - Implement rate limiting
 
@@ -574,6 +620,7 @@ After 5 failed attempts:
 ### Monitoring & Debugging
 
 1. **Log All Webhooks**
+
    ```javascript
    function logWebhook(event, status, error = null) {
      console.log({
@@ -581,12 +628,13 @@ After 5 failed attempts:
        event: event.event,
        eventId: event.id,
        status,
-       error: error?.message
+       error: error?.message,
      });
    }
    ```
 
 2. **Monitor Webhook Health**
+
    - Track success/failure rates
    - Alert on repeated failures
    - Monitor response times
@@ -601,6 +649,7 @@ After 5 failed attempts:
 ### Webhook CLI
 
 Test webhooks locally using our CLI:
+
 ```bash
 # Install CLI
 npm install -g @hastecrm/webhook-cli
@@ -618,6 +667,7 @@ hastecrm-webhooks events replay event_123
 ### Webhook Inspector
 
 View webhook deliveries in the dashboard:
+
 1. Navigate to Settings � Webhooks
 2. Click on a webhook
 3. View delivery history and payloads
@@ -626,31 +676,32 @@ View webhook deliveries in the dashboard:
 ## Example Implementations
 
 ### Node.js/Express
+
 ```javascript
-const express = require('express');
-const crypto = require('crypto');
+const express = require("express");
+const crypto = require("crypto");
 
 const app = express();
 app.use(express.json());
 
 // Webhook endpoint
-app.post('/webhooks/crm', async (req, res) => {
+app.post("/webhooks/crm", async (req, res) => {
   // Verify signature
   if (!verifySignature(req)) {
-    return res.status(401).send('Unauthorized');
+    return res.status(401).send("Unauthorized");
   }
-  
+
   // Acknowledge receipt
-  res.status(200).send('OK');
-  
+  res.status(200).send("OK");
+
   // Process event
   const event = req.body;
-  
+
   switch (event.event) {
-    case 'contact.created':
+    case "contact.created":
       await handleContactCreated(event.data);
       break;
-    case 'deal.stage_changed':
+    case "deal.stage_changed":
       await handleDealStageChange(event.data);
       break;
     // ... handle other events
@@ -658,23 +709,24 @@ app.post('/webhooks/crm', async (req, res) => {
 });
 
 function verifySignature(req) {
-  const signature = req.headers['x-webhook-signature'];
-  const timestamp = req.headers['x-webhook-timestamp'];
+  const signature = req.headers["x-webhook-signature"];
+  const timestamp = req.headers["x-webhook-timestamp"];
   const secret = process.env.WEBHOOK_SECRET;
-  
+
   const payload = JSON.stringify(req.body);
   const message = `${timestamp}.${payload}`;
-  
+
   const expectedSignature = `sha256=${crypto
-    .createHmac('sha256', secret)
+    .createHmac("sha256", secret)
     .update(message)
-    .digest('hex')}`;
-  
+    .digest("hex")}`;
+
   return signature === expectedSignature;
 }
 ```
 
 ### Python/Flask
+
 ```python
 import hmac
 import hashlib
@@ -688,29 +740,29 @@ def handle_webhook():
     # Verify signature
     if not verify_signature(request):
         abort(401)
-    
+
     # Process event
     event = request.json
-    
+
     if event['event'] == 'contact.created':
         handle_contact_created(event['data'])
     elif event['event'] == 'deal.stage_changed':
         handle_deal_stage_change(event['data'])
-    
+
     return 'OK', 200
 
 def verify_signature(request):
     signature = request.headers.get('X-Webhook-Signature')
     timestamp = request.headers.get('X-Webhook-Timestamp')
     secret = os.environ['WEBHOOK_SECRET']
-    
+
     message = f"{timestamp}.{request.data.decode()}"
     expected_signature = f"sha256={hmac.new(
         secret.encode(),
         message.encode(),
         hashlib.sha256
     ).hexdigest()}"
-    
+
     return hmac.compare_digest(signature, expected_signature)
 ```
 
@@ -719,17 +771,20 @@ def verify_signature(request):
 ### Common Issues
 
 1. **Webhook Not Receiving Events**
+
    - Verify webhook is active
    - Check event subscriptions
    - Confirm endpoint is accessible
    - Review firewall/security group rules
 
 2. **Signature Verification Failing**
+
    - Ensure secret matches exactly
    - Check timestamp validation window
    - Verify payload serialization matches
 
 3. **Duplicate Events**
+
    - Implement idempotency using event IDs
    - Check for multiple webhook registrations
    - Review retry policy understanding
@@ -742,6 +797,7 @@ def verify_signature(request):
 ## API Rate Limits
 
 Webhook endpoints are subject to:
+
 - 10,000 webhook deliveries per hour
 - 100 webhook endpoints per account
 - 50 events per webhook configuration

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] - 2024-01-15
 
 ### Added
+
 - Initial GraphQL API with full schema
 - REST API v1 endpoints
 - WebSocket support for real-time updates
@@ -20,12 +21,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive error handling
 
 ### API Endpoints
+
 - GraphQL endpoint at `/graphql`
 - REST API base path `/v1`
 - WebSocket endpoint at `/ws`
 - Server-sent events at `/v1/events/stream`
 
 ### Security
+
 - RS256 JWT tokens
 - 15-minute access token expiry
 - 7-day refresh token expiry
@@ -33,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Encrypted token storage
 
 ### Rate Limits
+
 - GraphQL: 1000 req/min (authenticated), 100 req/min (unauthenticated)
 - REST: 500 req/min (authenticated), 50 req/min (unauthenticated)
 - WebSocket: 100 msg/min
@@ -41,6 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Upcoming]
 
 ### Planned Features
+
 - GraphQL schema stitching for microservices
 - API versioning for GraphQL
 - Batch operations support
@@ -49,6 +54,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Usage analytics dashboard
 
 ### Deprecations
+
 - None planned
 
 ---

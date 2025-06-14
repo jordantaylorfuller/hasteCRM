@@ -13,6 +13,7 @@ pnpm dev
 ```
 
 Access:
+
 - Web: http://localhost:3000
 - API: http://localhost:4000/graphql
 
@@ -35,6 +36,7 @@ hasteCRM/
 ## Development Workflow
 
 ### 1. Create Feature Branch
+
 ```bash
 git checkout -b feature/your-feature
 ```
@@ -42,6 +44,7 @@ git checkout -b feature/your-feature
 ### 2. Make Changes
 
 #### Frontend (Next.js)
+
 ```typescript
 // apps/web/app/contacts/page.tsx
 export default async function ContactsPage() {
@@ -51,19 +54,21 @@ export default async function ContactsPage() {
 ```
 
 #### Backend (NestJS)
+
 ```typescript
 // apps/api/src/contacts/contacts.service.ts
 @Injectable()
 export class ContactsService {
   async findAll(workspaceId: string) {
     return this.prisma.contact.findMany({
-      where: { workspaceId }
+      where: { workspaceId },
     });
   }
 }
 ```
 
 ### 3. Run Tests
+
 ```bash
 pnpm test
 pnpm typecheck
@@ -71,6 +76,7 @@ pnpm lint
 ```
 
 ### 4. Commit Changes
+
 ```bash
 git add .
 git commit -m "feat: add contact filtering"
@@ -122,18 +128,21 @@ GOOGLE_CLIENT_SECRET=your-google-oauth-secret
 ## Common Tasks
 
 ### Add New Package
+
 ```bash
 pnpm add package-name --filter=web
 pnpm add package-name --filter=api
 ```
 
 ### Create Migration
+
 ```bash
 # Edit schema.prisma first
 pnpm -F database prisma migrate dev --name your_migration_name
 ```
 
 ### Debug API
+
 ```bash
 # Start with debugger
 pnpm -F api dev:debug
@@ -144,11 +153,12 @@ pnpm -F api dev:debug
 ## Code Style
 
 ### TypeScript
+
 ```typescript
 // ✅ Good
 export async function getContact(id: string): Promise<Contact> {
   const contact = await db.contact.findUnique({ where: { id } });
-  if (!contact) throw new NotFoundError('Contact not found');
+  if (!contact) throw new NotFoundError("Contact not found");
   return contact;
 }
 
@@ -159,6 +169,7 @@ export async function getContact(id) {
 ```
 
 ### React Components
+
 ```tsx
 // ✅ Good
 interface ContactCardProps {
@@ -178,13 +189,14 @@ export function ContactCard({ contact, onEdit }: ContactCardProps) {
 ```
 
 ### GraphQL Resolvers
+
 ```typescript
 @Resolver(() => Contact)
 export class ContactResolver {
   @Query(() => Contact, { nullable: true })
   async contact(
-    @Args('id') id: string,
-    @CurrentWorkspace() workspaceId: string
+    @Args("id") id: string,
+    @CurrentWorkspace() workspaceId: string,
   ): Promise<Contact | null> {
     return this.contactService.findOne(id, workspaceId);
   }
@@ -194,17 +206,20 @@ export class ContactResolver {
 ## Troubleshooting
 
 ### Port Already in Use
+
 ```bash
 lsof -ti:3000 | xargs kill -9
 lsof -ti:4000 | xargs kill -9
 ```
 
 ### Database Connection Error
+
 ```bash
 docker-compose restart postgres
 ```
 
 ### Type Errors
+
 ```bash
 pnpm clean
 pnpm install
@@ -212,5 +227,7 @@ pnpm build:packages
 ```
 
 ### Clear Cache
+
 ```bash
 rm -rf .next .turbo node_modules/.cache
+```

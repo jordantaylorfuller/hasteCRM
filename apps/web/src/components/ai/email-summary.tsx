@@ -64,11 +64,7 @@ export function EmailSummary({ emailId, isThread = false }: EmailSummaryProps) {
             <Sparkles className="h-4 w-4 text-primary" />
             AI Summary {isThread && <Badge variant="secondary">Thread</Badge>}
           </CardTitle>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => refetch()}
-          >
+          <Button variant="ghost" size="sm" onClick={() => refetch()}>
             <RefreshCw className="h-3 w-3" />
           </Button>
         </div>

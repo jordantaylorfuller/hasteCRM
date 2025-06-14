@@ -7,6 +7,7 @@ This guide will help you set up your local development environment for hasteCRM.
 Before you begin, ensure you have the following installed:
 
 ### Required Software
+
 - **Node.js**: v18.0.0 or higher ([Download](https://nodejs.org/))
 - **pnpm**: v8.0.0 or higher (`npm install -g pnpm`)
 - **Docker Desktop**: Latest version ([Download](https://www.docker.com/products/docker-desktop))
@@ -14,12 +15,14 @@ Before you begin, ensure you have the following installed:
 - **VS Code** (recommended) or your preferred IDE
 
 ### System Requirements
+
 - **OS**: macOS 12+, Windows 10/11 (WSL2), or Linux
 - **RAM**: 8GB minimum, 16GB recommended
 - **Storage**: 20GB free space
 - **CPU**: 4 cores minimum
 
 ### Required Accounts
+
 - **GitHub**: For repository access
 - **Google Cloud**: For Gmail API ([Console](https://console.cloud.google.com))
 - **Anthropic**: For Claude API ([Get API Key](https://console.anthropic.com))
@@ -48,6 +51,7 @@ cd hasteCRM
 ```
 
 Your application should now be running at:
+
 - Frontend: http://localhost:3000
 - API: http://localhost:4000/graphql
 - Email UI (MailHog): http://localhost:8025
@@ -59,11 +63,13 @@ Your application should now be running at:
 ### Step 1: Prerequisites Verification
 
 Run our prerequisite checker:
+
 ```bash
 ./scripts/check-prerequisites.sh
 ```
 
 This will verify:
+
 - ✅ Node.js version
 - ✅ pnpm installation
 - ✅ Docker status
@@ -73,12 +79,14 @@ This will verify:
 ### Step 2: Environment Configuration
 
 #### Automated Setup (Recommended)
+
 ```bash
 # Interactive environment setup
 pnpm setup:env
 ```
 
 #### Manual Setup
+
 Create a `.env.local` file in the root directory:
 
 ```env
@@ -139,6 +147,7 @@ FORCE_COLOR="1"
 ### Step 3: Google Cloud Setup (Detailed)
 
 #### 3.1 Create Project & Enable APIs
+
 ```bash
 # Install gcloud CLI
 # macOS
@@ -169,6 +178,7 @@ gcloud services enable \
 ```
 
 #### 3.2 Create Service Account
+
 ```bash
 # Create service account
 gcloud iam service-accounts create hastecrm-dev \
@@ -184,6 +194,7 @@ echo "GOOGLE_APPLICATION_CREDENTIALS=./credentials/google-service-account.json" 
 ```
 
 #### 3.3 OAuth 2.0 Setup
+
 1. Go to [Google Cloud Console](https://console.cloud.google.com)
 2. Navigate to **APIs & Services → Credentials**
 3. Click **Create Credentials → OAuth client ID**
@@ -202,6 +213,7 @@ echo "GOOGLE_APPLICATION_CREDENTIALS=./credentials/google-service-account.json" 
 7. Copy the Client ID and Client Secret to `.env.local`
 
 #### 3.4 Gmail Push Notifications
+
 ```bash
 # Create Pub/Sub topic
 gcloud pubsub topics create gmail-push-notifications
@@ -220,6 +232,7 @@ gcloud pubsub topics add-iam-policy-binding gmail-push-notifications \
 ### Step 4: Database Setup (Enhanced)
 
 #### 4.1 Start PostgreSQL
+
 ```bash
 # Start PostgreSQL with custom configuration
 docker-compose up -d postgres
@@ -229,6 +242,7 @@ docker-compose up -d postgres
 ```
 
 #### 4.2 Database Initialization
+
 ```bash
 # Create databases
 docker exec -it crm-postgres psql -U postgres << EOF
@@ -248,6 +262,7 @@ pnpm db:seed:large  # Creates 10k contacts, 50k activities
 ```
 
 #### 4.3 Database Management Commands
+
 ```bash
 # Open Prisma Studio (GUI)
 pnpm db:studio
@@ -286,8 +301,9 @@ docker run -d -p 8081:8081 \
 ### Step 6: Development Services Configuration
 
 #### Complete Docker Compose Stack
+
 ```yaml
-version: '3.8'
+version: "3.8"
 
 services:
   postgres:
@@ -326,8 +342,8 @@ services:
     image: mailhog/mailhog:latest
     container_name: crm-mailhog
     ports:
-      - "1025:1025"  # SMTP
-      - "8025:8025"  # Web UI
+      - "1025:1025" # SMTP
+      - "8025:8025" # Web UI
     environment:
       MH_STORAGE: maildir
       MH_MAILDIR_PATH: /maildir
@@ -342,8 +358,8 @@ services:
       MINIO_ROOT_USER: change-me-minio-user
       MINIO_ROOT_PASSWORD: change-me-minio-password
     ports:
-      - "9000:9000"  # API
-      - "9001:9001"  # Console
+      - "9000:9000" # API
+      - "9001:9001" # Console
     volumes:
       - minio_data:/data
     healthcheck:
@@ -450,6 +466,7 @@ hastecrm/
 ## 🧪 Testing Setup
 
 ### Test Database Configuration
+
 ```bash
 # Create test database
 docker exec -it crm-postgres psql -U postgres -c "CREATE DATABASE crm_test;"
@@ -459,6 +476,7 @@ NODE_ENV=test pnpm test
 ```
 
 ### Testing Commands
+
 ```bash
 # Unit tests
 pnpm test:unit           # Run unit tests
@@ -481,6 +499,7 @@ pnpm test:all           # Run everything
 ## 🔍 Development Tools
 
 ### Database Management
+
 ```bash
 # Prisma Studio (GUI)
 pnpm db:studio
@@ -498,6 +517,7 @@ pnpm db:console
 ```
 
 ### API Development
+
 ```bash
 # GraphQL Playground
 # http://localhost:4000/graphql
@@ -513,6 +533,7 @@ pnpm docs:api
 ```
 
 ### Email Development
+
 ```bash
 # MailHog UI
 # http://localhost:8025
@@ -529,6 +550,7 @@ curl -X DELETE http://localhost:8025/api/v1/messages
 ### Common Issues & Solutions
 
 #### Port Conflicts
+
 ```bash
 # Check what's using a port
 lsof -i :3000
@@ -542,6 +564,7 @@ API_PORT=4001 pnpm dev:api
 ```
 
 #### Database Issues
+
 ```bash
 # Connection refused
 docker-compose restart postgres
@@ -556,6 +579,7 @@ pnpm db:generate
 ```
 
 #### Node/pnpm Issues
+
 ```bash
 # Clear everything and start fresh
 ./scripts/clean-install.sh
@@ -569,6 +593,7 @@ pnpm db:generate
 ```
 
 #### Docker Issues
+
 ```bash
 # Complete Docker reset
 docker-compose down -v
@@ -583,6 +608,7 @@ docker-compose logs -f [service-name]
 ```
 
 #### AI API Issues
+
 ```bash
 # Check API keys
 ./scripts/verify-api-keys.sh
@@ -592,6 +618,7 @@ MOCK_AI_RESPONSES=true pnpm dev
 ```
 
 ### Debug Mode
+
 ```bash
 # Enable verbose logging
 DEBUG=* pnpm dev
@@ -609,6 +636,7 @@ NODE_OPTIONS='--inspect' pnpm dev:api
 ### VS Code Setup (Enhanced)
 
 #### Required Extensions
+
 ```bash
 # Install all recommended extensions
 code --install-extension dbaeumer.vscode-eslint
@@ -627,7 +655,9 @@ code --install-extension eamodio.gitlens
 ```
 
 #### Workspace Settings
+
 Create `.vscode/settings.json`:
+
 ```json
 {
   "editor.formatOnSave": true,
@@ -665,7 +695,9 @@ Create `.vscode/settings.json`:
 ```
 
 #### Launch Configurations
+
 Create `.vscode/launch.json`:
+
 ```json
 {
   "version": "0.2.0",
@@ -706,6 +738,7 @@ Create `.vscode/launch.json`:
 ```
 
 ### WebStorm/IntelliJ Setup
+
 1. Enable pnpm: Settings → Languages & Frameworks → Node.js → Package Manager
 2. Set TypeScript version: Settings → Languages & Frameworks → TypeScript
 3. Configure Prettier: Settings → Languages & Frameworks → JavaScript → Prettier
@@ -714,6 +747,7 @@ Create `.vscode/launch.json`:
 ## 📊 Performance Monitoring
 
 ### Development Performance Tools
+
 ```bash
 # Frontend bundle analysis
 pnpm analyze:web
@@ -729,6 +763,7 @@ pnpm monitor:memory
 ```
 
 ### Chrome DevTools Setup
+
 1. **React DevTools**: Install extension
 2. **Apollo DevTools**: For GraphQL debugging
 3. **Network throttling**: Test on slow connections
@@ -737,6 +772,7 @@ pnpm monitor:memory
 ## 🚀 Advanced Development
 
 ### Using Development Fixtures
+
 ```bash
 # Load specific test scenarios
 pnpm fixture:load large-workspace    # 10k contacts
@@ -745,18 +781,20 @@ pnpm fixture:load ai-automations     # AI test scenarios
 ```
 
 ### Feature Flags
+
 ```typescript
 // Toggle features in .env.local
-ENABLE_AI_FEATURES=true
-ENABLE_MEETING_INTELLIGENCE=false
+ENABLE_AI_FEATURES = true;
+ENABLE_MEETING_INTELLIGENCE = false;
 
 // Use in code
-if (process.env.ENABLE_AI_FEATURES === 'true') {
+if (process.env.ENABLE_AI_FEATURES === "true") {
   // AI features
 }
 ```
 
 ### Mock Services
+
 ```bash
 # Use mock AI responses
 MOCK_AI_RESPONSES=true pnpm dev
@@ -771,17 +809,20 @@ MOCK_ALL_EXTERNAL=true pnpm dev
 ## 📚 Learning Resources
 
 ### Documentation
+
 - [Architecture Guide](../architecture/overview.md)
 - [API Documentation](../api/graphql-schema.md)
 - [Database Schema](../architecture/database-schema.md)
 - [Testing Guide](testing-guide.md)
 
 ### Video Tutorials
+
 - [Getting Started (YouTube)](https://youtube.com/...)
 - [Architecture Overview (Loom)](https://loom.com/...)
 - [Debugging Tips (Internal)](https://...)
 
 ### Example Code
+
 - [API Examples](../../examples/api/)
 - [Frontend Patterns](../../examples/frontend/)
 - [Testing Patterns](../../examples/testing/)
@@ -789,6 +830,7 @@ MOCK_ALL_EXTERNAL=true pnpm dev
 ## 🚨 Troubleshooting Common Issues
 
 ### Port Already in Use
+
 ```bash
 # Find and kill process
 lsof -i :3000
@@ -799,6 +841,7 @@ npx kill-port 3000 4000 5432 6379
 ```
 
 ### Docker Not Running
+
 ```bash
 # macOS:
 open -a Docker
@@ -808,6 +851,7 @@ docker ps
 ```
 
 ### Database Connection Failed
+
 ```bash
 # Restart database container
 docker-compose down
@@ -819,6 +863,7 @@ pnpm run db:push
 ```
 
 ### Module Not Found Errors
+
 ```bash
 # Clean and rebuild
 pnpm run clean
@@ -828,6 +873,7 @@ pnpm run build
 ```
 
 ### TypeScript Errors
+
 ```bash
 # Generate Prisma client
 cd packages/database
@@ -838,17 +884,21 @@ cd ../..
 ## 🆘 Getting Help
 
 ### Self-Service
+
 1. Run diagnostics: `node scripts/check-setup.js`
 2. Check logs: `pnpm logs:all`
 3. Search issues: [GitHub Issues](https://github.com/hasteNYC/hasteCRM/issues)
 
 ### Team Support
+
 - **Slack**: #crm-development (fastest)
 - **Email**: crm-dev-team@haste.nyc
 - **Office Hours**: Tue/Thu 2-3pm PST
 
 ### Bug Reports
+
 Use `pnpm report:bug` to generate a bug report with:
+
 - System information
 - Environment variables (sanitized)
 - Recent logs

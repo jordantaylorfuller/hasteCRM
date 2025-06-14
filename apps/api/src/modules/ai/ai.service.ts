@@ -67,23 +67,23 @@ export class AiService {
       }
 
       // For threads, get all emails in the thread
-      let content = email.textContent || email.htmlContent || "";
+      let emailContent = email.bodyText || email.bodyHtml || "";
       if (email.threadId) {
         const threadEmails = await this.emailService.findByThread(
           email.threadId,
         );
         if (threadEmails && threadEmails.length > 0) {
-          content = threadEmails
+          emailContent = threadEmails
             .map(
               (e) =>
-                `From: ${e.from}\nDate: ${e.sentAt}\n\n${e.textContent || e.htmlContent || ""}`,
+                `From: ${e.fromEmail}\nDate: ${e.sentAt}\n\n${e.bodyText || e.bodyHtml || ""}`,
             )
             .join("\n\n---\n\n");
         }
       }
 
       if (this.useMockAi) {
-        return this.mockSummarizeEmail(content, options);
+        return this.mockSummarizeEmail(emailContent, options);
       }
 
       const message = await this.anthropic.messages.create({
@@ -94,7 +94,7 @@ export class AiService {
             role: "user",
             content: `Please summarize the following email thread concisely:
 
-${content}
+${emailContent}
 
 ${options.includeActionItems ? "Include any action items." : ""}
 ${options.includeKeyPoints ? "Include key points." : ""}
@@ -104,7 +104,9 @@ Format the response as JSON with fields: summary, actionItems (array), keyPoints
         ],
       });
 
-      const response = JSON.parse(message.content[0].text);
+      const responseContent = message.content[0];
+      const text = responseContent.type === "text" ? responseContent.text : "";
+      const response = JSON.parse(text);
       return response;
     } catch (error) {
       this.logger.error("Failed to summarize email", error);
@@ -138,7 +140,7 @@ Format the response as JSON with fields: summary, actionItems (array), keyPoints
           context = threadEmails
             .slice(-3) // Last 3 emails for context
             .map(
-              (e) => `From: ${e.from}\n${e.textContent || e.htmlContent || ""}`,
+              (e) => `From: ${e.fromEmail}\n${e.bodyText || e.bodyHtml || ""}`,
             )
             .join("\n\n---\n\n");
         }
@@ -166,7 +168,9 @@ Provide 3 different response options and one full draft. Format as JSON with fie
         ],
       });
 
-      const response = JSON.parse(message.content[0].text);
+      const responseContent = message.content[0];
+      const text = responseContent.type === "text" ? responseContent.text : "";
+      const response = JSON.parse(text);
       return response;
     } catch (error) {
       this.logger.error("Failed to generate smart compose", error);
@@ -188,7 +192,7 @@ Provide 3 different response options and one full draft. Format as JSON with fie
     try {
       // Get email statistics
       const emailStats = await this.prisma.email.groupBy({
-        by: ["from", "isRead", "isStarred"],
+        by: ["fromEmail", "isRead", "isStarred"],
         where: {
           workspaceId,
           sentAt: {
@@ -245,7 +249,9 @@ Generate insights about communication patterns, identify key relationships, and 
         ],
       });
 
-      const response = JSON.parse(message.content[0].text);
+      const responseContent = message.content[0];
+      const text = responseContent.type === "text" ? responseContent.text : "";
+      const response = JSON.parse(text);
       return response;
     } catch (error) {
       this.logger.error("Failed to generate insights", error);
@@ -258,9 +264,13 @@ Generate insights about communication patterns, identify key relationships, and 
    */
   async enrichContact(
     contactId: string,
+    workspaceId: string,
   ): Promise<ContactEnrichmentData | null> {
     try {
-      const contact = await this.contactsService.findOne(contactId);
+      const contact = await this.contactsService.findOne(
+        contactId,
+        workspaceId,
+      );
       if (!contact) {
         throw new Error("Contact not found");
       }
@@ -268,14 +278,17 @@ Generate insights about communication patterns, identify key relationships, and 
       // Get recent emails from/to this contact
       const recentEmails = await this.prisma.email.findMany({
         where: {
-          OR: [{ from: contact.email }, { to: { has: contact.email } }],
+          OR: [
+            { fromEmail: contact.email },
+            { toEmails: { has: contact.email } },
+          ],
         },
         orderBy: { sentAt: "desc" },
         take: 10,
       });
 
       const emailContent = recentEmails
-        .map((e) => e.textContent || e.htmlContent || "")
+        .map((e) => e.bodyText || e.bodyHtml || "")
         .join("\n\n");
 
       if (this.useMockAi) {
@@ -301,19 +314,17 @@ Extract or infer: company name, job title, LinkedIn URL (if mentioned), a brief 
         ],
       });
 
-      const enrichmentData = JSON.parse(message.content[0].text);
+      const responseContent = message.content[0];
+      const text = responseContent.type === "text" ? responseContent.text : "";
+      const enrichmentData = JSON.parse(text);
 
       // Update contact with enriched data
       await this.contactsService.update(contactId, contact.workspaceId, {
-        company: enrichmentData.company || contact.company,
         title: enrichmentData.title || contact.title,
-        customFields: {
-          ...contact.customFields,
-          linkedInUrl: enrichmentData.linkedInUrl,
-          aiSummary: enrichmentData.summary,
-          aiTags: enrichmentData.tags,
-        },
+        linkedinUrl: enrichmentData.linkedInUrl || contact.linkedinUrl,
       });
+
+      // TODO: Store enrichment data in custom fields or metadata
 
       return enrichmentData;
     } catch (error) {
@@ -400,7 +411,7 @@ Best regards`;
 
   private mockEnrichContact(contact: any, _emailContent: string) {
     return {
-      company: contact.company || "Acme Corporation",
+      company: "Acme Corporation",
       title: contact.title || "Senior Project Manager",
       linkedInUrl: "https://linkedin.com/in/example",
       summary:

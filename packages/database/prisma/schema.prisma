@@ -170,6 +170,34 @@ enum AuditAction {
   SHARE
 }
 
+enum AutomationTrigger {
+  STAGE_ENTER
+  STAGE_EXIT
+  DEAL_CREATED
+  DEAL_WON
+  DEAL_LOST
+  DEAL_STALLED
+  VALUE_CHANGED
+  PROBABILITY_CHANGED
+  OWNER_CHANGED
+  TAG_ADDED
+  TAG_REMOVED
+  CUSTOM_FIELD_CHANGED
+}
+
+enum AutomationAction {
+  SEND_EMAIL
+  CREATE_TASK
+  UPDATE_FIELD
+  ADD_TAG
+  REMOVE_TAG
+  ASSIGN_OWNER
+  SEND_WEBHOOK
+  CREATE_ACTIVITY
+  MOVE_STAGE
+  UPDATE_PROBABILITY
+}
+
 // ==========================================
 // MODELS
 // ==========================================
@@ -223,6 +251,7 @@ model User {
   notifications  Notification[]
   emailTemplates EmailTemplate[]
   twoFactorAuth  TwoFactorAuth?
+  dealTransitions DealStageTransition[]
 
   @@index([email])
   @@index([status])
@@ -492,9 +521,10 @@ model Pipeline {
   deletedAt DateTime?
 
   // Relations
-  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  stages    Stage[]
-  deals     Deal[]
+  workspace   Workspace          @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  stages      Stage[]
+  deals       Deal[]
+  automations PipelineAutomation[]
 
   @@unique([workspaceId, name])
   @@index([workspaceId])
@@ -514,8 +544,10 @@ model Stage {
   updatedAt DateTime @updatedAt
 
   // Relations
-  pipeline Pipeline @relation(fields: [pipelineId], references: [id], onDelete: Cascade)
-  deals    Deal[]
+  pipeline    Pipeline             @relation(fields: [pipelineId], references: [id], onDelete: Cascade)
+  deals       Deal[]
+  transitions DealStageTransition[] @relation("FromStage")
+  targetTransitions DealStageTransition[] @relation("ToStage")
 
   @@unique([pipelineId, name])
   @@index([pipelineId])
@@ -541,6 +573,11 @@ model Deal {
   wonReason   String?
   lostReason  String?
 
+  // Analytics
+  stageEnteredAt DateTime @default(now())
+  daysInStage    Int      @default(0)
+  totalDaysOpen  Int      @default(0)
+  
   // Metadata
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -562,6 +599,8 @@ model Deal {
   emails       Email[]
   tags         DealTag[]
   customFields DealCustomField[]
+  stageTransitions DealStageTransition[]
+  automationLogs   AutomationLog[]
 
   @@index([workspaceId])
   @@index([pipelineId])
@@ -1395,4 +1434,124 @@ model AuditLog {
   @@index([entityType])
   @@index([entityId])
   @@index([createdAt])
+}
+
+// Pipeline Analytics & Automation
+model DealStageTransition {
+  id         String   @id @default(cuid())
+  dealId     String
+  fromStageId String
+  toStageId   String
+  
+  // Timing
+  transitionTime DateTime @default(now())
+  timeInStage    Int      // minutes
+  
+  // Context
+  transitionedBy User     @relation(fields: [transitionedById], references: [id])
+  transitionedById String
+  reason         String?  @db.Text
+  
+  // Relations
+  deal      Deal  @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  fromStage Stage @relation("FromStage", fields: [fromStageId], references: [id])
+  toStage   Stage @relation("ToStage", fields: [toStageId], references: [id])
+  
+  @@index([dealId])
+  @@index([fromStageId])
+  @@index([toStageId])
+  @@index([transitionTime])
+}
+
+model PipelineAutomation {
+  id          String @id @default(cuid())
+  pipelineId  String
+  name        String
+  description String? @db.Text
+  
+  // Trigger
+  trigger     AutomationTrigger
+  triggerStageId String?        // For stage-specific triggers
+  conditions     Json @default("{}")  // Additional conditions
+  
+  // Actions
+  actions     AutomationAction[]
+  actionConfig Json @default("{}")   // Configuration for each action
+  
+  // Settings
+  isActive    Boolean @default(true)
+  delay       Int     @default(0)    // Delay in minutes before executing
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  lastTriggeredAt DateTime?
+  triggerCount    Int @default(0)
+  
+  // Relations
+  pipeline    Pipeline @relation(fields: [pipelineId], references: [id], onDelete: Cascade)
+  logs        AutomationLog[]
+  
+  @@index([pipelineId])
+  @@index([trigger])
+  @@index([isActive])
+}
+
+model AutomationLog {
+  id           String   @id @default(cuid())
+  automationId String
+  dealId       String
+  
+  // Execution
+  trigger      String
+  status       String   @default("PENDING") // PENDING, SUCCESS, FAILED
+  actions      Json     @default("[]")      // Actions executed
+  results      Json     @default("{}")      // Results of each action
+  error        String?  @db.Text
+  
+  // Timing
+  triggeredAt  DateTime @default(now())
+  executedAt   DateTime?
+  completedAt  DateTime?
+  
+  // Relations
+  automation   PipelineAutomation @relation(fields: [automationId], references: [id], onDelete: Cascade)
+  deal         Deal @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  
+  @@index([automationId])
+  @@index([dealId])
+  @@index([status])
+  @@index([triggeredAt])
+}
+
+// Pipeline Analytics Views (for reporting)
+model PipelineMetrics {
+  id          String @id @default(cuid())
+  pipelineId  String
+  period      String // daily, weekly, monthly
+  date        DateTime
+  
+  // Funnel Metrics
+  dealsCreated    Int @default(0)
+  dealsWon        Int @default(0)
+  dealsLost       Int @default(0)
+  totalValue      Decimal @db.Decimal(15, 2)
+  wonValue        Decimal @db.Decimal(15, 2)
+  lostValue       Decimal @db.Decimal(15, 2)
+  
+  // Conversion Metrics
+  winRate         Float @default(0)
+  avgDealSize     Decimal @db.Decimal(15, 2)
+  avgCycleLength  Int @default(0) // days
+  
+  // Stage Metrics
+  stageMetrics    Json @default("[]")
+  
+  // Metadata
+  calculatedAt    DateTime @default(now())
+  
+  @@unique([pipelineId, period, date])
+  @@index([pipelineId])
+  @@index([period])
+  @@index([date])
 }

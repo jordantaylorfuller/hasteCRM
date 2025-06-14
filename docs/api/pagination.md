@@ -41,6 +41,7 @@ query GetContacts($first: Int!, $after: String) {
 ```
 
 Variables:
+
 ```json
 {
   "first": 20,
@@ -76,21 +77,21 @@ query GetContactsPrevious($last: Int!, $before: String) {
 async function* paginateContacts(client, pageSize = 20) {
   let hasNextPage = true;
   let cursor = null;
-  
+
   while (hasNextPage) {
     const { data } = await client.query({
       query: GET_CONTACTS,
       variables: {
         first: pageSize,
-        after: cursor
-      }
+        after: cursor,
+      },
     });
-    
+
     // Yield current page results
     for (const edge of data.contacts.edges) {
       yield edge.node;
     }
-    
+
     // Update pagination state
     hasNextPage = data.contacts.pageInfo.hasNextPage;
     cursor = data.contacts.pageInfo.endCursor;
@@ -144,37 +145,37 @@ class PaginatedAPI {
   constructor(baseURL, token) {
     this.baseURL = baseURL;
     this.headers = {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
     };
   }
-  
+
   async *paginate(endpoint, limit = 50) {
     let cursor = null;
     let hasNext = true;
-    
+
     while (hasNext) {
       const url = new URL(`${this.baseURL}${endpoint}`);
-      url.searchParams.set('limit', limit);
+      url.searchParams.set("limit", limit);
       if (cursor) {
-        url.searchParams.set('cursor', cursor);
+        url.searchParams.set("cursor", cursor);
       }
-      
+
       const response = await fetch(url, {
-        headers: this.headers
+        headers: this.headers,
       });
-      
+
       const data = await response.json();
-      
+
       if (!data.success) {
         throw new Error(data.error.message);
       }
-      
+
       // Yield items from current page
       for (const item of data.data.items) {
         yield item;
       }
-      
+
       // Update pagination state
       hasNext = data.data.pagination.hasNext;
       cursor = data.data.pagination.nextCursor;
@@ -183,9 +184,9 @@ class PaginatedAPI {
 }
 
 // Usage
-const api = new PaginatedAPI('https://api.haste.nyc/v1', token);
+const api = new PaginatedAPI("https://api.haste.nyc/v1", token);
 
-for await (const contact of api.paginate('/contacts')) {
+for await (const contact of api.paginate("/contacts")) {
   console.log(contact.email);
 }
 ```
@@ -194,16 +195,17 @@ for await (const contact of api.paginate('/contacts')) {
 
 ### Common Parameters
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `first`/`limit` | Integer | 20 | Items per page (max: 100) |
-| `after`/`cursor` | String | null | Cursor for next page |
-| `before` | String | null | Cursor for previous page (GraphQL only) |
-| `last` | Integer | - | Items from end (GraphQL only) |
+| Parameter        | Type    | Default | Description                             |
+| ---------------- | ------- | ------- | --------------------------------------- |
+| `first`/`limit`  | Integer | 20      | Items per page (max: 100)               |
+| `after`/`cursor` | String  | null    | Cursor for next page                    |
+| `before`         | String  | null    | Cursor for previous page (GraphQL only) |
+| `last`           | Integer | -       | Items from end (GraphQL only)           |
 
 ### Filtering with Pagination
 
 #### GraphQL
+
 ```graphql
 query FilteredContacts($first: Int!, $after: String, $filter: ContactFilter) {
   contacts(first: $first, after: $after, filter: $filter) {
@@ -223,6 +225,7 @@ query FilteredContacts($first: Int!, $after: String, $filter: ContactFilter) {
 ```
 
 Variables:
+
 ```json
 {
   "first": 20,
@@ -235,6 +238,7 @@ Variables:
 ```
 
 #### REST
+
 ```http
 GET /v1/contacts?cursor=xxx&limit=20&filter[status]=active&filter[created_after]=2024-01-01
 ```
@@ -262,6 +266,7 @@ query SortedContacts($first: Int!, $after: String, $orderBy: ContactOrderBy) {
 ```
 
 Variables:
+
 ```json
 {
   "first": 20,
@@ -279,6 +284,7 @@ GET /v1/contacts?cursor=xxx&limit=20&sort=-created_at,last_name
 ```
 
 Sort syntax:
+
 - `-field` for descending
 - `field` for ascending
 - Comma-separated for multiple sorts
@@ -290,16 +296,16 @@ Sort syntax:
 ```javascript
 async function batchProcess(api, processor, batchSize = 100) {
   const batch = [];
-  
-  for await (const item of api.paginate('/contacts', batchSize)) {
+
+  for await (const item of api.paginate("/contacts", batchSize)) {
     batch.push(item);
-    
+
     if (batch.length >= batchSize) {
       await processor(batch);
       batch.length = 0; // Clear batch
     }
   }
-  
+
   // Process remaining items
   if (batch.length > 0) {
     await processor(batch);
@@ -307,20 +313,24 @@ async function batchProcess(api, processor, batchSize = 100) {
 }
 
 // Usage
-await batchProcess(api, async (contacts) => {
-  console.log(`Processing ${contacts.length} contacts`);
-  // Bulk operations here
-}, 100);
+await batchProcess(
+  api,
+  async (contacts) => {
+    console.log(`Processing ${contacts.length} contacts`);
+    // Bulk operations here
+  },
+  100,
+);
 ```
 
 ### 2. Parallel Pagination
 
 ```javascript
 async function parallelPaginate(api, endpoints) {
-  const iterators = endpoints.map(endpoint => 
-    api.paginate(endpoint)[Symbol.asyncIterator]()
+  const iterators = endpoints.map((endpoint) =>
+    api.paginate(endpoint)[Symbol.asyncIterator](),
   );
-  
+
   const results = await Promise.all(
     iterators.map(async (iterator) => {
       const items = [];
@@ -328,17 +338,17 @@ async function parallelPaginate(api, endpoints) {
         items.push(item);
       }
       return items;
-    })
+    }),
   );
-  
+
   return results;
 }
 
 // Usage
 const [contacts, deals, emails] = await parallelPaginate(api, [
-  '/contacts',
-  '/deals',
-  '/emails'
+  "/contacts",
+  "/deals",
+  "/emails",
 ]);
 ```
 
@@ -347,11 +357,11 @@ const [contacts, deals, emails] = await parallelPaginate(api, [
 ```javascript
 async function streamToFile(api, endpoint, filename) {
   const writeStream = fs.createWriteStream(filename);
-  
+
   for await (const item of api.paginate(endpoint)) {
-    writeStream.write(JSON.stringify(item) + '\n');
+    writeStream.write(JSON.stringify(item) + "\n");
   }
-  
+
   writeStream.end();
 }
 ```
@@ -369,27 +379,27 @@ class RealtimePaginatedList {
     this.items = new Map();
     this.newItems = [];
   }
-  
+
   async initialize() {
     // Load initial data
     for await (const item of this.api.paginate(this.endpoint)) {
       this.items.set(item.id, item);
     }
-    
+
     // Subscribe to updates
-    this.websocket.on('item:created', (item) => {
+    this.websocket.on("item:created", (item) => {
       this.newItems.push(item);
     });
-    
-    this.websocket.on('item:updated', (item) => {
+
+    this.websocket.on("item:updated", (item) => {
       this.items.set(item.id, item);
     });
-    
-    this.websocket.on('item:deleted', (item) => {
+
+    this.websocket.on("item:deleted", (item) => {
       this.items.delete(item.id);
     });
   }
-  
+
   getItems() {
     // Merge new items with existing
     return [...this.newItems, ...this.items.values()];
@@ -407,31 +417,31 @@ class CachedPaginator {
     this.api = api;
     this.cursorCache = new Map();
   }
-  
+
   async getPage(endpoint, pageNumber, pageSize = 20) {
     const cacheKey = `${endpoint}:${pageNumber}:${pageSize}`;
-    
+
     // Check if we have a cursor for this page
     let cursor = this.cursorCache.get(cacheKey);
-    
+
     if (!cursor && pageNumber > 1) {
       // Need to paginate to get cursor
       await this.paginateToPage(endpoint, pageNumber, pageSize);
       cursor = this.cursorCache.get(cacheKey);
     }
-    
+
     // Fetch the page
     const response = await this.api.get(endpoint, {
       cursor,
-      limit: pageSize
+      limit: pageSize,
     });
-    
+
     // Cache the next cursor
     if (response.pagination.nextCursor) {
       const nextKey = `${endpoint}:${pageNumber + 1}:${pageSize}`;
       this.cursorCache.set(nextKey, response.pagination.nextCursor);
     }
-    
+
     return response;
   }
 }
@@ -446,61 +456,60 @@ class PrefetchPaginator {
     this.prefetchPages = prefetchPages;
     this.cache = new Map();
   }
-  
+
   async *paginate(endpoint, pageSize = 20) {
     let cursor = null;
     let hasNext = true;
     let pageIndex = 0;
-    
+
     // Start prefetching
     this.prefetchNext(endpoint, cursor, pageSize, pageIndex);
-    
+
     while (hasNext) {
-      const cacheKey = `${cursor || 'initial'}`;
-      
+      const cacheKey = `${cursor || "initial"}`;
+
       // Wait for page if not cached
       while (!this.cache.has(cacheKey)) {
-        await new Promise(resolve => setTimeout(resolve, 10));
+        await new Promise((resolve) => setTimeout(resolve, 10));
       }
-      
+
       const page = this.cache.get(cacheKey);
       this.cache.delete(cacheKey);
-      
+
       // Yield items
       for (const item of page.items) {
         yield item;
       }
-      
+
       // Update state
       hasNext = page.pagination.hasNext;
       cursor = page.pagination.nextCursor;
       pageIndex++;
-      
+
       // Prefetch next pages
       if (hasNext) {
         this.prefetchNext(endpoint, cursor, pageSize, pageIndex);
       }
     }
   }
-  
+
   async prefetchNext(endpoint, cursor, pageSize, currentPage) {
     const promises = [];
     let nextCursor = cursor;
-    
+
     for (let i = 0; i < this.prefetchPages; i++) {
-      const cacheKey = `${nextCursor || 'initial'}`;
-      
+      const cacheKey = `${nextCursor || "initial"}`;
+
       if (!this.cache.has(cacheKey)) {
         promises.push(
-          this.fetchPage(endpoint, nextCursor, pageSize)
-            .then(page => {
-              this.cache.set(cacheKey, page);
-              nextCursor = page.pagination.nextCursor;
-            })
+          this.fetchPage(endpoint, nextCursor, pageSize).then((page) => {
+            this.cache.set(cacheKey, page);
+            nextCursor = page.pagination.nextCursor;
+          }),
         );
       }
     }
-    
+
     await Promise.all(promises);
   }
 }
@@ -514,22 +523,22 @@ class PrefetchPaginator {
 async function robustPaginate(api, endpoint, options = {}) {
   const { onError, maxRetries = 3 } = options;
   let retries = 0;
-  
+
   async function* paginate(cursor = null) {
     try {
       const response = await api.get(endpoint, { cursor });
-      
+
       for (const item of response.items) {
         yield item;
       }
-      
+
       if (response.pagination.hasNext) {
         yield* paginate(response.pagination.nextCursor);
       }
     } catch (error) {
-      if (error.code === 'CURSOR_EXPIRED' && retries < maxRetries) {
+      if (error.code === "CURSOR_EXPIRED" && retries < maxRetries) {
         retries++;
-        console.log('Cursor expired, restarting pagination');
+        console.log("Cursor expired, restarting pagination");
         yield* paginate(null); // Start from beginning
       } else {
         if (onError) {
@@ -540,8 +549,8 @@ async function robustPaginate(api, endpoint, options = {}) {
       }
     }
   }
-  
-  yield* paginate();
+
+  yield * paginate();
 }
 ```
 
@@ -551,13 +560,13 @@ async function robustPaginate(api, endpoint, options = {}) {
 
 ```javascript
 // Small pages for real-time UI
-const uiPaginator = api.paginate('/contacts', 20);
+const uiPaginator = api.paginate("/contacts", 20);
 
 // Large pages for batch processing
-const batchPaginator = api.paginate('/contacts', 100);
+const batchPaginator = api.paginate("/contacts", 100);
 
 // Maximum efficiency for exports
-const exportPaginator = api.paginate('/contacts', 1000);
+const exportPaginator = api.paginate("/contacts", 1000);
 ```
 
 ### 2. Handle Empty Results
@@ -566,16 +575,16 @@ const exportPaginator = api.paginate('/contacts', 1000);
 async function safePageinate(api, endpoint) {
   const results = [];
   let hasData = false;
-  
+
   for await (const item of api.paginate(endpoint)) {
     hasData = true;
     results.push(item);
   }
-  
+
   if (!hasData) {
-    console.log('No data found');
+    console.log("No data found");
   }
-  
+
   return results;
 }
 ```
@@ -586,21 +595,21 @@ async function safePageinate(api, endpoint) {
 async function paginateWithProgress(api, endpoint, onProgress) {
   let processed = 0;
   const startTime = Date.now();
-  
+
   for await (const item of api.paginate(endpoint)) {
     processed++;
-    
+
     if (processed % 100 === 0) {
       const elapsed = Date.now() - startTime;
       const rate = processed / (elapsed / 1000);
-      
+
       onProgress({
         processed,
         rate: Math.round(rate),
         elapsed
       });
     }
-    
+
     yield item;
   }
 }
@@ -627,15 +636,15 @@ function createMockPaginator(items, pageSize = 2) {
           yield item;
         }
       }
-    }
+    },
   };
 }
 
 // Test
 const mockApi = createMockPaginator([
-  { id: 1, name: 'Item 1' },
-  { id: 2, name: 'Item 2' },
-  { id: 3, name: 'Item 3' }
+  { id: 1, name: "Item 1" },
+  { id: 2, name: "Item 2" },
+  { id: 3, name: "Item 3" },
 ]);
 
 const results = [];

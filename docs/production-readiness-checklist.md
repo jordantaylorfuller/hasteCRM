@@ -9,18 +9,21 @@ This checklist ensures hasteCRM is properly configured and secure for production
 ### 🔐 Security
 
 - [ ] **SSL/TLS Configuration**
+
   - [ ] Valid SSL certificates installed
   - [ ] TLS 1.3 minimum enforced
   - [ ] HSTS headers configured
   - [ ] Certificate auto-renewal setup
 
 - [ ] **Authentication & Authorization**
+
   - [ ] JWT keys rotated from defaults
   - [ ] OAuth2 providers configured
   - [ ] Rate limiting enabled
   - [ ] CORS properly configured for production domains
 
 - [ ] **Secrets Management**
+
   - [ ] All default passwords changed
   - [ ] Secrets stored in secure vault (not in code)
   - [ ] Database passwords meet complexity requirements
@@ -35,6 +38,7 @@ This checklist ensures hasteCRM is properly configured and secure for production
 ### 📊 Infrastructure
 
 - [ ] **Database**
+
   - [ ] PostgreSQL 15.5 running with proper resources
   - [ ] Automated backups configured
   - [ ] Point-in-time recovery tested
@@ -42,6 +46,7 @@ This checklist ensures hasteCRM is properly configured and secure for production
   - [ ] Connection pooling optimized
 
 - [ ] **Redis**
+
   - [ ] Redis 7.2.4 cluster mode enabled
   - [ ] Persistence configured
   - [ ] Memory limits set
@@ -56,12 +61,14 @@ This checklist ensures hasteCRM is properly configured and secure for production
 ### 🚀 Application
 
 - [ ] **Configuration**
+
   - [ ] All environment variables set
   - [ ] Production mode enabled
   - [ ] Debug mode disabled
   - [ ] Error messages sanitized
 
 - [ ] **Performance**
+
   - [ ] Database queries optimized
   - [ ] Caching strategy implemented
   - [ ] CDN configured for assets
@@ -76,18 +83,21 @@ This checklist ensures hasteCRM is properly configured and secure for production
 ### 📈 Monitoring & Observability
 
 - [ ] **Metrics**
+
   - [ ] Prometheus/Datadog agents installed
   - [ ] Application metrics exposed
   - [ ] Custom business metrics defined
   - [ ] Dashboards created
 
 - [ ] **Logging**
+
   - [ ] Centralized logging configured
   - [ ] Log levels appropriate for production
   - [ ] PII excluded from logs
   - [ ] Log retention policy set
 
 - [ ] **Alerting**
+
   - [ ] Critical alerts configured
   - [ ] Alert routing setup
   - [ ] Escalation policies defined
@@ -102,12 +112,14 @@ This checklist ensures hasteCRM is properly configured and secure for production
 ### 🔄 Deployment
 
 - [ ] **CI/CD**
+
   - [ ] Automated testing passing
   - [ ] Security scans passing
   - [ ] Deployment pipeline tested
   - [ ] Rollback procedure verified
 
 - [ ] **Scaling**
+
   - [ ] Horizontal scaling tested
   - [ ] Auto-scaling policies configured
   - [ ] Resource limits set
@@ -122,12 +134,14 @@ This checklist ensures hasteCRM is properly configured and secure for production
 ### 📋 Operational
 
 - [ ] **Documentation**
+
   - [ ] Runbooks created
   - [ ] Architecture diagrams current
   - [ ] API documentation published
   - [ ] Troubleshooting guide available
 
 - [ ] **Team Readiness**
+
   - [ ] On-call rotation established
   - [ ] Incident response plan practiced
   - [ ] Access controls configured
@@ -183,13 +197,13 @@ readiness_criteria:
 
 ### Required Minimums
 
-| Metric | Target | Critical |
-|--------|--------|----------|
-| API Response Time (p95) | < 200ms | < 500ms |
-| Page Load Time | < 2s | < 4s |
-| Database Query Time (p95) | < 50ms | < 100ms |
-| Queue Processing Time | < 30s | < 60s |
-| Availability | 99.9% | 99.5% |
+| Metric                    | Target  | Critical |
+| ------------------------- | ------- | -------- |
+| API Response Time (p95)   | < 200ms | < 500ms  |
+| Page Load Time            | < 2s    | < 4s     |
+| Database Query Time (p95) | < 50ms  | < 100ms  |
+| Queue Processing Time     | < 30s   | < 60s    |
+| Availability              | 99.9%   | 99.5%    |
 
 ## Security Scan Requirements
 
@@ -219,10 +233,10 @@ All scans must pass before deployment:
 
 ## Sign-Offs
 
-- [ ] Engineering Lead: _______________
-- [ ] Security Lead: _______________
-- [ ] Operations Lead: _______________
-- [ ] Product Owner: _______________
+- [ ] Engineering Lead: ******\_\_\_******
+- [ ] Security Lead: ******\_\_\_******
+- [ ] Operations Lead: ******\_\_\_******
+- [ ] Product Owner: ******\_\_\_******
 
 ## Go-Live Checklist
 

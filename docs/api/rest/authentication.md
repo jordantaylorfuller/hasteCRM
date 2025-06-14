@@ -273,11 +273,7 @@ Authorization: Bearer YOUR_ACCESS_TOKEN
   "data": {
     "secret": "JBSWY3DPEHPK3PXP",
     "qrCode": "data:image/png;base64,iVBORw0KGgo...",
-    "backupCodes": [
-      "12345678",
-      "87654321",
-      "11223344"
-    ]
+    "backupCodes": ["12345678", "87654321", "11223344"]
   }
 }
 ```

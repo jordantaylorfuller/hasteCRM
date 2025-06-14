@@ -18,8 +18,10 @@ describe("AiService", () => {
     from: "sender@example.com",
     to: ["recipient@example.com"],
     subject: "Project Update",
-    textContent: "Please review the attached proposal and provide feedback by Friday.",
-    htmlContent: "<p>Please review the attached proposal and provide feedback by Friday.</p>",
+    textContent:
+      "Please review the attached proposal and provide feedback by Friday.",
+    htmlContent:
+      "<p>Please review the attached proposal and provide feedback by Friday.</p>",
     sentAt: new Date(),
   };
 
@@ -181,11 +183,14 @@ describe("AiService", () => {
   describe("generateInsights", () => {
     it("should generate AI insights", async () => {
       const mockStats = [
-        { from: "sender@example.com", isRead: true, isStarred: false, _count: 10 },
+        {
+          from: "sender@example.com",
+          isRead: true,
+          isStarred: false,
+          _count: 10,
+        },
       ];
-      const mockContacts = [
-        { ...mockContact, _count: { emails: 5 } },
-      ];
+      const mockContacts = [{ ...mockContact, _count: { emails: 5 } }];
 
       (prismaService.email.groupBy as jest.Mock).mockResolvedValue(mockStats);
       (prismaService.contact.findMany as jest.Mock).mockResolvedValue(

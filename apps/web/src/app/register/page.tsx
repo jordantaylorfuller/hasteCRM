@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import Link from "next/link";
-import { useAuth } from "@/lib/auth-context";
+import { useAuth, RegisterData } from "@/lib/auth-context";
 
 const registerSchema = z
   .object({
@@ -41,7 +41,7 @@ export default function RegisterPage() {
       setError(null);
       setIsLoading(true);
       const { confirmPassword, ...registerData } = data;
-      await registerUser(registerData);
+      await registerUser(registerData as RegisterData);
     } catch (err: any) {
       setError(err);
     } finally {

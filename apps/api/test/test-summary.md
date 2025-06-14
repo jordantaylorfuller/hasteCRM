@@ -5,6 +5,7 @@
 Based on our manual testing, here's what we found:
 
 ### ✅ Working Features:
+
 1. **User Registration** - Creates user with PENDING status
 2. **Duplicate Registration Prevention** - Correctly prevents duplicate emails
 3. **Google OAuth Redirect** - Properly redirects to Google OAuth
@@ -12,6 +13,7 @@ Based on our manual testing, here's what we found:
 5. **Access Control** - Properly denies access with invalid tokens
 
 ### ⚠️ Features That Need Email Verification:
+
 1. **User Login** - Blocked until email is verified (correct security behavior)
 2. **Protected Route Access** - Requires verified user
 3. **Token Refresh** - Requires valid login first
@@ -20,10 +22,12 @@ Based on our manual testing, here's what we found:
 6. **Logout** - Requires authenticated user
 
 ### 🔍 Features That Need Route Registration:
+
 1. **2FA Routes** (/auth/2fa/setup, /auth/2fa/enable) - 404 errors indicate routes not registered
 2. **Password Reset Route** (/auth/request-password-reset) - 404 error
 
 ### 📝 Testing Limitations:
+
 1. **Email Verification** - In development, emails are sent to Mailhog (localhost:8025)
 2. **Rate Limiting** - May need to check Redis configuration
 3. **Session Management** - Working internally but not directly testable
@@ -31,6 +35,7 @@ Based on our manual testing, here's what we found:
 ## How to Properly Test Phase 1:
 
 ### 1. Start All Services:
+
 ```bash
 # Terminal 1: Database
 docker-compose up -d
@@ -43,6 +48,7 @@ cd apps/web && pnpm dev
 ```
 
 ### 2. Test Registration Flow:
+
 1. Go to http://localhost:3001/register
 2. Register a new user
 3. Check Mailhog at http://localhost:8025 for verification email
@@ -50,12 +56,14 @@ cd apps/web && pnpm dev
 5. Login at http://localhost:3001/login
 
 ### 3. Test Authentication Features:
+
 - Login/Logout
 - JWT token refresh (automatic in web app)
 - Protected routes (dashboard)
 - Google OAuth login
 
 ### 4. Test Advanced Features:
+
 - 2FA setup (if routes are added)
 - Password reset flow
 - Rate limiting (make many rapid requests)
@@ -63,6 +71,7 @@ cd apps/web && pnpm dev
 ## Missing Route Registration
 
 The following routes need to be added to the AuthController:
+
 - POST /auth/2fa/setup
 - POST /auth/2fa/enable
 - POST /auth/2fa/disable
@@ -83,6 +92,7 @@ The following routes need to be added to the AuthController:
 ## Conclusion:
 
 Phase 1 core authentication is working correctly with proper security measures:
+
 - Users must verify email before login ✅
 - JWT tokens are properly generated and validated ✅
 - Password hashing is implemented ✅

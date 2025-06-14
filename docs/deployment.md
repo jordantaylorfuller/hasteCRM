@@ -15,6 +15,7 @@ pnpm dev
 ## Production with Docker
 
 ### 1. Build Images
+
 ```bash
 # Build all services
 docker build -f apps/api/Dockerfile -t hastenyc/api .
@@ -23,6 +24,7 @@ docker build -f apps/worker/Dockerfile -t hastenyc/worker .
 ```
 
 ### 2. Run with Docker Compose
+
 ```bash
 # Start production stack
 docker-compose -f docker-compose.production.yml up -d
@@ -33,6 +35,7 @@ docker-compose logs -f
 ```
 
 ### 3. Environment Variables
+
 ```env
 # Production .env
 NODE_ENV=production
@@ -45,11 +48,13 @@ NEXT_PUBLIC_API_URL=https://api.haste.nyc
 ## Kubernetes Deployment
 
 ### Prerequisites
+
 - Kubernetes cluster (1.28+)
 - kubectl configured
 - Helm installed
 
 ### Deploy
+
 ```bash
 # Create namespace
 kubectl create namespace hasteCRM
@@ -72,16 +77,19 @@ kubectl get services -n hasteCRM
 ## Health Checks
 
 ### API Health
+
 ```bash
 curl https://api.haste.nyc/health
 ```
 
 ### Database Health
+
 ```bash
 kubectl exec -it postgres-0 -n hasteCRM -- pg_isready
 ```
 
 ### Queue Status
+
 ```bash
 kubectl exec -it worker-0 -n hasteCRM -- npm run queue:stats
 ```
@@ -89,11 +97,13 @@ kubectl exec -it worker-0 -n hasteCRM -- npm run queue:stats
 ## Monitoring
 
 ### Metrics
+
 - CPU/Memory usage via Kubernetes metrics
 - Application metrics via Prometheus
 - Custom business metrics
 
 ### Logs
+
 ```bash
 # View logs
 kubectl logs -l app=api -n hasteCRM --tail=100 -f
@@ -103,7 +113,9 @@ kubectl logs -l app=api -n hasteCRM | grep ERROR
 ```
 
 ### Alerts
+
 Configure alerts for:
+
 - API response time > 500ms
 - Error rate > 5%
 - Database connections > 80%
@@ -112,6 +124,7 @@ Configure alerts for:
 ## Scaling
 
 ### Horizontal Scaling
+
 ```bash
 # Scale API pods
 kubectl scale deployment api --replicas=5 -n hasteCRM
@@ -121,6 +134,7 @@ kubectl scale deployment worker --replicas=3 -n hasteCRM
 ```
 
 ### Database Scaling
+
 - Add read replicas for queries
 - Use connection pooling
 - Enable query caching
@@ -128,6 +142,7 @@ kubectl scale deployment worker --replicas=3 -n hasteCRM
 ## Backup & Recovery
 
 ### Database Backup
+
 ```bash
 # Manual backup
 kubectl exec -it postgres-0 -n hasteCRM -- \
@@ -139,7 +154,9 @@ kubectl exec -i postgres-0 -n hasteCRM -- \
 ```
 
 ### Automated Backups
+
 Configure daily backups with retention:
+
 - Daily: 7 days
 - Weekly: 4 weeks
 - Monthly: 12 months
@@ -147,6 +164,7 @@ Configure daily backups with retention:
 ## SSL/TLS
 
 ### Certificate Management
+
 ```yaml
 # Using cert-manager
 apiVersion: cert-manager.io/v1
@@ -165,6 +183,7 @@ spec:
 ## Rollback
 
 ### Quick Rollback
+
 ```bash
 # Rollback deployment
 kubectl rollout undo deployment/api -n hasteCRM
@@ -176,16 +195,19 @@ kubectl rollout undo deployment/api --to-revision=2 -n hasteCRM
 ## Performance Tuning
 
 ### API Performance
+
 - Enable response caching
 - Optimize database queries
 - Use CDN for static assets
 
 ### Database Performance
+
 - Add appropriate indexes
 - Enable query plan caching
 - Regular VACUUM ANALYZE
 
 ### Redis Performance
+
 - Set appropriate memory limits
 - Configure eviction policy
 - Monitor memory usage

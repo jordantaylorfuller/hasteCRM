@@ -64,9 +64,7 @@ export default function DashboardPage() {
                 <dl className="space-y-1">
                   <div>
                     <dt className="text-sm text-gray-500">Workspace Name</dt>
-                    <dd className="text-sm text-gray-900">
-                      {workspace.name}
-                    </dd>
+                    <dd className="text-sm text-gray-900">{workspace.name}</dd>
                   </div>
                   <div>
                     <dt className="text-sm text-gray-500">Plan</dt>

@@ -52,8 +52,9 @@ export class AiResolver {
   @Mutation("enrichContact")
   async enrichContact(
     @Args("contactId") contactId: string,
-    @Context() _ctx: any,
+    @Context() ctx: any,
   ): Promise<any> {
-    return this.aiService.enrichContact(contactId);
+    const { workspaceId } = ctx.req.user;
+    return this.aiService.enrichContact(contactId, workspaceId);
   }
 }

@@ -20,6 +20,7 @@ This document defines the coding standards and best practices for hasteCRM. Foll
 ## General Principles
 
 ### Core Values
+
 1. **Readability** - Code should be self-documenting and easy to understand
 2. **Maintainability** - Code should be easy to modify and extend
 3. **Consistency** - Follow established patterns throughout the codebase
@@ -27,6 +28,7 @@ This document defines the coding standards and best practices for hasteCRM. Foll
 5. **Performance** - Consider performance implications, but don't optimize prematurely
 
 ### Code Quality Rules
+
 - No commented-out code in production
 - No console.log statements in production code
 - Handle all error cases explicitly
@@ -38,23 +40,25 @@ This document defines the coding standards and best practices for hasteCRM. Foll
 ## TypeScript/JavaScript Standards
 
 ### Language Version
+
 - TypeScript 5.0+
 - Target ES2022 for Node.js
 - Target ES2020 for browser code
 - Use strict mode always
 
 ### File Organization
+
 ```typescript
 // 1. Imports - grouped and ordered
-import React, { useState, useEffect } from 'react'; // React imports first
-import { useRouter } from 'next/router'; // Framework imports
+import React, { useState, useEffect } from "react"; // React imports first
+import { useRouter } from "next/router"; // Framework imports
 
-import { Button, Card } from '@/components/ui'; // Internal UI components
-import { ContactService } from '@/services/contact'; // Internal services
-import { Contact, ContactInput } from '@/types'; // Types
+import { Button, Card } from "@/components/ui"; // Internal UI components
+import { ContactService } from "@/services/contact"; // Internal services
+import { Contact, ContactInput } from "@/types"; // Types
 
-import { formatDate, validateEmail } from '@/utils'; // Utilities
-import styles from './ContactList.module.css'; // Styles last
+import { formatDate, validateEmail } from "@/utils"; // Utilities
+import styles from "./ContactList.module.css"; // Styles last
 
 // 2. Type definitions
 interface ContactListProps {
@@ -67,7 +71,10 @@ const ITEMS_PER_PAGE = 20;
 const DEBOUNCE_DELAY = 300;
 
 // 4. Component/Function definition
-export function ContactList({ workspaceId, onContactSelect }: ContactListProps) {
+export function ContactList({
+  workspaceId,
+  onContactSelect,
+}: ContactListProps) {
   // Implementation
 }
 
@@ -80,9 +87,10 @@ function filterContacts(contacts: Contact[], query: string): Contact[] {
 ### Naming Conventions
 
 #### Variables and Functions
+
 ```typescript
 // Use camelCase for variables and functions
-const userEmail = 'user@haste.nyc';
+const userEmail = "user@haste.nyc";
 function calculateTotalRevenue(deals: Deal[]): number {
   // Implementation
 }
@@ -102,6 +110,7 @@ const currentUser = await getUser();
 ```
 
 #### Classes and Interfaces
+
 ```typescript
 // Use PascalCase for classes, interfaces, types, and enums
 class ContactService {
@@ -115,16 +124,17 @@ interface UserProfile {
   lastName: string;
 }
 
-type ContactStatus = 'active' | 'inactive' | 'pending';
+type ContactStatus = "active" | "inactive" | "pending";
 
 enum ErrorCode {
-  NotFound = 'NOT_FOUND',
-  Unauthorized = 'UNAUTHORIZED',
-  ValidationError = 'VALIDATION_ERROR',
+  NotFound = "NOT_FOUND",
+  Unauthorized = "UNAUTHORIZED",
+  ValidationError = "VALIDATION_ERROR",
 }
 ```
 
 #### Files and Directories
+
 ```
 // Use kebab-case for file names
 contact-service.ts
@@ -148,6 +158,7 @@ DealPipeline.tsx
 ### TypeScript Best Practices
 
 #### Type Safety
+
 ```typescript
 // Always use explicit types for function parameters and return values
 function createContact(input: ContactInput): Promise<Contact> {
@@ -157,10 +168,10 @@ function createContact(input: ContactInput): Promise<Contact> {
 // Use type guards
 function isContact(value: unknown): value is Contact {
   return (
-    typeof value === 'object' &&
+    typeof value === "object" &&
     value !== null &&
-    'id' in value &&
-    'email' in value
+    "id" in value &&
+    "email" in value
   );
 }
 
@@ -178,16 +189,17 @@ function processData(data: unknown) {
 }
 
 // Use discriminated unions for complex types
-type ApiResponse<T> = 
-  | { status: 'success'; data: T }
-  | { status: 'error'; error: string }
-  | { status: 'loading' };
+type ApiResponse<T> =
+  | { status: "success"; data: T }
+  | { status: "error"; error: string }
+  | { status: "loading" };
 ```
 
 #### Null/Undefined Handling
+
 ```typescript
 // Use optional chaining
-const userName = user?.profile?.name ?? 'Unknown';
+const userName = user?.profile?.name ?? "Unknown";
 
 // Use nullish coalescing
 const port = process.env.PORT ?? 3000;
@@ -202,6 +214,7 @@ interface User {
 ```
 
 ### Async/Await Best Practices
+
 ```typescript
 // Always use try-catch for async operations
 async function fetchContact(id: string): Promise<Contact> {
@@ -209,7 +222,7 @@ async function fetchContact(id: string): Promise<Contact> {
     const response = await api.get(`/contacts/${id}`);
     return response.data;
   } catch (error) {
-    logger.error('Failed to fetch contact', { id, error });
+    logger.error("Failed to fetch contact", { id, error });
     throw new ContactNotFoundError(id);
   }
 }
@@ -229,7 +242,7 @@ const results = await Promise.allSettled([
 ]);
 
 results.forEach((result, index) => {
-  if (result.status === 'rejected') {
+  if (result.status === "rejected") {
     logger.error(`Operation ${index} failed:`, result.reason);
   }
 });
@@ -238,6 +251,7 @@ results.forEach((result, index) => {
 ## React/Frontend Standards
 
 ### Component Structure
+
 ```typescript
 // Functional components with TypeScript
 import React, { useState, useEffect, useMemo } from 'react';
@@ -250,27 +264,27 @@ interface ContactCardProps {
   isSelected?: boolean;
 }
 
-export function ContactCard({ 
-  contact, 
-  onEdit, 
-  onDelete, 
-  isSelected = false 
+export function ContactCard({
+  contact,
+  onEdit,
+  onDelete,
+  isSelected = false
 }: ContactCardProps) {
   // 1. Hooks at the top
   const { t } = useTranslation('contacts');
   const [isDeleting, setIsDeleting] = useState(false);
-  
+
   // 2. Computed values
   const fullName = useMemo(
     () => `${contact.firstName} ${contact.lastName}`.trim(),
     [contact.firstName, contact.lastName]
   );
-  
+
   // 3. Effects
   useEffect(() => {
     // Effect logic
   }, [contact.id]);
-  
+
   // 4. Event handlers
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -282,7 +296,7 @@ export function ContactCard({
       setIsDeleting(false);
     }
   };
-  
+
   // 5. Render
   return (
     <div className={`contact-card ${isSelected ? 'selected' : ''}`}>
@@ -293,16 +307,17 @@ export function ContactCard({
 ```
 
 ### Hooks Best Practices
+
 ```typescript
 // Custom hooks for reusable logic
 function useContacts(workspaceId: string) {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  
+
   useEffect(() => {
     let cancelled = false;
-    
+
     async function loadContacts() {
       try {
         setLoading(true);
@@ -321,21 +336,21 @@ function useContacts(workspaceId: string) {
         }
       }
     }
-    
+
     loadContacts();
-    
+
     return () => {
       cancelled = true;
     };
   }, [workspaceId]);
-  
+
   return { contacts, loading, error, refetch: loadContacts };
 }
 
 // Memoization for expensive computations
 const sortedContacts = useMemo(
   () => contacts.sort((a, b) => a.lastName.localeCompare(b.lastName)),
-  [contacts]
+  [contacts],
 );
 
 // useCallback for stable function references
@@ -343,15 +358,16 @@ const handleSearch = useCallback(
   debounce((query: string) => {
     searchContacts(query);
   }, 300),
-  [searchContacts]
+  [searchContacts],
 );
 ```
 
 ### State Management
+
 ```typescript
 // Use Zustand for global state
-import { create } from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { devtools, persist } from "zustand/middleware";
 
 interface AppState {
   user: User | null;
@@ -370,10 +386,10 @@ export const useAppStore = create<AppState>()(
         setWorkspace: (workspace) => set({ workspace }),
       }),
       {
-        name: 'app-storage',
-      }
-    )
-  )
+        name: "app-storage",
+      },
+    ),
+  ),
 );
 
 // Component state for local UI state
@@ -382,6 +398,7 @@ const [selectedItems, setSelectedItems] = useState<string[]>([]);
 ```
 
 ### Performance Optimization
+
 ```typescript
 // Lazy loading for code splitting
 const EmailComposer = lazy(() => import('./EmailComposer'));
@@ -409,7 +426,7 @@ function VirtualContactList({ contacts }: { contacts: Contact[] }) {
       <ContactCard contact={contacts[index]} />
     </div>
   );
-  
+
   return (
     <FixedSizeList
       height={600}
@@ -426,6 +443,7 @@ function VirtualContactList({ contacts }: { contacts: Contact[] }) {
 ## Node.js/Backend Standards
 
 ### Project Structure
+
 ```
 /src
   /config         # Configuration files
@@ -441,38 +459,39 @@ function VirtualContactList({ contacts }: { contacts: Contact[] }) {
 ```
 
 ### Service Layer Pattern
+
 ```typescript
 // services/contact.service.ts
 export class ContactService {
   constructor(
     private contactRepo: ContactRepository,
     private emailService: EmailService,
-    private aiService: AIService
+    private aiService: AIService,
   ) {}
-  
+
   async createContact(input: CreateContactInput): Promise<Contact> {
     // Validate input
     const validated = contactSchema.parse(input);
-    
+
     // Business logic
     const enrichedData = await this.aiService.enrichContact(validated.email);
-    
+
     // Data persistence
     const contact = await this.contactRepo.create({
       ...validated,
       enrichmentData: enrichedData,
     });
-    
+
     // Side effects
     await this.emailService.sendWelcomeEmail(contact);
-    
+
     return contact;
   }
-  
+
   async searchContacts(
-    workspaceId: string, 
-    query: string, 
-    options: SearchOptions
+    workspaceId: string,
+    query: string,
+    options: SearchOptions,
   ): Promise<PaginatedResult<Contact>> {
     // Complex search logic
     const filters = this.buildSearchFilters(query);
@@ -482,6 +501,7 @@ export class ContactService {
 ```
 
 ### Error Handling
+
 ```typescript
 // Custom error classes
 export class AppError extends Error {
@@ -489,7 +509,7 @@ export class AppError extends Error {
     message: string,
     public statusCode: number,
     public code: string,
-    public details?: any
+    public details?: any,
   ) {
     super(message);
     Error.captureStackTrace(this, this.constructor);
@@ -498,13 +518,13 @@ export class AppError extends Error {
 
 export class ValidationError extends AppError {
   constructor(message: string, details: any) {
-    super(message, 400, 'VALIDATION_ERROR', details);
+    super(message, 400, "VALIDATION_ERROR", details);
   }
 }
 
 export class NotFoundError extends AppError {
   constructor(resource: string, id: string) {
-    super(`${resource} with id ${id} not found`, 404, 'NOT_FOUND');
+    super(`${resource} with id ${id} not found`, 404, "NOT_FOUND");
   }
 }
 
@@ -513,7 +533,7 @@ export function errorHandler(
   err: Error,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   if (err instanceof AppError) {
     return res.status(err.statusCode).json({
@@ -524,31 +544,32 @@ export function errorHandler(
       },
     });
   }
-  
+
   // Log unexpected errors
-  logger.error('Unexpected error:', err);
-  
+  logger.error("Unexpected error:", err);
+
   res.status(500).json({
     error: {
-      code: 'INTERNAL_ERROR',
-      message: 'An unexpected error occurred',
+      code: "INTERNAL_ERROR",
+      message: "An unexpected error occurred",
     },
   });
 }
 ```
 
 ### Dependency Injection
+
 ```typescript
 // Use a DI container (e.g., tsyringe)
-import { container, injectable, inject } from 'tsyringe';
+import { container, injectable, inject } from "tsyringe";
 
 @injectable()
 export class ContactController {
   constructor(
-    @inject('ContactService') private contactService: ContactService,
-    @inject('Logger') private logger: Logger
+    @inject("ContactService") private contactService: ContactService,
+    @inject("Logger") private logger: Logger,
   ) {}
-  
+
   async create(req: Request, res: Response, next: NextFunction) {
     try {
       const contact = await this.contactService.createContact(req.body);
@@ -560,60 +581,61 @@ export class ContactController {
 }
 
 // Container setup
-container.register('ContactService', { useClass: ContactService });
-container.register('Logger', { useValue: logger });
+container.register("ContactService", { useClass: ContactService });
+container.register("Logger", { useValue: logger });
 ```
 
 ## Database Standards
 
 ### Query Patterns
+
 ```typescript
 // Use query builders for complex queries
 export class ContactRepository {
   async search(
     workspaceId: string,
     filters: ContactFilters,
-    options: PaginationOptions
+    options: PaginationOptions,
   ): Promise<PaginatedResult<Contact>> {
     const query = db
-      .select('*')
-      .from('contacts')
-      .where('workspace_id', workspaceId)
-      .where('deleted_at', null);
-    
+      .select("*")
+      .from("contacts")
+      .where("workspace_id", workspaceId)
+      .where("deleted_at", null);
+
     // Dynamic filters
     if (filters.email) {
-      query.where('email', 'ilike', `%${filters.email}%`);
+      query.where("email", "ilike", `%${filters.email}%`);
     }
-    
+
     if (filters.tags?.length) {
-      query.whereIn('id', function() {
-        this.select('contact_id')
-          .from('contact_tags')
-          .whereIn('tag_id', filters.tags);
+      query.whereIn("id", function () {
+        this.select("contact_id")
+          .from("contact_tags")
+          .whereIn("tag_id", filters.tags);
       });
     }
-    
+
     // Sorting
-    const sortColumn = options.sortBy || 'created_at';
-    const sortOrder = options.sortOrder || 'desc';
+    const sortColumn = options.sortBy || "created_at";
+    const sortOrder = options.sortOrder || "desc";
     query.orderBy(sortColumn, sortOrder);
-    
+
     // Pagination
     const page = options.page || 1;
     const limit = options.limit || 20;
     const offset = (page - 1) * limit;
-    
+
     const [data, countResult] = await Promise.all([
       query.limit(limit).offset(offset),
-      db('contacts')
-        .where('workspace_id', workspaceId)
-        .where('deleted_at', null)
-        .count('* as total')
+      db("contacts")
+        .where("workspace_id", workspaceId)
+        .where("deleted_at", null)
+        .count("* as total"),
     ]);
-    
+
     const total = parseInt(countResult[0].total);
-    
+
     return {
       data,
       pagination: {
@@ -628,36 +650,35 @@ export class ContactRepository {
 ```
 
 ### Transaction Management
+
 ```typescript
 // Use transactions for data consistency
 async function transferDeal(
-  dealId: string, 
-  fromUserId: string, 
-  toUserId: string
+  dealId: string,
+  fromUserId: string,
+  toUserId: string,
 ): Promise<void> {
   await db.transaction(async (trx) => {
     // Update deal owner
-    await trx('deals')
-      .where('id', dealId)
-      .update({ 
-        owner_id: toUserId,
-        updated_at: new Date(),
-      });
-    
+    await trx("deals").where("id", dealId).update({
+      owner_id: toUserId,
+      updated_at: new Date(),
+    });
+
     // Log the transfer
-    await trx('deal_history').insert({
+    await trx("deal_history").insert({
       deal_id: dealId,
-      field_name: 'owner_id',
+      field_name: "owner_id",
       old_value: fromUserId,
       new_value: toUserId,
       changed_by: getCurrentUserId(),
       changed_at: new Date(),
     });
-    
+
     // Update activity
-    await trx('activities').insert({
-      type: 'deal_transferred',
-      entity_type: 'deal',
+    await trx("activities").insert({
+      type: "deal_transferred",
+      entity_type: "deal",
       entity_id: dealId,
       metadata: { from: fromUserId, to: toUserId },
       user_id: getCurrentUserId(),
@@ -670,6 +691,7 @@ async function transferDeal(
 ## API Design Standards
 
 ### RESTful Conventions
+
 ```typescript
 // Resource naming - use plural nouns
 GET    /api/contacts           // List contacts
@@ -691,6 +713,7 @@ POST   /api/emails/send
 ```
 
 ### Request/Response Format
+
 ```typescript
 // Consistent response structure
 interface ApiResponse<T> {
@@ -752,14 +775,15 @@ interface ApiResponse<T> {
 ```
 
 ### API Versioning
+
 ```typescript
 // Version in URL path
-app.use('/api/v1', v1Routes);
-app.use('/api/v2', v2Routes);
+app.use("/api/v1", v1Routes);
+app.use("/api/v2", v2Routes);
 
 // Version in header (alternative)
 app.use((req, res, next) => {
-  const version = req.headers['api-version'] || 'v1';
+  const version = req.headers["api-version"] || "v1";
   req.apiVersion = version;
   next();
 });
@@ -768,6 +792,7 @@ app.use((req, res, next) => {
 ## Testing Standards
 
 ### Test Organization
+
 ```typescript
 // Mirror source structure
 /src
@@ -785,99 +810,101 @@ app.use((req, res, next) => {
 ```
 
 ### Unit Testing
+
 ```typescript
 // Use descriptive test names
-describe('ContactService', () => {
+describe("ContactService", () => {
   let contactService: ContactService;
   let mockContactRepo: jest.Mocked<ContactRepository>;
-  
+
   beforeEach(() => {
     mockContactRepo = createMockContactRepo();
     contactService = new ContactService(mockContactRepo);
   });
-  
-  describe('createContact', () => {
-    it('should create a contact with valid input', async () => {
+
+  describe("createContact", () => {
+    it("should create a contact with valid input", async () => {
       // Arrange
       const input: CreateContactInput = {
-        email: 'test@haste.nyc',
-        firstName: 'John',
-        lastName: 'Doe',
+        email: "test@haste.nyc",
+        firstName: "John",
+        lastName: "Doe",
       };
-      
+
       const expectedContact = {
-        id: '123',
+        id: "123",
         ...input,
         createdAt: new Date(),
       };
-      
+
       mockContactRepo.create.mockResolvedValue(expectedContact);
-      
+
       // Act
       const result = await contactService.createContact(input);
-      
+
       // Assert
       expect(result).toEqual(expectedContact);
       expect(mockContactRepo.create).toHaveBeenCalledWith(input);
     });
-    
-    it('should throw ValidationError for invalid email', async () => {
+
+    it("should throw ValidationError for invalid email", async () => {
       // Arrange
       const input = {
-        email: 'invalid-email',
-        firstName: 'John',
+        email: "invalid-email",
+        firstName: "John",
       };
-      
+
       // Act & Assert
-      await expect(contactService.createContact(input))
-        .rejects
-        .toThrow(ValidationError);
+      await expect(contactService.createContact(input)).rejects.toThrow(
+        ValidationError,
+      );
     });
   });
 });
 ```
 
 ### Integration Testing
+
 ```typescript
 // Test API endpoints with real database
-describe('POST /api/contacts', () => {
+describe("POST /api/contacts", () => {
   let app: Application;
   let testDb: TestDatabase;
-  
+
   beforeAll(async () => {
     testDb = await createTestDatabase();
     app = createApp(testDb);
   });
-  
+
   afterAll(async () => {
     await testDb.cleanup();
   });
-  
+
   beforeEach(async () => {
     await testDb.reset();
   });
-  
-  it('should create a contact successfully', async () => {
+
+  it("should create a contact successfully", async () => {
     const response = await request(app)
-      .post('/api/contacts')
-      .set('Authorization', 'Bearer test-token')
+      .post("/api/contacts")
+      .set("Authorization", "Bearer test-token")
       .send({
-        email: 'test@haste.nyc',
-        firstName: 'John',
-        lastName: 'Doe',
+        email: "test@haste.nyc",
+        firstName: "John",
+        lastName: "Doe",
       });
-    
+
     expect(response.status).toBe(201);
     expect(response.body.data).toMatchObject({
-      email: 'test@haste.nyc',
-      firstName: 'John',
-      lastName: 'Doe',
+      email: "test@haste.nyc",
+      firstName: "John",
+      lastName: "Doe",
     });
-    
+
     // Verify in database
     const contact = await testDb.query(
-      'SELECT * FROM contacts WHERE email = $1',
-      ['test@haste.nyc']
+      "SELECT * FROM contacts WHERE email = $1",
+      ["test@haste.nyc"],
     );
     expect(contact.rows).toHaveLength(1);
   });
@@ -885,6 +912,7 @@ describe('POST /api/contacts', () => {
 ```
 
 ### Test Coverage Requirements
+
 - Minimum 80% code coverage
 - 100% coverage for critical business logic
 - Focus on behavior, not implementation
@@ -893,15 +921,19 @@ describe('POST /api/contacts', () => {
 ## Security Standards
 
 ### Input Validation
+
 ```typescript
 // Use Zod for schema validation
-import { z } from 'zod';
+import { z } from "zod";
 
 const createContactSchema = z.object({
   email: z.string().email(),
   firstName: z.string().min(1).max(100),
   lastName: z.string().min(1).max(100),
-  phone: z.string().regex(/^\+?[1-9]\d{1,14}$/).optional(),
+  phone: z
+    .string()
+    .regex(/^\+?[1-9]\d{1,14}$/)
+    .optional(),
   customFields: z.record(z.unknown()).optional(),
 });
 
@@ -915,8 +947,8 @@ export function validate<T>(schema: z.Schema<T>) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({
           error: {
-            code: 'VALIDATION_ERROR',
-            message: 'Invalid input',
+            code: "VALIDATION_ERROR",
+            message: "Invalid input",
             details: error.errors,
           },
         });
@@ -928,31 +960,32 @@ export function validate<T>(schema: z.Schema<T>) {
 ```
 
 ### Authentication & Authorization
+
 ```typescript
 // JWT authentication middleware
 export async function authenticate(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
-    const token = req.headers.authorization?.replace('Bearer ', '');
-    
+    const token = req.headers.authorization?.replace("Bearer ", "");
+
     if (!token) {
-      throw new UnauthorizedError('No token provided');
+      throw new UnauthorizedError("No token provided");
     }
-    
+
     const payload = jwt.verify(token, process.env.JWT_SECRET);
     const user = await userService.findById(payload.userId);
-    
+
     if (!user) {
-      throw new UnauthorizedError('User not found');
+      throw new UnauthorizedError("User not found");
     }
-    
+
     req.user = user;
     next();
   } catch (error) {
-    next(new UnauthorizedError('Invalid token'));
+    next(new UnauthorizedError("Invalid token"));
   }
 }
 
@@ -960,74 +993,78 @@ export async function authenticate(
 export function authorize(...roles: string[]) {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
-      return next(new UnauthorizedError('Not authenticated'));
+      return next(new UnauthorizedError("Not authenticated"));
     }
-    
+
     if (!roles.includes(req.user.role)) {
-      return next(new ForbiddenError('Insufficient permissions'));
+      return next(new ForbiddenError("Insufficient permissions"));
     }
-    
+
     next();
   };
 }
 
 // Usage
 router.post(
-  '/api/users',
+  "/api/users",
   authenticate,
-  authorize('admin'),
+  authorize("admin"),
   validate(createUserSchema),
-  userController.create
+  userController.create,
 );
 ```
 
 ### Security Best Practices
+
 ```typescript
 // Prevent SQL injection - use parameterized queries
 // Bad
 const query = `SELECT * FROM users WHERE email = '${email}'`;
 
 // Good
-const query = 'SELECT * FROM users WHERE email = $1';
+const query = "SELECT * FROM users WHERE email = $1";
 const result = await db.query(query, [email]);
 
 // Prevent XSS - sanitize user input
-import DOMPurify from 'isomorphic-dompurify';
+import DOMPurify from "isomorphic-dompurify";
 
 const sanitizedHtml = DOMPurify.sanitize(userInput);
 
 // Rate limiting
-import rateLimit from 'express-rate-limit';
+import rateLimit from "express-rate-limit";
 
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP',
+  message: "Too many requests from this IP",
 });
 
-app.use('/api/', apiLimiter);
+app.use("/api/", apiLimiter);
 
 // CORS configuration
-app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS?.split(',') || '*',
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+app.use(
+  cors({
+    origin: process.env.ALLOWED_ORIGINS?.split(",") || "*",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
 ```
 
 ## Documentation Standards
 
 ### Code Comments
+
 ```typescript
 /**
  * Creates a new contact in the system.
- * 
+ *
  * @param input - The contact creation data
  * @returns The created contact with generated ID and timestamps
  * @throws {ValidationError} If input data is invalid
  * @throws {DuplicateError} If email already exists in workspace
- * 
+ *
  * @example
  * const contact = await contactService.createContact({
  *   email: 'john@haste.nyc',
@@ -1044,12 +1081,13 @@ const score = contacts.reduce((total, contact) => {
   // Weight recent activity higher using exponential decay
   const daysSinceActivity = getDaysSince(contact.lastActivityAt);
   const activityScore = Math.exp(-daysSinceActivity / 30);
-  
+
   return total + contact.baseScore * activityScore;
 }, 0);
 ```
 
 ### API Documentation
+
 ```typescript
 /**
  * @swagger
@@ -1077,11 +1115,18 @@ const score = contacts.reduce((total, contact) => {
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  */
-router.post('/contacts', authenticate, validate(createContactSchema), contactController.create);
+router.post(
+  "/contacts",
+  authenticate,
+  validate(createContactSchema),
+  contactController.create,
+);
 ```
 
 ### README Files
+
 Each module should have a README explaining:
+
 - Purpose and functionality
 - Setup instructions
 - API endpoints (if applicable)
@@ -1092,6 +1137,7 @@ Each module should have a README explaining:
 ## Git & Version Control
 
 ### Branch Naming
+
 ```
 feature/add-email-templates
 bugfix/fix-contact-search
@@ -1101,7 +1147,9 @@ refactor/improve-query-performance
 ```
 
 ### Commit Messages
+
 Follow conventional commits format:
+
 ```
 feat: add email template management
 fix: resolve contact search pagination issue
@@ -1114,6 +1162,7 @@ perf: optimize contact list query
 ```
 
 ### Pull Request Guidelines
+
 1. Keep PRs small and focused
 2. Include tests for new features
 3. Update documentation as needed
@@ -1122,6 +1171,7 @@ perf: optimize contact list query
 6. Squash commits when merging
 
 ### Code Review Checklist
+
 - [ ] Code follows style guidelines
 - [ ] Tests are included and passing
 - [ ] Documentation is updated
@@ -1133,6 +1183,7 @@ perf: optimize contact list query
 ## Enforcement
 
 ### Automated Tools
+
 ```json
 // .eslintrc.json
 {
@@ -1163,6 +1214,7 @@ perf: optimize contact list query
 ```
 
 ### Pre-commit Hooks
+
 ```json
 // package.json
 {
@@ -1180,6 +1232,7 @@ perf: optimize contact list query
 ```
 
 ### CI/CD Checks
+
 - Linting (ESLint)
 - Formatting (Prettier)
 - Type checking (TypeScript)

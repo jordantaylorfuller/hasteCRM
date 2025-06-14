@@ -160,7 +160,7 @@ export class ContactImportService {
     return contact;
   }
 
-  async getImportStatus(importId: string, workspaceId: string) {
+  async getImportStatus(importId: string, workspaceId: string): Promise<any> {
     const importRecord = await this.prisma.import.findFirst({
       where: {
         id: importId,

@@ -1,24 +1,24 @@
 // Mock Prisma Client
-jest.mock('@prisma/client', () => ({
+jest.mock("@prisma/client", () => ({
   ContactStatus: {
-    ACTIVE: 'ACTIVE',
-    INACTIVE: 'INACTIVE',
-    LEAD: 'LEAD',
-    PROSPECT: 'PROSPECT',
-    CUSTOMER: 'CUSTOMER',
+    ACTIVE: "ACTIVE",
+    INACTIVE: "INACTIVE",
+    LEAD: "LEAD",
+    PROSPECT: "PROSPECT",
+    CUSTOMER: "CUSTOMER",
   },
   ContactSource: {
-    MANUAL: 'MANUAL',
-    IMPORT: 'IMPORT',
-    API: 'API',
-    GMAIL: 'GMAIL',
-    FORM: 'FORM',
+    MANUAL: "MANUAL",
+    IMPORT: "IMPORT",
+    API: "API",
+    GMAIL: "GMAIL",
+    FORM: "FORM",
   },
   ImportStatus: {
-    PENDING: 'PENDING',
-    PROCESSING: 'PROCESSING',
-    COMPLETED: 'COMPLETED',
-    FAILED: 'FAILED',
+    PENDING: "PENDING",
+    PROCESSING: "PROCESSING",
+    COMPLETED: "COMPLETED",
+    FAILED: "FAILED",
   },
   PrismaClient: jest.fn().mockImplementation(() => ({
     $connect: jest.fn(),
@@ -132,16 +132,16 @@ jest.mock('@prisma/client', () => ({
 // Mock external libraries will be handled in individual test files
 
 // Set test environment variables
-process.env.NODE_ENV = 'test';
-process.env.JWT_SECRET = 'test-jwt-secret';
-process.env.JWT_REFRESH_SECRET = 'test-refresh-secret';
-process.env.FRONTEND_URL = 'http://localhost:3000';
-process.env.REDIS_HOST = 'localhost';
-process.env.REDIS_PORT = '6379';
+process.env.NODE_ENV = "test";
+process.env.JWT_SECRET = "test-jwt-secret";
+process.env.JWT_REFRESH_SECRET = "test-refresh-secret";
+process.env.FRONTEND_URL = "http://localhost:3000";
+process.env.REDIS_HOST = "localhost";
+process.env.REDIS_PORT = "6379";
 
 // Mock class-validator decorators that cause issues in tests
-jest.mock('class-validator', () => {
-  const actual = jest.requireActual('class-validator');
+jest.mock("class-validator", () => {
+  const actual = jest.requireActual("class-validator");
   return {
     ...actual,
     IsEnum: () => () => {},

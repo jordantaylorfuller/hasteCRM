@@ -4,15 +4,16 @@ import { useAuth } from "@/lib/auth-context";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 import Link from "next/link";
-import { 
-  LayoutDashboard, 
-  Users, 
-  Building2, 
-  Mail, 
-  Settings, 
+import {
+  LayoutDashboard,
+  Users,
+  Building2,
+  Mail,
+  Settings,
   LogOut,
   Menu,
-  X
+  X,
+  Kanban,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -20,6 +21,7 @@ import { useState } from "react";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Pipelines", href: "/pipelines", icon: Kanban },
   { name: "Contacts", href: "/contacts", icon: Users },
   { name: "Companies", href: "/companies", icon: Building2 },
   { name: "Emails", href: "/emails", icon: Mail },
@@ -57,11 +59,16 @@ export default function DashboardLayout({
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Mobile sidebar */}
-      <div className={cn(
-        "fixed inset-0 z-50 lg:hidden",
-        sidebarOpen ? "block" : "hidden"
-      )}>
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
+      <div
+        className={cn(
+          "fixed inset-0 z-50 lg:hidden",
+          sidebarOpen ? "block" : "hidden",
+        )}
+      >
+        <div
+          className="fixed inset-0 bg-gray-600 bg-opacity-75"
+          onClick={() => setSidebarOpen(false)}
+        />
         <nav className="fixed top-0 left-0 bottom-0 flex flex-col w-64 bg-white">
           <div className="flex items-center justify-between h-16 px-4 border-b">
             <h1 className="text-xl font-semibold">hasteCRM</h1>
@@ -85,7 +92,7 @@ export default function DashboardLayout({
                     "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
                     isActive
                       ? "bg-gray-100 text-gray-900"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
                   )}
                   onClick={() => setSidebarOpen(false)}
                 >
@@ -134,7 +141,7 @@ export default function DashboardLayout({
                     "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
                     isActive
                       ? "bg-gray-100 text-gray-900"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
                   )}
                 >
                   <Icon className="mr-3 h-5 w-5" />
@@ -176,14 +183,13 @@ export default function DashboardLayout({
             <Menu className="h-5 w-5" />
           </Button>
           <div className="ml-4 text-lg font-semibold">
-            {navigation.find(item => item.href === pathname)?.name || "Dashboard"}
+            {navigation.find((item) => item.href === pathname)?.name ||
+              "Dashboard"}
           </div>
         </div>
 
         {/* Page content */}
-        <main className="flex-1">
-          {children}
-        </main>
+        <main className="flex-1">{children}</main>
       </div>
     </div>
   );

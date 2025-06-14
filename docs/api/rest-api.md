@@ -1,6 +1,7 @@
 # REST API Documentation
 
 ## Table of Contents
+
 1. [Overview](#overview)
 2. [Authentication](#authentication)
 3. [Base URL & Versioning](#base-url--versioning)
@@ -21,6 +22,7 @@ While the hasteCRM primarily uses GraphQL for its API, certain operations are be
 All REST API endpoints require authentication using JWT tokens obtained through the GraphQL API.
 
 ### Request Headers
+
 ```http
 Authorization: Bearer your-jwt-token-here
 Content-Type: application/json
@@ -28,6 +30,7 @@ X-Workspace-ID: workspace_uuid (optional, defaults to user's primary workspace)
 ```
 
 ### Example Request
+
 ```bash
 curl -X GET https://api.haste.nyc/v1/contacts \
   -H "Authorization: Bearer your-jwt-token-here" \
@@ -45,6 +48,7 @@ Development: http://localhost:4000/v1
 ## Standard Response Format
 
 ### Success Response
+
 ```json
 {
   "success": true,
@@ -60,6 +64,7 @@ Development: http://localhost:4000/v1
 ```
 
 ### Error Response
+
 ```json
 {
   "success": false,
@@ -79,35 +84,38 @@ Development: http://localhost:4000/v1
 ```
 
 ### Error Codes
-| Code | HTTP Status | Description |
-|------|-------------|-------------|
-| `UNAUTHORIZED` | 401 | Missing or invalid authentication |
-| `FORBIDDEN` | 403 | Insufficient permissions |
-| `NOT_FOUND` | 404 | Resource not found |
-| `VALIDATION_ERROR` | 400 | Invalid request data |
-| `RATE_LIMITED` | 429 | Too many requests |
-| `SERVER_ERROR` | 500 | Internal server error |
-| `CONFLICT` | 409 | Resource conflict (e.g., duplicate) |
-| `PAYLOAD_TOO_LARGE` | 413 | Request size exceeds limit |
-| `UNPROCESSABLE_ENTITY` | 422 | Semantic validation error |
-| `SERVICE_UNAVAILABLE` | 503 | Temporary service issue |
+
+| Code                   | HTTP Status | Description                         |
+| ---------------------- | ----------- | ----------------------------------- |
+| `UNAUTHORIZED`         | 401         | Missing or invalid authentication   |
+| `FORBIDDEN`            | 403         | Insufficient permissions            |
+| `NOT_FOUND`            | 404         | Resource not found                  |
+| `VALIDATION_ERROR`     | 400         | Invalid request data                |
+| `RATE_LIMITED`         | 429         | Too many requests                   |
+| `SERVER_ERROR`         | 500         | Internal server error               |
+| `CONFLICT`             | 409         | Resource conflict (e.g., duplicate) |
+| `PAYLOAD_TOO_LARGE`    | 413         | Request size exceeds limit          |
+| `UNPROCESSABLE_ENTITY` | 422         | Semantic validation error           |
+| `SERVICE_UNAVAILABLE`  | 503         | Temporary service issue             |
 
 ## 📄 Pagination
 
 All list endpoints support cursor-based pagination for efficient data retrieval.
 
 ### Pagination Parameters
+
 ```http
 GET /v1/contacts?cursor=eyJpZCI6ImNvbnRhY3RfMTIzIn0&limit=50
 ```
 
-| Parameter | Type | Default | Max | Description |
-|-----------|------|---------|-----|-------------|
-| `cursor` | string | null | - | Opaque cursor for next page |
-| `limit` | integer | 20 | 100 | Number of items per page |
-| `direction` | string | "next" | - | "next" or "prev" |
+| Parameter   | Type    | Default | Max | Description                 |
+| ----------- | ------- | ------- | --- | --------------------------- |
+| `cursor`    | string  | null    | -   | Opaque cursor for next page |
+| `limit`     | integer | 20      | 100 | Number of items per page    |
+| `direction` | string  | "next"  | -   | "next" or "prev"            |
 
 ### Paginated Response
+
 ```json
 {
   "success": true,
@@ -127,6 +135,7 @@ GET /v1/contacts?cursor=eyJpZCI6ImNvbnRhY3RfMTIzIn0&limit=50
 ```
 
 ### Pagination Best Practices
+
 1. Always use cursors for consistent pagination
 2. Don't construct cursors manually
 3. Handle edge cases (empty results, last page)
@@ -135,6 +144,7 @@ GET /v1/contacts?cursor=eyJpZCI6ImNvbnRhY3RfMTIzIn0&limit=50
 ## File Upload Endpoints
 
 ### Upload File
+
 Upload files for attachments, profile pictures, or documents.
 
 ```http
@@ -142,6 +152,7 @@ POST /v1/files/upload
 ```
 
 **Request:**
+
 ```bash
 curl -X POST https://api.haste.nyc/v1/files/upload \
   -H "Content-Type: multipart/form-data" \
@@ -153,6 +164,7 @@ curl -X POST https://api.haste.nyc/v1/files/upload \
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -173,21 +185,25 @@ curl -X POST https://api.haste.nyc/v1/files/upload \
 ```
 
 ### Get File
+
 ```http
 GET /v1/files/:fileId
 ```
 
 ### Delete File
+
 ```http
 DELETE /v1/files/:fileId
 ```
 
 ### Generate Upload URL (for large files)
+
 ```http
 POST /v1/files/upload-url
 ```
 
 **Request:**
+
 ```json
 {
   "filename": "large-video.mp4",
@@ -197,6 +213,7 @@ POST /v1/files/upload-url
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -211,6 +228,7 @@ POST /v1/files/upload-url
 ## Webhook Endpoints
 
 ### Gmail Push Notifications
+
 Receive real-time Gmail updates.
 
 ```http
@@ -218,6 +236,7 @@ POST /v1/webhooks/gmail
 ```
 
 **Headers:**
+
 ```http
 X-Goog-Channel-ID: channel_123
 X-Goog-Message-Number: 1
@@ -227,6 +246,7 @@ X-Goog-Resource-URI: https://www.googleapis.com/gmail/v1/users/me/messages
 ```
 
 **Request Body:**
+
 ```json
 {
   "message": {
@@ -238,6 +258,7 @@ X-Goog-Resource-URI: https://www.googleapis.com/gmail/v1/users/me/messages
 ```
 
 ### SendGrid Events
+
 Track email delivery events.
 
 ```http
@@ -245,6 +266,7 @@ POST /v1/webhooks/sendgrid
 ```
 
 **Request Body:**
+
 ```json
 [
   {
@@ -260,6 +282,7 @@ POST /v1/webhooks/sendgrid
 ```
 
 ### Stripe Events
+
 Handle subscription updates.
 
 ```http
@@ -267,11 +290,13 @@ POST /v1/webhooks/stripe
 ```
 
 **Headers:**
+
 ```http
 Stripe-Signature: t=1705318200,v1=signature...
 ```
 
 ### Custom Webhooks
+
 Register custom webhooks for automation triggers.
 
 ```http
@@ -281,21 +306,25 @@ POST /v1/webhooks/custom/:webhookId
 ## OAuth Callback Endpoints
 
 ### Google OAuth
+
 ```http
 GET /v1/auth/google/callback?code=AUTH_CODE&state=STATE_TOKEN
 ```
 
 **Response (Redirect):**
+
 ```
 Location: https://www.haste.nyc/auth/success?token=your-jwt-token-here
 ```
 
 ### Microsoft OAuth
+
 ```http
 GET /v1/auth/microsoft/callback?code=AUTH_CODE&state=STATE_TOKEN
 ```
 
 ### LinkedIn OAuth
+
 ```http
 GET /v1/auth/linkedin/callback?code=AUTH_CODE&state=STATE_TOKEN
 ```
@@ -303,6 +332,7 @@ GET /v1/auth/linkedin/callback?code=AUTH_CODE&state=STATE_TOKEN
 ## Export Endpoints
 
 ### Export Contacts
+
 Export contacts in various formats.
 
 ```http
@@ -310,6 +340,7 @@ POST /v1/export/contacts
 ```
 
 **Request:**
+
 ```json
 {
   "format": "csv",
@@ -317,17 +348,12 @@ POST /v1/export/contacts
     "tags": ["customer", "high-value"],
     "createdAfter": "2024-01-01"
   },
-  "fields": [
-    "email",
-    "firstName",
-    "lastName",
-    "company",
-    "customFields.budget"
-  ]
+  "fields": ["email", "firstName", "lastName", "company", "customFields.budget"]
 }
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -341,16 +367,19 @@ POST /v1/export/contacts
 ```
 
 ### Get Export Status
+
 ```http
 GET /v1/export/:exportId/status
 ```
 
 ### Download Export
+
 ```http
 GET /v1/export/:exportId/download
 ```
 
 **Response:**
+
 ```
 Content-Type: text/csv
 Content-Disposition: attachment; filename="contacts_2024-01-15.csv"
@@ -363,24 +392,29 @@ john@haste.nyc,John,Doe,Acme Corp,50000
 ## Email Tracking Endpoints
 
 ### Track Email Open
+
 ```http
 GET /v1/track/open/:trackingId.gif
 ```
 
 **Response:**
+
 - Returns a 1x1 transparent GIF
 - Records open event with IP, user agent, timestamp
 
 ### Track Link Click
+
 ```http
 GET /v1/track/click/:trackingId/:linkId
 ```
 
 **Response:**
+
 - Redirects to target URL
 - Records click event with link details
 
 ### Unsubscribe
+
 ```http
 GET /v1/unsubscribe/:token
 POST /v1/unsubscribe/:token
@@ -389,6 +423,7 @@ POST /v1/unsubscribe/:token
 ## Search Endpoints
 
 ### Global Search
+
 Search across all entities.
 
 ```http
@@ -396,6 +431,7 @@ GET /v1/search?q=john&types=contact,deal,email&limit=20
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -427,6 +463,7 @@ GET /v1/search?q=john&types=contact,deal,email&limit=20
 ```
 
 ### Autocomplete
+
 ```http
 GET /v1/autocomplete?type=contact&field=company&q=acm&limit=10
 ```
@@ -434,11 +471,13 @@ GET /v1/autocomplete?type=contact&field=company&q=acm&limit=10
 ## Health & Status Endpoints
 
 ### Health Check
+
 ```http
 GET /v1/health
 ```
 
 **Response:**
+
 ```json
 {
   "status": "healthy",
@@ -454,16 +493,19 @@ GET /v1/health
 ```
 
 ### Readiness Check
+
 ```http
 GET /v1/ready
 ```
 
 ### Metrics
+
 ```http
 GET /v1/metrics
 ```
 
 **Response (Prometheus format):**
+
 ```
 # HELP api_requests_total Total API requests
 # TYPE api_requests_total counter
@@ -477,11 +519,13 @@ api_request_duration_seconds_bucket{le="0.1"} 1000
 ## Admin Endpoints
 
 ### Workspace Usage
+
 ```http
 GET /v1/admin/workspace/usage
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -511,6 +555,7 @@ GET /v1/admin/workspace/usage
 ```
 
 ### Audit Logs
+
 ```http
 GET /v1/admin/audit-logs?startDate=2024-01-01&endDate=2024-01-15&limit=100
 ```
@@ -518,17 +563,20 @@ GET /v1/admin/audit-logs?startDate=2024-01-01&endDate=2024-01-15&limit=100
 ## Real-time Endpoints
 
 ### Server-Sent Events (SSE)
+
 ```http
 GET /v1/events/stream
 ```
 
 **Headers:**
+
 ```http
 Accept: text/event-stream
 Cache-Control: no-cache
 ```
 
 **Response Stream:**
+
 ```
 event: contact_updated
 data: {"id":"contact_123","changes":{"score":85}}
@@ -541,11 +589,13 @@ data: {"timestamp":"2024-01-15T10:30:00Z"}
 ```
 
 ### WebSocket Connection
+
 ```
 wss://api.haste.nyc/v1/ws
 ```
 
 **Authentication:**
+
 ```json
 {
   "type": "auth",
@@ -554,6 +604,7 @@ wss://api.haste.nyc/v1/ws
 ```
 
 **Subscribe to channels:**
+
 ```json
 {
   "type": "subscribe",
@@ -564,6 +615,7 @@ wss://api.haste.nyc/v1/ws
 ## Rate Limiting
 
 ### Headers
+
 ```http
 X-RateLimit-Limit: 1000
 X-RateLimit-Remaining: 999
@@ -571,23 +623,26 @@ X-RateLimit-Reset: 1705318800
 ```
 
 ### Rate Limits by Endpoint
-| Endpoint Pattern | Limit | Window |
-|-----------------|-------|---------|
-| `/v1/auth/*` | 10 | 1 minute |
-| `/v1/files/upload` | 100 | 1 hour |
-| `/v1/export/*` | 10 | 1 hour |
-| `/v1/search` | 100 | 1 minute |
-| `/v1/track/*` | 10000 | 1 hour |
-| Default | 1000 | 1 hour |
+
+| Endpoint Pattern   | Limit | Window   |
+| ------------------ | ----- | -------- |
+| `/v1/auth/*`       | 10    | 1 minute |
+| `/v1/files/upload` | 100   | 1 hour   |
+| `/v1/export/*`     | 10    | 1 hour   |
+| `/v1/search`       | 100   | 1 minute |
+| `/v1/track/*`      | 10000 | 1 hour   |
+| Default            | 1000  | 1 hour   |
 
 ## Utility Endpoints
 
 ### Generate IDs
+
 ```http
 POST /v1/utils/generate-id
 ```
 
 **Request:**
+
 ```json
 {
   "type": "contact",
@@ -596,6 +651,7 @@ POST /v1/utils/generate-id
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -612,11 +668,13 @@ POST /v1/utils/generate-id
 ```
 
 ### Validate Email
+
 ```http
 POST /v1/utils/validate-email
 ```
 
 **Request:**
+
 ```json
 {
   "email": "john@haste.nyc"
@@ -624,6 +682,7 @@ POST /v1/utils/validate-email
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -645,11 +704,13 @@ POST /v1/utils/validate-email
 ```
 
 ### Parse Email Headers
+
 ```http
 POST /v1/utils/parse-email
 ```
 
 **Request:**
+
 ```json
 {
   "headers": "From: John Doe <john@haste.nyc>\nTo: jane@haste.nyc\n...",
@@ -660,6 +721,7 @@ POST /v1/utils/parse-email
 ## Batch Operations
 
 ### Batch Request
+
 Execute multiple operations in a single request.
 
 ```http
@@ -667,6 +729,7 @@ POST /v1/batch
 ```
 
 **Request:**
+
 ```json
 {
   "operations": [
@@ -693,6 +756,7 @@ POST /v1/batch
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -722,6 +786,7 @@ POST /v1/batch
 ## Example Integrations
 
 ### Python
+
 ```python
 import requests
 
@@ -733,7 +798,7 @@ class HasteCRMAPI:
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json"
         }
-    
+
     def upload_file(self, file_path, entity_type, entity_id):
         with open(file_path, 'rb') as f:
             files = {'file': f}
@@ -756,30 +821,31 @@ result = api.upload_file("document.pdf", "contact", "contact_123")
 ```
 
 ### Node.js
+
 ```javascript
-const FormData = require('form-data');
-const fs = require('fs');
+const FormData = require("form-data");
+const fs = require("fs");
 
 class HasteCRMAPI {
-  constructor(apiKey, baseUrl = 'https://api.haste.nyc/v1') {
+  constructor(apiKey, baseUrl = "https://api.haste.nyc/v1") {
     this.apiKey = apiKey;
     this.baseUrl = baseUrl;
   }
 
   async uploadFile(filePath, entityType, entityId) {
     const form = new FormData();
-    form.append('file', fs.createReadStream(filePath));
-    form.append('type', 'attachment');
-    form.append('entityType', entityType);
-    form.append('entityId', entityId);
+    form.append("file", fs.createReadStream(filePath));
+    form.append("type", "attachment");
+    form.append("entityType", entityType);
+    form.append("entityId", entityId);
 
     const response = await fetch(`${this.baseUrl}/files/upload`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${this.apiKey}`,
-        ...form.getHeaders()
+        Authorization: `Bearer ${this.apiKey}`,
+        ...form.getHeaders(),
       },
-      body: form
+      body: form,
     });
 
     return response.json();
@@ -787,11 +853,12 @@ class HasteCRMAPI {
 }
 
 // Usage
-const api = new HasteCRMAPI('your_api_key');
-const result = await api.uploadFile('document.pdf', 'contact', 'contact_123');
+const api = new HasteCRMAPI("your_api_key");
+const result = await api.uploadFile("document.pdf", "contact", "contact_123");
 ```
 
 ### cURL Examples
+
 ```bash
 # Upload file
 curl -X POST https://api.haste.nyc/v1/files/upload \
@@ -825,13 +892,16 @@ curl -N -H "Authorization: Bearer YOUR_API_KEY" \
 ## Migration from v0 to v1
 
 ### Breaking Changes
+
 1. Authentication header changed from `X-API-Key` to `Authorization: Bearer`
 2. Response format standardized with `success`, `data`, and `meta` fields
 3. Error codes are now uppercase with underscores
 4. File upload endpoint moved from `/files` to `/v1/files/upload`
 
 ### Deprecated Endpoints
+
 These v0 endpoints are deprecated and will be removed:
+
 - `/api/contacts` → Use `/v1/contacts` (or GraphQL preferred)
 - `/api/search` → Use `/v1/search`
 - `/api/export` → Use `/v1/export/:entity`
@@ -847,6 +917,7 @@ These v0 endpoints are deprecated and will be removed:
 ## Support
 
 For API support:
+
 - **Status Page**: [status.haste.nyc](https://status.haste.nyc)
 - **API Console**: [console.haste.nyc](https://console.haste.nyc)
 - **Developer Forum**: [forum.haste.nyc/api](https://forum.haste.nyc/api)
@@ -857,21 +928,24 @@ For API support:
 ## 🔒 Security Best Practices
 
 ### API Key Management
+
 1. **Never expose API keys in client-side code**
+
    - Use environment variables
    - Implement proxy endpoints for frontend
    - Rotate keys regularly
 
 2. **Use appropriate authentication flows**
+
    ```javascript
    // BAD: API key in frontend
-   fetch('https://api.haste.nyc/v1/contacts', {
-     headers: { 'Authorization': 'Bearer sk_live_abc123' }
+   fetch("https://api.haste.nyc/v1/contacts", {
+     headers: { Authorization: "Bearer sk_live_abc123" },
    });
 
    // GOOD: Proxy through backend
-   fetch('/api/proxy/contacts', {
-     credentials: 'include'
+   fetch("/api/proxy/contacts", {
+     credentials: "include",
    });
    ```
 
@@ -881,19 +955,22 @@ For API support:
    - Monitor for unauthorized access
 
 ### Request Validation
+
 1. **Always validate input data**
+
    ```javascript
    // Input validation example
    const validateEmail = (email) => {
      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
      if (!emailRegex.test(email)) {
-       throw new Error('Invalid email format');
+       throw new Error("Invalid email format");
      }
      return email.toLowerCase().trim();
    };
    ```
 
 2. **Sanitize user input**
+
    - Prevent SQL injection
    - Escape special characters
    - Validate file uploads
@@ -904,7 +981,9 @@ For API support:
    - Use certificate pinning for mobile apps
 
 ### Rate Limiting & DDoS Protection
+
 1. **Implement client-side rate limiting**
+
    ```javascript
    class RateLimiter {
      constructor(maxRequests, timeWindow) {
@@ -915,12 +994,12 @@ For API support:
 
      async execute(fn) {
        const now = Date.now();
-       this.requests = this.requests.filter(t => now - t < this.timeWindow);
-       
+       this.requests = this.requests.filter((t) => now - t < this.timeWindow);
+
        if (this.requests.length >= this.maxRequests) {
-         throw new Error('Rate limit exceeded');
+         throw new Error("Rate limit exceeded");
        }
-       
+
        this.requests.push(now);
        return await fn();
      }
@@ -933,12 +1012,15 @@ For API support:
    - Show user-friendly error messages
 
 ### Data Protection
+
 1. **Encrypt sensitive data**
+
    - Use field-level encryption for PII
    - Implement key rotation
    - Store encryption keys separately
 
 2. **Implement audit logging**
+
    ```json
    {
      "action": "contact.update",
@@ -960,19 +1042,21 @@ For API support:
    - Maintain consent records
 
 ### Webhook Security
+
 1. **Verify webhook signatures**
+
    ```javascript
-   const crypto = require('crypto');
+   const crypto = require("crypto");
 
    function verifyWebhookSignature(payload, signature, secret) {
      const expectedSignature = crypto
-       .createHmac('sha256', secret)
+       .createHmac("sha256", secret)
        .update(payload)
-       .digest('hex');
-     
+       .digest("hex");
+
      return crypto.timingSafeEqual(
        Buffer.from(signature),
-       Buffer.from(expectedSignature)
+       Buffer.from(expectedSignature),
      );
    }
    ```
@@ -983,28 +1067,27 @@ For API support:
    - Dead letter queues
 
 ### CORS Configuration
+
 ```javascript
 // Restrictive CORS policy
 const corsOptions = {
-  origin: [
-    'https://www.haste.nyc',
-    'https://staging.haste.nyc'
-  ],
+  origin: ["https://www.haste.nyc", "https://staging.haste.nyc"],
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  maxAge: 86400 // 24 hours
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  maxAge: 86400, // 24 hours
 };
 ```
 
 ## 🛠️ Advanced Examples
 
 ### Implementing Retry Logic
+
 ```javascript
 class APIClient {
   constructor(apiKey, options = {}) {
     this.apiKey = apiKey;
-    this.baseURL = options.baseURL || 'https://api.haste.nyc/v1';
+    this.baseURL = options.baseURL || "https://api.haste.nyc/v1";
     this.maxRetries = options.maxRetries || 3;
     this.retryDelay = options.retryDelay || 1000;
   }
@@ -1014,8 +1097,8 @@ class APIClient {
       const response = await fetch(`${this.baseURL}${path}`, {
         method,
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.apiKey}`,
+          "Content-Type": "application/json",
         },
         body: data ? JSON.stringify(data) : null,
       });
@@ -1024,10 +1107,10 @@ class APIClient {
         if (response.status === 429 && retries < this.maxRetries) {
           // Rate limited - retry with exponential backoff
           const delay = this.retryDelay * Math.pow(2, retries);
-          await new Promise(resolve => setTimeout(resolve, delay));
+          await new Promise((resolve) => setTimeout(resolve, delay));
           return this.request(method, path, data, retries + 1);
         }
-        
+
         throw new Error(`API Error: ${response.status}`);
       }
 
@@ -1035,7 +1118,7 @@ class APIClient {
     } catch (error) {
       if (retries < this.maxRetries) {
         const delay = this.retryDelay * Math.pow(2, retries);
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise((resolve) => setTimeout(resolve, delay));
         return this.request(method, path, data, retries + 1);
       }
       throw error;
@@ -1045,67 +1128,71 @@ class APIClient {
 ```
 
 ### Streaming Large Datasets
+
 ```javascript
 async function* streamContacts(apiClient) {
   let cursor = null;
-  
+
   do {
-    const response = await apiClient.request('GET', 
-      `/contacts?cursor=${cursor || ''}&limit=100`
+    const response = await apiClient.request(
+      "GET",
+      `/contacts?cursor=${cursor || ""}&limit=100`,
     );
-    
+
     for (const contact of response.data.items) {
       yield contact;
     }
-    
+
     cursor = response.data.pagination.nextCursor;
   } while (cursor);
 }
 
 // Usage
-const client = new APIClient('your_api_key');
+const client = new APIClient("your_api_key");
 for await (const contact of streamContacts(client)) {
   console.log(contact.email);
 }
 ```
 
 ### Webhook Handler with Queue
+
 ```javascript
-const Queue = require('bull');
-const webhookQueue = new Queue('webhooks');
+const Queue = require("bull");
+const webhookQueue = new Queue("webhooks");
 
 // Webhook endpoint
-app.post('/webhooks/gmail', async (req, res) => {
+app.post("/webhooks/gmail", async (req, res) => {
   // Verify signature
   if (!verifyGoogleSignature(req)) {
-    return res.status(401).send('Unauthorized');
+    return res.status(401).send("Unauthorized");
   }
-  
+
   // Quick response
-  res.status(200).send('OK');
-  
+  res.status(200).send("OK");
+
   // Queue for processing
-  await webhookQueue.add('process-gmail', {
+  await webhookQueue.add("process-gmail", {
     headers: req.headers,
     body: req.body,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 });
 
 // Process webhook
-webhookQueue.process('process-gmail', async (job) => {
+webhookQueue.process("process-gmail", async (job) => {
   const { headers, body } = job.data;
-  
+
   // Decode message
-  const decodedData = Buffer.from(body.message.data, 'base64').toString();
+  const decodedData = Buffer.from(body.message.data, "base64").toString();
   const messageData = JSON.parse(decodedData);
-  
+
   // Process email update
   await processEmailUpdate(messageData);
 });
 ```
 
 ### TypeScript SDK Example
+
 ```typescript
 interface APIConfig {
   apiKey: string;
@@ -1126,19 +1213,19 @@ interface PaginatedResponse<T> {
 
 class HasteCRMSDK {
   private config: APIConfig;
-  
+
   constructor(config: APIConfig) {
     this.config = {
-      baseURL: 'https://api.haste.nyc/v1',
+      baseURL: "https://api.haste.nyc/v1",
       timeout: 30000,
-      ...config
+      ...config,
     };
   }
-  
+
   async contacts(): Promise<ContactsAPI> {
     return new ContactsAPI(this.config);
   }
-  
+
   async files(): Promise<FilesAPI> {
     return new FilesAPI(this.config);
   }
@@ -1146,7 +1233,7 @@ class HasteCRMSDK {
 
 class ContactsAPI {
   constructor(private config: APIConfig) {}
-  
+
   async list(options?: {
     cursor?: string;
     limit?: number;
@@ -1154,15 +1241,15 @@ class ContactsAPI {
   }): Promise<PaginatedResponse<Contact>> {
     // Implementation
   }
-  
+
   async create(data: CreateContactInput): Promise<Contact> {
     // Implementation
   }
-  
+
   async update(id: string, data: UpdateContactInput): Promise<Contact> {
     // Implementation
   }
-  
+
   async delete(id: string): Promise<void> {
     // Implementation
   }
@@ -1174,5 +1261,5 @@ const contacts = await crm.contacts();
 const result = await contacts.list({ limit: 50 });
 ```
 
-*API Version: 1.0*  
-*Last Updated: 2024-01-15*
+_API Version: 1.0_  
+_Last Updated: 2024-01-15_
