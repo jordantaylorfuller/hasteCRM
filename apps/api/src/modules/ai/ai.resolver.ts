@@ -14,7 +14,7 @@ export class AiResolver {
     @Context() _ctx: any,
   ): Promise<any> {
     const { emailId, includeActionItems, includeKeyPoints, maxLength } = input;
-    
+
     return this.aiService.summarizeEmail(emailId, {
       includeActionItems,
       includeKeyPoints,
@@ -28,7 +28,7 @@ export class AiResolver {
     @Context() ctx: any,
   ): Promise<any> {
     const { workspaceId } = ctx.req.user;
-    
+
     return this.aiService.generateInsights(workspaceId, {
       start: new Date(timeRange.start),
       end: new Date(timeRange.end),
@@ -41,7 +41,7 @@ export class AiResolver {
     @Context() _ctx: any,
   ): Promise<any> {
     const { emailId, prompt, tone, length, includeContext } = input;
-    
+
     return this.aiService.generateSmartCompose(emailId, prompt, {
       tone,
       length,

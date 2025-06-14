@@ -117,7 +117,7 @@ export class GmailService {
         : options.bcc
       : "";
 
-    let email = [
+    const email = [
       `To: ${toAddresses}`,
       ...(ccAddresses ? [`Cc: ${ccAddresses}`] : []),
       ...(bccAddresses ? [`Bcc: ${bccAddresses}`] : []),
@@ -323,6 +323,6 @@ export class GmailService {
   async refreshAccessToken(refreshToken: string): Promise<string> {
     this.oauth2Client.setCredentials({ refresh_token: refreshToken });
     const { credentials } = await this.oauth2Client.refreshAccessToken();
-    return credentials.access_token!;
+    return credentials.access_token || "";
   }
 }

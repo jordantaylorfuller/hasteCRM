@@ -138,8 +138,7 @@ Format the response as JSON with fields: summary, actionItems (array), keyPoints
           context = threadEmails
             .slice(-3) // Last 3 emails for context
             .map(
-              (e) =>
-                `From: ${e.from}\n${e.textContent || e.htmlContent || ""}`,
+              (e) => `From: ${e.from}\n${e.textContent || e.htmlContent || ""}`,
             )
             .join("\n\n---\n\n");
         }
@@ -406,7 +405,12 @@ Best regards`;
       linkedInUrl: "https://linkedin.com/in/example",
       summary:
         "Experienced project manager focusing on digital transformation initiatives. Key contact for enterprise software decisions.",
-      tags: ["decision-maker", "technology", "enterprise", "project-management"],
+      tags: [
+        "decision-maker",
+        "technology",
+        "enterprise",
+        "project-management",
+      ],
     };
   }
 }

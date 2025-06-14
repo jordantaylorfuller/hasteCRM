@@ -28,7 +28,7 @@ export class EmailResolver {
     @Args("skip", { type: () => Int, nullable: true }) skip?: number,
     @Args("take", { type: () => Int, nullable: true }) take?: number,
     @Args("filters", { nullable: true }) filters?: any,
-    @Context() ctx?: any,
+    @Context() _ctx?: any,
   ): Promise<{ emails: Email[]; total: number; hasMore: boolean }> {
     const { workspaceId } = _ctx.req.user;
     const { emails, total } = await this.emailService.findByWorkspace(
@@ -75,7 +75,7 @@ export class EmailResolver {
     @Args("query") query: string,
     @Args("skip", { type: () => Int, nullable: true }) skip?: number,
     @Args("take", { type: () => Int, nullable: true }) take?: number,
-    @Context() ctx?: any,
+    @Context() _ctx?: any,
   ): Promise<{ emails: Email[]; total: number; hasMore: boolean }> {
     const { workspaceId } = _ctx.req.user;
     const { emails, total } = await this.emailService.search(

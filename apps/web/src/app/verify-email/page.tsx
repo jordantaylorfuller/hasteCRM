@@ -15,27 +15,22 @@ export default function VerifyEmailPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const verify = async () => {
-      if (token) {
-        await verifyEmail();
+    const verifyEmail = async () => {
+      if (!token) return;
+      try {
+        setVerifying(true);
+        setError(null);
+        await api.post("/auth/verify-email", { token });
+        setVerified(true);
+        await refreshUser();
+      } catch (err: any) {
+        setError(err.response?.data?.message || "Verification failed");
+      } finally {
+        setVerifying(false);
       }
     };
-    verify();
-  }, [token]);
-
-  const verifyEmail = async () => {
-    try {
-      setVerifying(true);
-      setError(null);
-      await api.post("/auth/verify-email", { token });
-      setVerified(true);
-      await refreshUser();
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Verification failed");
-    } finally {
-      setVerifying(false);
-    }
-  };
+    verifyEmail();
+  }, [token, refreshUser]);
 
   const resendVerification = async () => {
     try {

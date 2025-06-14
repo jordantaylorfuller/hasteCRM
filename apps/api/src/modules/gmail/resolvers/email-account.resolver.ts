@@ -1,11 +1,4 @@
-import {
-  Resolver,
-  Query,
-  Mutation,
-  Args,
-  ID,
-  Context,
-} from "@nestjs/graphql";
+import { Resolver, Query, Mutation, Args, ID, Context } from "@nestjs/graphql";
 import { UseGuards } from "@nestjs/common";
 import { EmailAccountService } from "../email-account.service";
 import { GmailSyncService } from "../gmail-sync.service";
@@ -21,7 +14,7 @@ export class EmailAccountResolver {
   ) {}
 
   @Query("emailAccounts")
-  async emailAccounts(@Context() _ctx: any): Promise<EmailAccount[]> {
+  async emailAccounts(@Context() ctx: any): Promise<EmailAccount[]> {
     const { workspaceId } = ctx.req.user;
     return this.emailAccountService.findByWorkspace(workspaceId);
   }
@@ -36,7 +29,7 @@ export class EmailAccountResolver {
   }
 
   @Query("emailSyncStatus")
-  async emailSyncStatus(@Context() _ctx: any): Promise<any[]> {
+  async emailSyncStatus(@Context() ctx: any): Promise<any[]> {
     const { workspaceId } = ctx.req.user;
     return this.gmailSyncService.getSyncStatus(workspaceId);
   }
@@ -47,7 +40,7 @@ export class EmailAccountResolver {
     @Context() _ctx: any,
   ): Promise<{ authUrl: string }> {
     // TODO: Implement OAuth flow initiation
-    const authUrl = `${process.env.API_URL}/auth/google/connect?email=${input.email}&workspace=${ctx.req.user.workspaceId}`;
+    const authUrl = `${process.env.API_URL}/auth/google/connect?email=${input.email}&workspace=${_ctx.req.user.workspaceId}`;
     return { authUrl };
   }
 
@@ -84,7 +77,7 @@ export class EmailAccountResolver {
     @Args("id", { type: () => ID }) id: string,
     @Args("fullSync", { type: () => Boolean, nullable: true })
     fullSync?: boolean,
-    @Context() ctx?: any,
+    @Context() _ctx?: any,
   ): Promise<{ success: boolean; message: string }> {
     try {
       // TODO: Add workspace validation
