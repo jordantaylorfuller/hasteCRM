@@ -1,250 +1,529 @@
-import { Test, TestingModule } from "@nestjs/testing";
-import { ConfigService } from "@nestjs/config";
-import { AiService } from "./ai.service";
-import { EmailService } from "../gmail/email.service";
-import { ContactsService } from "../contacts/contacts.service";
-import { PrismaService } from "../prisma/prisma.service";
+import { Test, TestingModule } from '@nestjs/testing';
+import { AiService } from './ai.service';
+import { ConfigService } from '@nestjs/config';
+import { EmailService } from '../gmail/email.service';
+import { ContactsService } from '../contacts/contacts.service';
+import { PrismaService } from '../prisma/prisma.service';
+import Anthropic from '@anthropic-ai/sdk';
 
-describe("AiService", () => {
+jest.mock('@anthropic-ai/sdk');
+
+describe('AiService', () => {
   let service: AiService;
+  let configService: ConfigService;
   let emailService: EmailService;
   let contactsService: ContactsService;
   let prismaService: PrismaService;
+  let mockAnthropicClient: any;
 
-  const mockEmail = {
-    id: "email-123",
-    messageId: "msg-123",
-    threadId: "thread-123",
-    from: "sender@example.com",
-    to: ["recipient@example.com"],
-    subject: "Project Update",
-    textContent:
-      "Please review the attached proposal and provide feedback by Friday.",
-    htmlContent:
-      "<p>Please review the attached proposal and provide feedback by Friday.</p>",
-    sentAt: new Date(),
+  const mockConfigService = {
+    get: jest.fn(),
   };
 
-  const mockContact = {
-    id: "contact-123",
-    workspaceId: "workspace-123",
-    email: "john@example.com",
-    firstName: "John",
-    lastName: "Doe",
-    company: null,
-    title: null,
-    customFields: {},
+  const mockEmailService = {
+    findByMessageId: jest.fn(),
+    findByThread: jest.fn(),
+  };
+
+  const mockContactsService = {
+    findOne: jest.fn(),
+    update: jest.fn(),
+  };
+
+  const mockPrismaService = {
+    email: {
+      findMany: jest.fn(),
+      groupBy: jest.fn(),
+    },
+    contact: {
+      findMany: jest.fn(),
+    },
   };
 
   beforeEach(async () => {
+    jest.clearAllMocks();
+    
+    mockAnthropicClient = {
+      messages: {
+        create: jest.fn(),
+      },
+    };
+    
+    (Anthropic as jest.MockedClass<typeof Anthropic>).mockImplementation(() => mockAnthropicClient);
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AiService,
         {
           provide: ConfigService,
-          useValue: {
-            get: jest.fn((key) => {
-              if (key === "USE_MOCK_AI") return true;
-              return null;
-            }),
-          },
+          useValue: mockConfigService,
         },
         {
           provide: EmailService,
-          useValue: {
-            findByMessageId: jest.fn(),
-            findByThread: jest.fn(),
-          },
+          useValue: mockEmailService,
         },
         {
           provide: ContactsService,
-          useValue: {
-            findOne: jest.fn(),
-            update: jest.fn(),
-          },
+          useValue: mockContactsService,
         },
         {
           provide: PrismaService,
-          useValue: {
-            email: {
-              groupBy: jest.fn(),
-              findMany: jest.fn(),
-            },
-            contact: {
-              findMany: jest.fn(),
-            },
-          },
+          useValue: mockPrismaService,
         },
       ],
     }).compile();
 
     service = module.get<AiService>(AiService);
+    configService = module.get<ConfigService>(ConfigService);
     emailService = module.get<EmailService>(EmailService);
     contactsService = module.get<ContactsService>(ContactsService);
     prismaService = module.get<PrismaService>(PrismaService);
   });
 
-  describe("summarizeEmail", () => {
-    it("should summarize a single email", async () => {
-      (emailService.findByMessageId as jest.Mock).mockResolvedValue(mockEmail);
-      (emailService.findByThread as jest.Mock).mockResolvedValue([mockEmail]);
-
-      const result = await service.summarizeEmail("msg-123");
-
-      expect(result).toHaveProperty("summary");
-      expect(result.summary).toBeTruthy();
-      expect(emailService.findByMessageId).toHaveBeenCalledWith("msg-123");
-    });
-
-    it("should summarize an email thread", async () => {
-      const threadEmails = [
-        mockEmail,
-        { ...mockEmail, id: "email-124", messageId: "msg-124" },
-      ];
-      (emailService.findByMessageId as jest.Mock).mockResolvedValue(mockEmail);
-      (emailService.findByThread as jest.Mock).mockResolvedValue(threadEmails);
-
-      const result = await service.summarizeEmail("msg-123");
-
-      expect(result).toHaveProperty("summary");
-      expect(emailService.findByThread).toHaveBeenCalledWith("thread-123");
-    });
-
-    it("should include action items when requested", async () => {
-      (emailService.findByMessageId as jest.Mock).mockResolvedValue(mockEmail);
-      (emailService.findByThread as jest.Mock).mockResolvedValue([mockEmail]);
-
-      const result = await service.summarizeEmail("msg-123", {
-        includeActionItems: true,
+  describe('initialization', () => {
+    it('should use mock AI when USE_MOCK_AI is true', () => {
+      mockConfigService.get.mockImplementation((key: string, defaultValue?: any) => {
+        if (key === 'USE_MOCK_AI') return true;
+        if (key === 'ANTHROPIC_API_KEY') return 'test-key';
+        return defaultValue;
       });
 
-      expect(result).toHaveProperty("actionItems");
-      expect(Array.isArray(result.actionItems)).toBe(true);
-      expect(result.actionItems!.length).toBeGreaterThan(0);
+      const newService = new AiService(configService, emailService, contactsService, prismaService);
+      expect(newService['useMockAi']).toBe(true);
     });
 
-    it("should include key points when requested", async () => {
-      (emailService.findByMessageId as jest.Mock).mockResolvedValue(mockEmail);
-      (emailService.findByThread as jest.Mock).mockResolvedValue([mockEmail]);
+    it('should use real AI when USE_MOCK_AI is false and API key exists', () => {
+      mockConfigService.get.mockImplementation((key: string, defaultValue?: any) => {
+        if (key === 'USE_MOCK_AI') return false;
+        if (key === 'ANTHROPIC_API_KEY') return 'test-key';
+        return defaultValue;
+      });
 
-      const result = await service.summarizeEmail("msg-123", {
+      const newService = new AiService(configService, emailService, contactsService, prismaService);
+      expect(newService['useMockAi']).toBe(false);
+      expect(Anthropic).toHaveBeenCalledWith({ apiKey: 'test-key' });
+    });
+
+    it('should warn when no API key is provided', () => {
+      const loggerSpy = jest.spyOn(console, 'warn').mockImplementation();
+      mockConfigService.get.mockImplementation((key: string, defaultValue?: any) => {
+        if (key === 'USE_MOCK_AI') return false;
+        if (key === 'ANTHROPIC_API_KEY') return '';
+        return defaultValue;
+      });
+
+      new AiService(configService, emailService, contactsService, prismaService);
+      expect(loggerSpy).toHaveBeenCalled();
+      loggerSpy.mockRestore();
+    });
+  });
+
+  describe('summarizeEmail', () => {
+    const mockEmailId = 'email-123';
+    const mockEmail = {
+      id: mockEmailId,
+      subject: 'Project Update',
+      bodyText: 'Here is the latest update on our project. We have completed phase 1.',
+      bodyHtml: '<p>Here is the latest update on our project. We have completed phase 1.</p>',
+      fromEmail: 'sender@example.com',
+      toEmails: ['recipient@example.com'],
+      threadId: 'thread-123',
+    };
+
+    beforeEach(() => {
+      mockEmailService.findByMessageId.mockResolvedValue(mockEmail);
+      mockEmailService.findByThread.mockResolvedValue([mockEmail]);
+    });
+
+    it('should summarize email using mock AI', async () => {
+      mockConfigService.get.mockImplementation((key: string, defaultValue?: any) => {
+        if (key === 'USE_MOCK_AI') return true;
+        return defaultValue;
+      });
+      
+      const newService = new AiService(configService, emailService, contactsService, prismaService);
+
+      const result = await newService.summarizeEmail(mockEmailId);
+
+      expect(result).toEqual({
+        summary: expect.any(String),
+        actionItems: expect.any(Array),
+        keyPoints: expect.any(Array),
+      });
+      expect(mockEmailService.findByMessageId).toHaveBeenCalledWith(mockEmailId);
+    });
+
+    it('should summarize email using real AI', async () => {
+      mockConfigService.get.mockImplementation((key: string, defaultValue?: any) => {
+        if (key === 'USE_MOCK_AI') return false;
+        if (key === 'ANTHROPIC_API_KEY') return 'test-key';
+        return defaultValue;
+      });
+
+      const aiResponse = {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            summary: 'Project update showing completion of phase 1',
+            keyPoints: ['Phase 1 completed', 'Moving to phase 2'],
+            actionItems: ['Begin phase 2 planning'],
+          }),
+        }],
+      };
+
+      mockAnthropicClient.messages.create.mockResolvedValue(aiResponse);
+
+      const result = await service.summarizeEmail(mockEmailId, {
+        includeActionItems: true,
         includeKeyPoints: true,
       });
 
-      expect(result).toHaveProperty("keyPoints");
-      expect(Array.isArray(result.keyPoints)).toBe(true);
-      expect(result.keyPoints!.length).toBeGreaterThan(0);
-    });
-
-    it("should throw error if email not found", async () => {
-      (emailService.findByMessageId as jest.Mock).mockResolvedValue(null);
-
-      await expect(service.summarizeEmail("msg-123")).rejects.toThrow(
-        "Email not found",
-      );
-    });
-  });
-
-  describe("generateSmartCompose", () => {
-    it("should generate smart compose suggestions", async () => {
-      (emailService.findByMessageId as jest.Mock).mockResolvedValue(mockEmail);
-
-      const result = await service.generateSmartCompose(
-        "msg-123",
-        "I want to accept their proposal",
-      );
-
-      expect(result).toHaveProperty("suggestions");
-      expect(result).toHaveProperty("fullDraft");
-      expect(Array.isArray(result.suggestions)).toBe(true);
-      expect(result.suggestions.length).toBe(3);
-      expect(result.fullDraft).toBeTruthy();
-    });
-
-    it("should include context when requested", async () => {
-      const threadEmails = [
-        mockEmail,
-        { ...mockEmail, id: "email-124", messageId: "msg-124" },
-      ];
-      (emailService.findByMessageId as jest.Mock).mockResolvedValue(mockEmail);
-      (emailService.findByThread as jest.Mock).mockResolvedValue(threadEmails);
-
-      const result = await service.generateSmartCompose(
-        "msg-123",
-        "I want to accept their proposal",
-        { includeContext: true },
-      );
-
-      expect(emailService.findByThread).toHaveBeenCalledWith("thread-123");
-      expect(result.suggestions).toBeTruthy();
-    });
-  });
-
-  describe("generateInsights", () => {
-    it("should generate AI insights", async () => {
-      const mockStats = [
-        {
-          from: "sender@example.com",
-          isRead: true,
-          isStarred: false,
-          _count: 10,
-        },
-      ];
-      const mockContacts = [{ ...mockContact, _count: { emails: 5 } }];
-
-      (prismaService.email.groupBy as jest.Mock).mockResolvedValue(mockStats);
-      (prismaService.contact.findMany as jest.Mock).mockResolvedValue(
-        mockContacts,
-      );
-
-      const timeRange = {
-        start: new Date("2024-01-01"),
-        end: new Date("2024-01-31"),
-      };
-
-      const result = await service.generateInsights("workspace-123", timeRange);
-
-      expect(result).toHaveProperty("communicationPatterns");
-      expect(result).toHaveProperty("topContacts");
-      expect(result).toHaveProperty("suggestions");
-      expect(Array.isArray(result.suggestions)).toBe(true);
-    });
-  });
-
-  describe("enrichContact", () => {
-    it("should enrich contact information", async () => {
-      const mockEmails = [
-        {
-          ...mockEmail,
-          textContent:
-            "John Doe is the Senior Project Manager at Acme Corporation",
-        },
-      ];
-
-      (contactsService.findOne as jest.Mock).mockResolvedValue(mockContact);
-      (prismaService.email.findMany as jest.Mock).mockResolvedValue(mockEmails);
-      (contactsService.update as jest.Mock).mockResolvedValue({
-        ...mockContact,
-        company: "Acme Corporation",
-        title: "Senior Project Manager",
+      expect(result).toEqual({
+        summary: 'Project update showing completion of phase 1',
+        keyPoints: ['Phase 1 completed', 'Moving to phase 2'],
+        actionItems: ['Begin phase 2 planning'],
       });
 
-      const result = await service.enrichContact("contact-123");
-
-      expect(result).toHaveProperty("company");
-      expect(result).toHaveProperty("title");
-      expect(result).toHaveProperty("summary");
-      expect(result).toHaveProperty("tags");
-      // Update is not called in mock mode
-      expect(contactsService.update).not.toHaveBeenCalled();
+      expect(mockAnthropicClient.messages.create).toHaveBeenCalledWith({
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 500,
+        messages: [{
+          role: 'user',
+          content: expect.stringContaining('summarize'),
+        }],
+      });
     });
 
-    it("should throw error if contact not found", async () => {
-      (contactsService.findOne as jest.Mock).mockResolvedValue(null);
+    it('should handle email not found', async () => {
+      mockEmailService.findByMessageId.mockResolvedValue(null);
 
-      await expect(service.enrichContact("contact-123")).rejects.toThrow(
-        "Contact not found",
+      await expect(service.summarizeEmail('non-existent-email')).rejects.toThrow(
+        'Email not found',
       );
+    });
+
+    it('should handle thread emails', async () => {
+      const threadEmails = [
+        { ...mockEmail, id: 'email-1', sentAt: new Date('2024-01-01') },
+        { ...mockEmail, id: 'email-2', sentAt: new Date('2024-01-02') },
+      ];
+      
+      mockEmailService.findByThread.mockResolvedValue(threadEmails);
+
+      await service.summarizeEmail(mockEmailId);
+
+      expect(mockEmailService.findByThread).toHaveBeenCalledWith(mockEmail.threadId);
+    });
+
+    it('should handle API errors', async () => {
+      mockConfigService.get.mockImplementation((key: string, defaultValue?: any) => {
+        if (key === 'USE_MOCK_AI') return false;
+        if (key === 'ANTHROPIC_API_KEY') return 'test-key';
+        return defaultValue;
+      });
+
+      mockAnthropicClient.messages.create.mockRejectedValue(new Error('API Error'));
+
+      await expect(service.summarizeEmail(mockEmailId)).rejects.toThrow('API Error');
+    });
+  });
+
+  describe('generateSmartCompose', () => {
+    const mockEmailId = 'email-123';
+    const mockEmail = {
+      id: mockEmailId,
+      subject: 'Meeting Request',
+      bodyText: 'Would you be available for a meeting next Tuesday at 2 PM?',
+      fromEmail: 'client@example.com',
+      threadId: 'thread-123',
+    };
+
+    beforeEach(() => {
+      mockEmailService.findByMessageId.mockResolvedValue(mockEmail);
+      mockEmailService.findByThread.mockResolvedValue([mockEmail]);
+    });
+
+    it('should generate smart compose using mock AI', async () => {
+      mockConfigService.get.mockImplementation((key: string, defaultValue?: any) => {
+        if (key === 'USE_MOCK_AI') return true;
+        return defaultValue;
+      });
+      
+      const newService = new AiService(configService, emailService, contactsService, prismaService);
+
+      const result = await newService.generateSmartCompose(mockEmailId, 'I would like to accept', {
+        tone: 'professional',
+        includeContext: true,
+      });
+
+      expect(result).toEqual({
+        suggestions: expect.any(Array),
+        fullDraft: expect.any(String),
+      });
+      expect(result.suggestions).toHaveLength(3);
+    });
+
+    it('should generate smart compose using real AI', async () => {
+      mockConfigService.get.mockImplementation((key: string, defaultValue?: any) => {
+        if (key === 'USE_MOCK_AI') return false;
+        if (key === 'ANTHROPIC_API_KEY') return 'test-key';
+        return defaultValue;
+      });
+
+      const aiResponse = {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            suggestions: [
+              'Thank you for the meeting request. Tuesday at 2 PM works well for me.',
+              'I appreciate your invitation. I\'m available on Tuesday at 2 PM.',
+              'Tuesday at 2 PM is perfect. Looking forward to our meeting.',
+            ],
+            fullDraft: 'Dear Client,\n\nThank you for reaching out. I would be happy to meet on Tuesday at 2 PM.\n\nBest regards',
+          }),
+        }],
+      };
+
+      mockAnthropicClient.messages.create.mockResolvedValue(aiResponse);
+
+      const result = await service.generateSmartCompose(mockEmailId, 'I would like to accept');
+
+      expect(result.suggestions).toHaveLength(3);
+      expect(result.fullDraft).toBeDefined();
+    });
+
+    it('should handle email not found', async () => {
+      mockEmailService.findByMessageId.mockResolvedValue(null);
+
+      await expect(
+        service.generateSmartCompose('non-existent-email', 'test'),
+      ).rejects.toThrow('Email not found');
+    });
+  });
+
+  describe('generateInsights', () => {
+    const mockWorkspaceId = 'workspace-123';
+    const timeRange = {
+      start: new Date('2024-01-01'),
+      end: new Date('2024-01-31'),
+    };
+
+    it('should generate insights using mock AI', async () => {
+      mockConfigService.get.mockImplementation((key: string, defaultValue?: any) => {
+        if (key === 'USE_MOCK_AI') return true;
+        return defaultValue;
+      });
+
+      mockPrismaService.email.groupBy.mockResolvedValue([
+        { fromEmail: 'test@example.com', isRead: true, isStarred: false, _count: 10 },
+      ]);
+
+      mockPrismaService.contact.findMany.mockResolvedValue([
+        {
+          id: 'contact-1',
+          firstName: 'John',
+          lastName: 'Doe',
+          email: 'john@example.com',
+          _count: { emails: 5 },
+        },
+      ]);
+
+      const newService = new AiService(configService, emailService, contactsService, prismaService);
+      const result = await newService.generateInsights(mockWorkspaceId, timeRange);
+
+      expect(result).toEqual({
+        communicationPatterns: expect.any(Object),
+        topContacts: expect.any(Array),
+        suggestions: expect.any(Array),
+      });
+    });
+
+    it('should generate insights using real AI', async () => {
+      mockConfigService.get.mockImplementation((key: string, defaultValue?: any) => {
+        if (key === 'USE_MOCK_AI') return false;
+        if (key === 'ANTHROPIC_API_KEY') return 'test-key';
+        return defaultValue;
+      });
+
+      mockPrismaService.email.groupBy.mockResolvedValue([]);
+      mockPrismaService.contact.findMany.mockResolvedValue([]);
+
+      const aiResponse = {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            communicationPatterns: { totalEmails: 100, peakHours: ['9-11 AM'] },
+            topContacts: [{ name: 'John Doe', interactionCount: 25 }],
+            suggestions: ['Follow up with key contacts'],
+          }),
+        }],
+      };
+
+      mockAnthropicClient.messages.create.mockResolvedValue(aiResponse);
+
+      const result = await service.generateInsights(mockWorkspaceId, timeRange);
+
+      expect(result).toEqual({
+        communicationPatterns: { totalEmails: 100, peakHours: ['9-11 AM'] },
+        topContacts: [{ name: 'John Doe', interactionCount: 25 }],
+        suggestions: ['Follow up with key contacts'],
+      });
+    });
+  });
+
+  describe('enrichContact', () => {
+    const mockContactId = 'contact-123';
+    const mockWorkspaceId = 'workspace-123';
+    const mockContact = {
+      id: mockContactId,
+      email: 'john@acme.com',
+      firstName: 'John',
+      lastName: 'Doe',
+    };
+
+    beforeEach(() => {
+      mockContactsService.findOne.mockResolvedValue(mockContact);
+      mockPrismaService.email.findMany.mockResolvedValue([]);
+    });
+
+    it('should enrich contact using mock AI', async () => {
+      mockConfigService.get.mockImplementation((key: string, defaultValue?: any) => {
+        if (key === 'USE_MOCK_AI') return true;
+        return defaultValue;
+      });
+
+      const newService = new AiService(configService, emailService, contactsService, prismaService);
+      const result = await newService.enrichContact(mockContactId, mockWorkspaceId);
+
+      expect(result).toEqual({
+        company: expect.any(String),
+        title: expect.any(String),
+        linkedInUrl: expect.any(String),
+        summary: expect.any(String),
+        tags: expect.any(Array),
+      });
+
+      expect(mockContactsService.update).toHaveBeenCalled();
+    });
+
+    it('should enrich contact using real AI', async () => {
+      mockConfigService.get.mockImplementation((key: string, defaultValue?: any) => {
+        if (key === 'USE_MOCK_AI') return false;
+        if (key === 'ANTHROPIC_API_KEY') return 'test-key';
+        return defaultValue;
+      });
+
+      const aiResponse = {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            company: 'Acme Corporation',
+            title: 'Senior Project Manager',
+            linkedInUrl: 'https://linkedin.com/in/johndoe',
+            summary: 'Experienced project manager',
+            tags: ['technology', 'enterprise'],
+          }),
+        }],
+      };
+
+      mockAnthropicClient.messages.create.mockResolvedValue(aiResponse);
+
+      const result = await service.enrichContact(mockContactId, mockWorkspaceId);
+
+      expect(result).toEqual({
+        company: 'Acme Corporation',
+        title: 'Senior Project Manager',
+        linkedInUrl: 'https://linkedin.com/in/johndoe',
+        summary: 'Experienced project manager',
+        tags: ['technology', 'enterprise'],
+      });
+
+      expect(mockContactsService.update).toHaveBeenCalledWith(
+        mockContactId,
+        mockWorkspaceId,
+        {
+          title: 'Senior Project Manager',
+          linkedinUrl: 'https://linkedin.com/in/johndoe',
+        },
+      );
+    });
+
+    it('should handle contact not found', async () => {
+      mockContactsService.findOne.mockResolvedValue(null);
+
+      await expect(
+        service.enrichContact('non-existent-contact', mockWorkspaceId),
+      ).rejects.toThrow('Contact not found');
+    });
+
+    it('should handle enrichment errors', async () => {
+      mockConfigService.get.mockImplementation((key: string, defaultValue?: any) => {
+        if (key === 'USE_MOCK_AI') return false;
+        if (key === 'ANTHROPIC_API_KEY') return 'test-key';
+        return defaultValue;
+      });
+
+      mockAnthropicClient.messages.create.mockRejectedValue(new Error('API Error'));
+
+      await expect(
+        service.enrichContact(mockContactId, mockWorkspaceId),
+      ).rejects.toThrow('API Error');
+    });
+  });
+
+  describe('mock implementations', () => {
+    beforeEach(() => {
+      mockConfigService.get.mockImplementation((key: string, defaultValue?: any) => {
+        if (key === 'USE_MOCK_AI') return true;
+        return defaultValue;
+      });
+    });
+
+    it('should provide consistent mock summarization', async () => {
+      const newService = new AiService(configService, emailService, contactsService, prismaService);
+      const result = newService['mockSummarizeEmail']('Test email content', {
+        includeActionItems: true,
+        includeKeyPoints: true,
+      });
+
+      expect(result).toHaveProperty('summary');
+      expect(result).toHaveProperty('actionItems');
+      expect(result).toHaveProperty('keyPoints');
+      expect(result.actionItems).toHaveLength(3);
+      expect(result.keyPoints).toHaveLength(3);
+    });
+
+    it('should provide consistent mock smart compose', async () => {
+      const newService = new AiService(configService, emailService, contactsService, prismaService);
+      const result = newService['mockGenerateSmartCompose']('prompt', 'context', {
+        tone: 'professional',
+      });
+
+      expect(result).toHaveProperty('suggestions');
+      expect(result).toHaveProperty('fullDraft');
+      expect(result.suggestions).toHaveLength(3);
+    });
+
+    it('should provide consistent mock insights', async () => {
+      const newService = new AiService(configService, emailService, contactsService, prismaService);
+      const result = newService['mockGenerateInsights']([], []);
+
+      expect(result).toHaveProperty('communicationPatterns');
+      expect(result).toHaveProperty('topContacts');
+      expect(result).toHaveProperty('suggestions');
+      expect(result.suggestions).toHaveLength(4);
+    });
+
+    it('should provide consistent mock enrichment', async () => {
+      const newService = new AiService(configService, emailService, contactsService, prismaService);
+      const result = newService['mockEnrichContact']({ firstName: 'John' }, '');
+
+      expect(result).toHaveProperty('company');
+      expect(result).toHaveProperty('title');
+      expect(result).toHaveProperty('linkedInUrl');
+      expect(result).toHaveProperty('summary');
+      expect(result).toHaveProperty('tags');
+      expect(result.tags).toHaveLength(4);
     });
   });
 });
