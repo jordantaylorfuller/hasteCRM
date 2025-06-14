@@ -13,7 +13,7 @@ import {
   AutomationAction,
   Deal,
   PipelineAutomation,
-} from "../prisma/prisma-client";
+} from "@hasteCRM/database";
 import { InjectQueue } from "@nestjs/bullmq";
 import { Queue } from "bullmq";
 
@@ -165,10 +165,11 @@ export class PipelineAutomationService implements OnModuleInit {
     }
 
     // Value conditions
-    if (conditions.minValue && context.deal.value < conditions.minValue) {
+    const dealValue = parseFloat(context.deal.value || '0');
+    if (conditions.minValue && dealValue < conditions.minValue) {
       return false;
     }
-    if (conditions.maxValue && context.deal.value > conditions.maxValue) {
+    if (conditions.maxValue && dealValue > conditions.maxValue) {
       return false;
     }
 

@@ -17,14 +17,31 @@ export class RefreshJwtStrategy extends PassportStrategy(
   }
 
   async validate(payload: JwtPayload) {
+    // Handle null payload
+    if (!payload) {
+      throw new UnauthorizedException("Invalid refresh token payload");
+    }
+
+    // Check required fields
     if (!payload.sub || !payload.email) {
       throw new UnauthorizedException("Invalid refresh token payload");
+    }
+
+    // Check if it's a refresh token
+    if (payload.type !== 'refresh') {
+      throw new UnauthorizedException("Invalid token type");
+    }
+
+    // Check workspaceId
+    if (!payload.workspaceId) {
+      throw new UnauthorizedException("Missing workspace ID");
     }
 
     // Return minimal data needed for refresh
     return {
       userId: payload.sub,
       email: payload.email,
+      workspaceId: payload.workspaceId,
     };
   }
 }

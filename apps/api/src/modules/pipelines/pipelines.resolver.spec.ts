@@ -2,6 +2,14 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PipelinesResolver, DealsResolver } from './pipelines.resolver';
 import { PipelinesService } from './pipelines.service';
 import { DealsService } from './deals.service';
+import { CustomGqlAuthGuard } from '../../common/guards/custom-gql-auth.guard';
+
+// Mock the guard to bypass authentication in tests
+jest.mock('../../common/guards/custom-gql-auth.guard', () => ({
+  CustomGqlAuthGuard: jest.fn().mockImplementation(() => ({
+    canActivate: jest.fn().mockResolvedValue(true),
+  })),
+}));
 
 describe('PipelinesResolver', () => {
   let resolver: PipelinesResolver;

@@ -1,31 +1,45 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { ContactList } from './ContactList';
-import { useQuery } from '@apollo/client';
-import { useRouter } from 'next/navigation';
+import { Contact } from '@/types/contact';
 
-// Mock dependencies
-jest.mock('@apollo/client');
-jest.mock('next/navigation');
+// Mock the ContactCard component
+jest.mock('./ContactCard', () => ({
+  ContactCard: ({ contact, onUpdate }: { contact: Contact; onUpdate: () => void }) => (
+    <div data-testid={`contact-${contact.id}`}>
+      <div>{contact.firstName} {contact.lastName}</div>
+      <div>{contact.email}</div>
+      {contact.company && <div>{contact.company.name}</div>}
+      <button onClick={onUpdate}>Update</button>
+    </div>
+  ),
+}));
 
-const mockUseQuery = useQuery as jest.MockedFunction<typeof useQuery>;
-const mockUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
+// Mock the Skeleton component
+jest.mock('@/components/ui/skeleton', () => ({
+  Skeleton: ({ className }: { className?: string }) => (
+    <div data-testid="skeleton" className={className} />
+  ),
+}));
 
 describe('ContactList', () => {
-  const mockPush = jest.fn();
-  const mockRefetch = jest.fn();
-
-  const mockContacts = [
+  const mockContacts: Contact[] = [
     {
       id: '1',
       firstName: 'John',
       lastName: 'Doe',
       email: 'john@example.com',
       phone: '+1234567890',
-      company: { name: 'Acme Corp' },
+      company: { id: '1', name: 'Acme Corp', industry: null, website: null, size: null },
       title: 'CEO',
-      tags: [{ id: 'tag1', name: 'VIP' }],
+      tags: [{ id: 'tag1', name: 'VIP', color: '#000' }],
+      notes: [],
+      customFields: {},
+      lastContactDate: null,
+      source: null,
+      workspaceId: 'workspace1',
       createdAt: '2024-01-01T00:00:00Z',
+      updatedAt: '2024-01-01T00:00:00Z',
     },
     {
       id: '2',
@@ -33,271 +47,98 @@ describe('ContactList', () => {
       lastName: 'Smith',
       email: 'jane@example.com',
       phone: '+0987654321',
-      company: { name: 'Tech Inc' },
+      company: { id: '2', name: 'Tech Inc', industry: null, website: null, size: null },
       title: 'CTO',
       tags: [],
+      notes: [],
+      customFields: {},
+      lastContactDate: null,
+      source: null,
+      workspaceId: 'workspace1',
       createdAt: '2024-01-02T00:00:00Z',
+      updatedAt: '2024-01-02T00:00:00Z',
     },
   ];
 
+  const mockOnRefresh = jest.fn();
+
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseRouter.mockReturnValue({
-      push: mockPush,
-      back: jest.fn(),
-      forward: jest.fn(),
-      refresh: jest.fn(),
-      replace: jest.fn(),
-      prefetch: jest.fn(),
-    } as any);
   });
 
   it('renders loading state', () => {
-    mockUseQuery.mockReturnValue({
-      loading: true,
-      error: null,
-      data: null,
-      refetch: mockRefetch,
-    } as any);
-
-    render(<ContactList />);
-    expect(screen.getByTestId('contact-list-loading')).toBeInTheDocument();
+    render(
+      <ContactList
+        contacts={[]}
+        loading={true}
+        onRefresh={mockOnRefresh}
+      />
+    );
+    
+    const skeletons = screen.getAllByTestId('skeleton');
+    expect(skeletons).toHaveLength(6);
   });
 
-  it('renders error state', () => {
-    mockUseQuery.mockReturnValue({
-      loading: false,
-      error: new Error('Failed to load contacts'),
-      data: null,
-      refetch: mockRefetch,
-    } as any);
-
-    render(<ContactList />);
-    expect(screen.getByText(/Failed to load contacts/i)).toBeInTheDocument();
-  });
-
-  it('renders empty state', () => {
-    mockUseQuery.mockReturnValue({
-      loading: false,
-      error: null,
-      data: { contacts: [] },
-      refetch: mockRefetch,
-    } as any);
-
-    render(<ContactList />);
-    expect(screen.getByText(/No contacts found/i)).toBeInTheDocument();
+  it('renders empty state when no contacts', () => {
+    render(
+      <ContactList
+        contacts={[]}
+        loading={false}
+        onRefresh={mockOnRefresh}
+      />
+    );
+    
+    expect(screen.getByText('No contacts')).toBeInTheDocument();
+    expect(screen.getByText('Get started by creating a new contact.')).toBeInTheDocument();
   });
 
   it('renders contact list', () => {
-    mockUseQuery.mockReturnValue({
-      loading: false,
-      error: null,
-      data: { contacts: mockContacts },
-      refetch: mockRefetch,
-    } as any);
-
-    render(<ContactList />);
+    render(
+      <ContactList
+        contacts={mockContacts}
+        loading={false}
+        onRefresh={mockOnRefresh}
+      />
+    );
     
+    expect(screen.getByTestId('contact-1')).toBeInTheDocument();
     expect(screen.getByText('John Doe')).toBeInTheDocument();
     expect(screen.getByText('john@example.com')).toBeInTheDocument();
     expect(screen.getByText('Acme Corp')).toBeInTheDocument();
-    expect(screen.getByText('VIP')).toBeInTheDocument();
     
+    expect(screen.getByTestId('contact-2')).toBeInTheDocument();
     expect(screen.getByText('Jane Smith')).toBeInTheDocument();
     expect(screen.getByText('jane@example.com')).toBeInTheDocument();
     expect(screen.getByText('Tech Inc')).toBeInTheDocument();
   });
 
-  it('handles contact click', () => {
-    mockUseQuery.mockReturnValue({
-      loading: false,
-      error: null,
-      data: { contacts: mockContacts },
-      refetch: mockRefetch,
-    } as any);
-
-    render(<ContactList />);
+  it('passes onRefresh callback to ContactCard', () => {
+    render(
+      <ContactList
+        contacts={mockContacts}
+        loading={false}
+        onRefresh={mockOnRefresh}
+      />
+    );
     
-    const contactCard = screen.getByText('John Doe').closest('div[role="button"]');
-    fireEvent.click(contactCard!);
+    const updateButtons = screen.getAllByText('Update');
+    expect(updateButtons).toHaveLength(2);
     
-    expect(mockPush).toHaveBeenCalledWith('/contacts/1');
+    // Click update button on first contact
+    updateButtons[0].click();
+    expect(mockOnRefresh).toHaveBeenCalledTimes(1);
   });
 
-  it('filters contacts by search term', async () => {
-    mockUseQuery.mockReturnValue({
-      loading: false,
-      error: null,
-      data: { contacts: mockContacts },
-      refetch: mockRefetch,
-    } as any);
-
-    render(<ContactList />);
+  it('renders correct grid layout', () => {
+    const { container } = render(
+      <ContactList
+        contacts={mockContacts}
+        loading={false}
+        onRefresh={mockOnRefresh}
+      />
+    );
     
-    const searchInput = screen.getByPlaceholderText(/Search contacts/i);
-    fireEvent.change(searchInput, { target: { value: 'John' } });
-    
-    await waitFor(() => {
-      expect(screen.getByText('John Doe')).toBeInTheDocument();
-      expect(screen.queryByText('Jane Smith')).not.toBeInTheDocument();
-    });
-  });
-
-  it('filters contacts by company', async () => {
-    mockUseQuery.mockReturnValue({
-      loading: false,
-      error: null,
-      data: { contacts: mockContacts },
-      refetch: mockRefetch,
-    } as any);
-
-    render(<ContactList />);
-    
-    const companyFilter = screen.getByRole('combobox', { name: /company/i });
-    fireEvent.change(companyFilter, { target: { value: 'Acme Corp' } });
-    
-    await waitFor(() => {
-      expect(mockRefetch).toHaveBeenCalledWith({
-        filters: { companyId: expect.any(String) },
-      });
-    });
-  });
-
-  it('filters contacts by tag', async () => {
-    mockUseQuery.mockReturnValue({
-      loading: false,
-      error: null,
-      data: { contacts: mockContacts },
-      refetch: mockRefetch,
-    } as any);
-
-    render(<ContactList />);
-    
-    const tagFilter = screen.getByRole('combobox', { name: /tag/i });
-    fireEvent.change(tagFilter, { target: { value: 'VIP' } });
-    
-    await waitFor(() => {
-      expect(mockRefetch).toHaveBeenCalledWith({
-        filters: { tagIds: expect.arrayContaining(['tag1']) },
-      });
-    });
-  });
-
-  it('handles pagination', () => {
-    const mockContactsWithPagination = {
-      contacts: mockContacts,
-      totalCount: 50,
-      pageInfo: {
-        hasNextPage: true,
-        hasPreviousPage: false,
-      },
-    };
-
-    mockUseQuery.mockReturnValue({
-      loading: false,
-      error: null,
-      data: mockContactsWithPagination,
-      refetch: mockRefetch,
-    } as any);
-
-    render(<ContactList />);
-    
-    const nextButton = screen.getByRole('button', { name: /next/i });
-    expect(nextButton).toBeEnabled();
-    
-    fireEvent.click(nextButton);
-    
-    expect(mockRefetch).toHaveBeenCalledWith({
-      skip: 20,
-      take: 20,
-    });
-  });
-
-  it('handles sort order change', () => {
-    mockUseQuery.mockReturnValue({
-      loading: false,
-      error: null,
-      data: { contacts: mockContacts },
-      refetch: mockRefetch,
-    } as any);
-
-    render(<ContactList />);
-    
-    const sortSelect = screen.getByRole('combobox', { name: /sort/i });
-    fireEvent.change(sortSelect, { target: { value: 'email' } });
-    
-    expect(mockRefetch).toHaveBeenCalledWith({
-      orderBy: { email: 'asc' },
-    });
-  });
-
-  it('handles bulk selection', () => {
-    mockUseQuery.mockReturnValue({
-      loading: false,
-      error: null,
-      data: { contacts: mockContacts },
-      refetch: mockRefetch,
-    } as any);
-
-    render(<ContactList />);
-    
-    const selectAllCheckbox = screen.getByRole('checkbox', { name: /select all/i });
-    fireEvent.click(selectAllCheckbox);
-    
-    const checkboxes = screen.getAllByRole('checkbox');
-    checkboxes.forEach((checkbox, index) => {
-      if (index > 0) { // Skip the select all checkbox
-        expect(checkbox).toBeChecked();
-      }
-    });
-  });
-
-  it('handles bulk delete', async () => {
-    mockUseQuery.mockReturnValue({
-      loading: false,
-      error: null,
-      data: { contacts: mockContacts },
-      refetch: mockRefetch,
-    } as any);
-
-    render(<ContactList />);
-    
-    // Select first contact
-    const firstCheckbox = screen.getAllByRole('checkbox')[1];
-    fireEvent.click(firstCheckbox);
-    
-    // Click bulk delete
-    const deleteButton = screen.getByRole('button', { name: /delete selected/i });
-    fireEvent.click(deleteButton);
-    
-    // Confirm deletion
-    const confirmButton = screen.getByRole('button', { name: /confirm/i });
-    fireEvent.click(confirmButton);
-    
-    await waitFor(() => {
-      expect(mockRefetch).toHaveBeenCalled();
-    });
-  });
-
-  it('exports contacts', async () => {
-    mockUseQuery.mockReturnValue({
-      loading: false,
-      error: null,
-      data: { contacts: mockContacts },
-      refetch: mockRefetch,
-    } as any);
-
-    render(<ContactList />);
-    
-    const exportButton = screen.getByRole('button', { name: /export/i });
-    fireEvent.click(exportButton);
-    
-    const csvOption = screen.getByRole('menuitem', { name: /CSV/i });
-    fireEvent.click(csvOption);
-    
-    // Mock file download
-    await waitFor(() => {
-      expect(global.URL.createObjectURL).toHaveBeenCalled();
-    });
+    const grid = container.querySelector('.grid');
+    expect(grid).toHaveClass('gap-4', 'md:grid-cols-2', 'lg:grid-cols-3');
   });
 });

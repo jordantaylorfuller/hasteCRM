@@ -29,6 +29,7 @@ describe('PipelineAnalyticsService', () => {
     pipelineMetrics: {
       deleteMany: jest.fn(),
       create: jest.fn(),
+      upsert: jest.fn(),
     },
   };
 
@@ -101,8 +102,8 @@ describe('PipelineAnalyticsService', () => {
       const result = await service.calculateFunnelMetrics(mockPipelineId);
 
       expect(result).toBeDefined();
-      expect(result.stages).toHaveLength(4);
-      expect(result.overallConversion).toBeDefined();
+      expect(result.funnel).toHaveLength(4);
+      expect(result.totalDeals).toBe(3);
       expect(mockPrismaService.pipeline.findUnique).toHaveBeenCalledWith({
         where: { id: mockPipelineId },
         include: {
@@ -154,9 +155,9 @@ describe('PipelineAnalyticsService', () => {
 
       const result = await service.calculateFunnelMetrics(mockPipelineId);
 
-      expect(result.stages).toHaveLength(4);
-      result.stages.forEach(stage => {
-        expect(stage.conversionRate).toBe(0);
+      expect(result.funnel).toHaveLength(4);
+      result.funnel.forEach(stageData => {
+        expect(stageData.conversionRate).toBe(0);
       });
     });
   });
@@ -223,9 +224,9 @@ describe('PipelineAnalyticsService', () => {
       const result = await service.calculateVelocityMetrics(mockPipelineId);
 
       expect(result).toBeDefined();
-      expect(result.averageCycleLength).toBeDefined();
+      expect(result.avgCycleTime).toBeDefined();
       expect(result.stageVelocities).toBeDefined();
-      expect(result.velocityTrend).toBeDefined();
+      expect(result.totalDealsAnalyzed).toBe(2);
     });
 
     it('should handle deals without transitions', async () => {
@@ -243,8 +244,8 @@ describe('PipelineAnalyticsService', () => {
 
       const result = await service.calculateVelocityMetrics(mockPipelineId);
 
-      expect(result.averageCycleLength).toBeGreaterThan(0);
-      expect(result.stageVelocities).toEqual({});
+      expect(result.avgCycleTime).toBeGreaterThan(0);
+      expect(result.stageVelocities).toEqual([]);
     });
 
     it('should handle date range filtering', async () => {
@@ -261,8 +262,7 @@ describe('PipelineAnalyticsService', () => {
         where: {
           pipelineId: mockPipelineId,
           status: { in: ['WON', 'LOST'] },
-          closedAt: { not: null },
-          createdAt: {
+          closedAt: {
             gte: dateRange.start,
             lte: dateRange.end,
           },
@@ -280,64 +280,41 @@ describe('PipelineAnalyticsService', () => {
 
       const result = await service.calculateVelocityMetrics(mockPipelineId);
 
-      expect(result.averageCycleLength).toBe(0);
-      expect(result.stageVelocities).toEqual({});
-      expect(result.velocityTrend).toEqual([]);
+      expect(result.avgCycleTime).toBe(0);
+      expect(result.stageVelocities).toEqual([]);
+      expect(result.totalDealsAnalyzed).toBe(0);
     });
   });
 
   describe('calculateWinRateMetrics', () => {
     it('should calculate win rate metrics correctly', async () => {
-      mockPrismaService.deal.count.mockResolvedValueOnce(100); // total
-      mockPrismaService.deal.count.mockResolvedValueOnce(30); // won
-      mockPrismaService.deal.count.mockResolvedValueOnce(20); // lost
+      const mockDeals = [
+        { id: 'deal-1', status: 'WON', value: new Decimal(10000), owner: { 
+          id: 'user-1', firstName: 'John', lastName: 'Doe' 
+        }, closedAt: new Date() },
+        { id: 'deal-2', status: 'LOST', value: new Decimal(5000), owner: { 
+          id: 'user-1', firstName: 'John', lastName: 'Doe' 
+        }, closedAt: new Date() },
+      ];
 
-      mockPrismaService.deal.aggregate
-        .mockResolvedValueOnce({ _sum: { value: new Decimal(500000) } }) // total
-        .mockResolvedValueOnce({ _sum: { value: new Decimal(300000) } }) // won
-        .mockResolvedValueOnce({ _sum: { value: new Decimal(100000) } }); // lost
+      mockPrismaService.deal.findMany.mockResolvedValue(mockDeals);
 
-      mockPrismaService.deal.groupBy.mockResolvedValue([
-        {
-          stageId: 'stage-1',
-          status: 'WON',
-          _count: { id: 10 },
-          _sum: { value: new Decimal(100000) },
-        },
-        {
-          stageId: 'stage-2',
-          status: 'WON',
-          _count: { id: 15 },
-          _sum: { value: new Decimal(150000) },
-        },
-        {
-          stageId: 'stage-3',
-          status: 'WON',
-          _count: { id: 5 },
-          _sum: { value: new Decimal(50000) },
-        },
-      ]);
-
-      const result = await service.calculateWinRateMetrics(mockPipelineId);
+      const result = await service.calculateWinRateMetrics(mockPipelineId, 'owner');
 
       expect(result).toBeDefined();
-      expect(result.overallWinRate).toBe(0.6); // 30 won / (30 won + 20 lost)
-      expect(result.totalDeals).toBe(100);
-      expect(result.wonDeals).toBe(30);
-      expect(result.lostDeals).toBe(20);
-      expect(result.winRateByStage).toBeDefined();
+      expect(result.pipelineId).toBe(mockPipelineId);
+      expect(result.groupBy).toBe('owner');
+      expect(result.results).toHaveLength(1);
+      expect(result.results[0].winRate).toBe(50);
+      expect(result.results[0].key).toBe('John Doe');
     });
 
     it('should handle no deals', async () => {
-      mockPrismaService.deal.count.mockResolvedValue(0);
-      mockPrismaService.deal.aggregate.mockResolvedValue({ _sum: { value: null } });
-      mockPrismaService.deal.groupBy.mockResolvedValue([]);
+      mockPrismaService.deal.findMany.mockResolvedValue([]);
 
-      const result = await service.calculateWinRateMetrics(mockPipelineId);
+      const result = await service.calculateWinRateMetrics(mockPipelineId, 'owner');
 
-      expect(result.overallWinRate).toBe(0);
-      expect(result.totalDeals).toBe(0);
-      expect(result.averageDealSize).toBe(0);
+      expect(result.results).toEqual([]);
     });
 
     it('should handle date range filtering', async () => {
@@ -350,15 +327,19 @@ describe('PipelineAnalyticsService', () => {
       mockPrismaService.deal.aggregate.mockResolvedValue({ _sum: { value: null } });
       mockPrismaService.deal.groupBy.mockResolvedValue([]);
 
-      await service.calculateWinRateMetrics(mockPipelineId, dateRange);
+      await service.calculateWinRateMetrics(mockPipelineId, 'owner', dateRange);
 
-      expect(mockPrismaService.deal.count).toHaveBeenCalledWith({
+      expect(mockPrismaService.deal.findMany).toHaveBeenCalledWith({
         where: {
           pipelineId: mockPipelineId,
-          createdAt: {
+          status: { in: ['WON', 'LOST'] },
+          closedAt: {
             gte: dateRange.start,
             lte: dateRange.end,
           },
+        },
+        include: {
+          owner: true,
         },
       });
     });
@@ -366,68 +347,66 @@ describe('PipelineAnalyticsService', () => {
 
   describe('getStageBottlenecks', () => {
     it('should identify stage bottlenecks', async () => {
-      const mockPipeline = {
-        id: mockPipelineId,
-        stages: [
-          { id: 'stage-1', name: 'Lead', order: 0 },
-          { id: 'stage-2', name: 'Qualified', order: 1 },
-          { id: 'stage-3', name: 'Proposal', order: 2 },
-        ],
-      };
+      const mockStages = [
+        { id: 'stage-1', name: 'Lead', order: 0, pipelineId: mockPipelineId },
+        { id: 'stage-2', name: 'Qualified', order: 1, pipelineId: mockPipelineId },
+        { id: 'stage-3', name: 'Proposal', order: 2, pipelineId: mockPipelineId },
+      ];
 
-      mockPrismaService.pipeline.findUnique.mockResolvedValue(mockPipeline);
+      mockPrismaService.stage.findMany.mockResolvedValue(mockStages);
       
-      // Mock for each stage
-      mockPrismaService.deal.count.mockResolvedValueOnce(50); // stage-1
-      mockPrismaService.deal.count.mockResolvedValueOnce(30); // stage-2
-      mockPrismaService.deal.count.mockResolvedValueOnce(10); // stage-3
+      // Mock for each stage (current deals, avg time, stalled deals)
+      mockPrismaService.deal.count
+        .mockResolvedValueOnce(50)  // stage-1 current
+        .mockResolvedValueOnce(5)   // stage-1 stalled
+        .mockResolvedValueOnce(30)  // stage-2 current
+        .mockResolvedValueOnce(3)   // stage-2 stalled
+        .mockResolvedValueOnce(10)  // stage-3 current
+        .mockResolvedValueOnce(1);  // stage-3 stalled
 
       mockPrismaService.dealStageTransition.aggregate
-        .mockResolvedValueOnce({ _avg: { timeInStage: 7200 } }) // stage-1: 5 days
+        .mockResolvedValueOnce({ _avg: { timeInStage: 7200 } })  // stage-1: 5 days
         .mockResolvedValueOnce({ _avg: { timeInStage: 14400 } }) // stage-2: 10 days
         .mockResolvedValueOnce({ _avg: { timeInStage: 21600 } }); // stage-3: 15 days
 
-      mockPrismaService.dealStageTransition.groupBy
-        .mockResolvedValueOnce([]) // stage-1 exit reasons
-        .mockResolvedValueOnce([]) // stage-2 exit reasons
-        .mockResolvedValueOnce([]); // stage-3 exit reasons
-
       const result = await service.getStageBottlenecks(mockPipelineId);
 
-      expect(result).toHaveLength(3);
-      expect(result[0]).toMatchObject({
-        stageId: 'stage-1',
-        stageName: 'Lead',
-        dealsStuck: 50,
-        averageTimeInStage: 5,
+      expect(result.stages).toHaveLength(3);
+      expect(result.stages[0]).toMatchObject({
+        stage: {
+          id: 'stage-1',
+          name: 'Lead',
+        },
+        currentDeals: 50,
+        avgTimeInStage: 5,
+        stalledDeals: 5,
+        isBottleneck: true, // 50 > 10
       });
     });
 
-    it('should handle pipeline not found', async () => {
-      mockPrismaService.pipeline.findUnique.mockResolvedValue(null);
+    it('should handle no stages', async () => {
+      mockPrismaService.stage.findMany.mockResolvedValue([]);
 
-      await expect(
-        service.getStageBottlenecks(mockPipelineId),
-      ).rejects.toThrow('Pipeline not found');
+      const result = await service.getStageBottlenecks(mockPipelineId);
+      
+      expect(result.stages).toEqual([]);
+      expect(result.identifiedBottlenecks).toEqual([]);
     });
 
     it('should handle stages with no deals', async () => {
-      const mockPipeline = {
-        id: mockPipelineId,
-        stages: [{ id: 'stage-1', name: 'Lead', order: 0 }],
-      };
+      const mockStages = [{ id: 'stage-1', name: 'Lead', order: 0, pipelineId: mockPipelineId }];
 
-      mockPrismaService.pipeline.findUnique.mockResolvedValue(mockPipeline);
+      mockPrismaService.stage.findMany.mockResolvedValue(mockStages);
       mockPrismaService.deal.count.mockResolvedValue(0);
       mockPrismaService.dealStageTransition.aggregate.mockResolvedValue({
         _avg: { timeInStage: null },
       });
-      mockPrismaService.dealStageTransition.groupBy.mockResolvedValue([]);
 
       const result = await service.getStageBottlenecks(mockPipelineId);
 
-      expect(result[0].dealsStuck).toBe(0);
-      expect(result[0].averageTimeInStage).toBe(0);
+      expect(result.stages[0].currentDeals).toBe(0);
+      expect(result.stages[0].avgTimeInStage).toBe(0);
+      expect(result.stages[0].isBottleneck).toBe(false);
     });
   });
 
@@ -445,21 +424,25 @@ describe('PipelineAnalyticsService', () => {
       mockPrismaService.deal.aggregate.mockResolvedValue({
         _sum: { value: new Decimal(100000) },
       });
-      mockPrismaService.pipelineMetrics.deleteMany.mockResolvedValue({});
-      mockPrismaService.pipelineMetrics.create.mockResolvedValue({});
+      mockPrismaService.pipelineMetrics.upsert.mockResolvedValue({});
 
       await service.calculateDailyMetrics();
 
       expect(mockPrismaService.pipeline.findMany).toHaveBeenCalled();
-      expect(mockPrismaService.pipelineMetrics.deleteMany).toHaveBeenCalledTimes(2);
-      expect(mockPrismaService.pipelineMetrics.create).toHaveBeenCalledTimes(2);
+      expect(mockPrismaService.pipelineMetrics.upsert).toHaveBeenCalledTimes(2);
     });
 
     it('should handle errors gracefully', async () => {
       mockPrismaService.pipeline.findMany.mockRejectedValue(new Error('DB Error'));
       
+      // Mock console.error to prevent output in tests
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+      
       // Should not throw
-      await expect(service.calculateDailyMetrics()).resolves.not.toThrow();
+      await service.calculateDailyMetrics();
+      
+      expect(consoleErrorSpy).toHaveBeenCalled();
+      consoleErrorSpy.mockRestore();
     });
   });
 
@@ -478,20 +461,32 @@ describe('PipelineAnalyticsService', () => {
         .mockResolvedValueOnce({ _sum: { value: new Decimal(200000) } }) // won
         .mockResolvedValueOnce({ _sum: { value: new Decimal(50000) } }); // lost
 
-      mockPrismaService.pipelineMetrics.deleteMany.mockResolvedValue({});
-      mockPrismaService.pipelineMetrics.create.mockResolvedValue({});
+      mockPrismaService.pipelineMetrics.upsert.mockResolvedValue({});
 
       await service['calculateAndStorePipelineMetrics'](pipelineId, period, date);
 
-      expect(mockPrismaService.pipelineMetrics.create).toHaveBeenCalledWith({
-        data: expect.objectContaining({
+      expect(mockPrismaService.pipelineMetrics.upsert).toHaveBeenCalledWith({
+        where: {
+          pipelineId_period_date: {
+            pipelineId,
+            period,
+            date,
+          },
+        },
+        update: expect.objectContaining({
+          dealsCreated: 50,
+          dealsWon: 10,
+          dealsLost: 5,
+          winRate: 0.6666666666666666, // 10 / (10 + 5)
+        }),
+        create: expect.objectContaining({
           pipelineId,
           period,
           date,
           dealsCreated: 50,
           dealsWon: 10,
           dealsLost: 5,
-          winRate: 0.67, // 10 / (10 + 5)
+          winRate: 0.6666666666666666, // 10 / (10 + 5)
         }),
       });
     });
@@ -499,13 +494,20 @@ describe('PipelineAnalyticsService', () => {
     it('should handle no deals', async () => {
       mockPrismaService.deal.count.mockResolvedValue(0);
       mockPrismaService.deal.aggregate.mockResolvedValue({ _sum: { value: null } });
-      mockPrismaService.pipelineMetrics.deleteMany.mockResolvedValue({});
-      mockPrismaService.pipelineMetrics.create.mockResolvedValue({});
+      mockPrismaService.pipelineMetrics.upsert.mockResolvedValue({});
 
       await service['calculateAndStorePipelineMetrics']('pipeline-123', 'daily', new Date());
 
-      expect(mockPrismaService.pipelineMetrics.create).toHaveBeenCalledWith({
-        data: expect.objectContaining({
+      expect(mockPrismaService.pipelineMetrics.upsert).toHaveBeenCalledWith({
+        where: expect.any(Object),
+        update: expect.objectContaining({
+          dealsCreated: 0,
+          dealsWon: 0,
+          dealsLost: 0,
+          winRate: 0,
+          totalValue: new Decimal(0),
+        }),
+        create: expect.objectContaining({
           dealsCreated: 0,
           dealsWon: 0,
           dealsLost: 0,

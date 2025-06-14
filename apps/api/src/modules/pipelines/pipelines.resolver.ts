@@ -11,7 +11,7 @@ import { UseGuards } from "@nestjs/common";
 import { PipelinesService } from "./pipelines.service";
 import { DealsService } from "./deals.service";
 import { CustomGqlAuthGuard } from "../../common/guards/custom-gql-auth.guard";
-import { Pipeline, Deal, Stage } from "../prisma/prisma-client";
+import { Pipeline, Deal, Stage } from "@hasteCRM/database";
 
 @Resolver("Pipeline")
 @UseGuards(CustomGqlAuthGuard)

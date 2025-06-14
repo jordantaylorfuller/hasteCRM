@@ -305,20 +305,22 @@ export class AuthService {
   }
 
   private async generateTokens(user: User, workspaceId: string, role: string) {
-    const payload: JwtPayload = {
+    const basePayload = {
       sub: user.id,
       email: user.email,
       workspaceId,
       role,
     };
 
-    const accessToken = await this.jwtService.signAsync(payload, {
-      expiresIn: "15m",
-    });
+    const accessToken = await this.jwtService.signAsync(
+      { ...basePayload, type: 'access' as const },
+      { expiresIn: "15m" }
+    );
 
-    const refreshToken = await this.jwtService.signAsync(payload, {
-      expiresIn: "7d",
-    });
+    const refreshToken = await this.jwtService.signAsync(
+      { ...basePayload, type: 'refresh' as const },
+      { expiresIn: "7d" }
+    );
 
     return {
       accessToken,

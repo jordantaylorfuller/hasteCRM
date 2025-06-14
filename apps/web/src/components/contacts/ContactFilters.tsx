@@ -73,11 +73,11 @@ export function ContactFilters({ filters, onChange }: ContactFiltersProps) {
             <div className="grid gap-2">
               <Label htmlFor="status">Status</Label>
               <Select
-                value={localFilters.status || ""}
+                value={localFilters.status || "all"}
                 onValueChange={(value) =>
                   setLocalFilters({
                     ...localFilters,
-                    status: value as ContactStatus,
+                    status: value === "all" ? undefined : (value as ContactStatus),
                   })
                 }
               >
@@ -85,7 +85,7 @@ export function ContactFilters({ filters, onChange }: ContactFiltersProps) {
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All</SelectItem>
+                  <SelectItem value="all">All</SelectItem>
                   <SelectItem value={ContactStatus.ACTIVE}>Active</SelectItem>
                   <SelectItem value={ContactStatus.INACTIVE}>
                     Inactive
@@ -100,11 +100,11 @@ export function ContactFilters({ filters, onChange }: ContactFiltersProps) {
             <div className="grid gap-2">
               <Label htmlFor="source">Source</Label>
               <Select
-                value={localFilters.source || ""}
+                value={localFilters.source || "all"}
                 onValueChange={(value) =>
                   setLocalFilters({
                     ...localFilters,
-                    source: value as ContactSource,
+                    source: value === "all" ? undefined : (value as ContactSource),
                   })
                 }
               >
@@ -112,7 +112,7 @@ export function ContactFilters({ filters, onChange }: ContactFiltersProps) {
                   <SelectValue placeholder="Select source" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All</SelectItem>
+                  <SelectItem value="all">All</SelectItem>
                   <SelectItem value={ContactSource.MANUAL}>Manual</SelectItem>
                   <SelectItem value={ContactSource.IMPORT}>Import</SelectItem>
                   <SelectItem value={ContactSource.API}>API</SelectItem>

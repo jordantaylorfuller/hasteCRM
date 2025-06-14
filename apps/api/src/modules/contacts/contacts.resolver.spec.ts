@@ -51,6 +51,7 @@ describe("ContactsResolver", () => {
             restore: jest.fn(),
             updateScore: jest.fn(),
             getContactsByCompany: jest.fn(),
+            search: jest.fn(),
           },
         },
       ],
@@ -179,6 +180,80 @@ describe("ContactsResolver", () => {
         mockUser.workspaceId,
       );
       expect(result).toEqual(mockContact);
+    });
+  });
+
+  describe("searchContacts", () => {
+    it("should search contacts by query", async () => {
+      const searchResult = {
+        contacts: [mockContact],
+        total: 1,
+        hasMore: false,
+      };
+
+      (contactsService.search as jest.Mock).mockResolvedValue(searchResult);
+
+      const mockContext = {
+        req: {
+          user: mockUser,
+        },
+      };
+
+      const result = await resolver.search(
+        "john",
+        undefined,
+        0,
+        20,
+        mockContext,
+      );
+
+      expect(contactsService.search).toHaveBeenCalledWith(
+        mockUser.workspaceId,
+        "john",
+        undefined,
+        0,
+        20,
+      );
+      expect(result).toEqual(searchResult);
+    });
+
+    it("should search with filters", async () => {
+      const filters = {
+        status: "ACTIVE",
+        tags: ["vip"],
+        companyId: "company-123",
+      };
+
+      const searchResult = {
+        contacts: [mockContact],
+        total: 1,
+        hasMore: false,
+      };
+
+      (contactsService.search as jest.Mock).mockResolvedValue(searchResult);
+
+      const mockContext = {
+        req: {
+          user: mockUser,
+        },
+      };
+
+      const result = await resolver.search(
+        "john",
+        filters,
+        0,
+        10,
+        mockContext,
+      );
+
+      expect(contactsService.search).toHaveBeenCalledWith(
+        mockUser.workspaceId,
+        "john",
+        filters,
+        0,
+        10,
+      );
+      expect(result).toEqual(searchResult);
     });
   });
 

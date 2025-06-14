@@ -59,7 +59,7 @@ input InsightsTimeRangeInput {
   end: String!
 }
 
-type Query {
+extend type Query {
   # Summarize an email or email thread
   summarizeEmail(input: EmailSummarizationInput!): EmailSummary!
   
@@ -67,7 +67,7 @@ type Query {
   getAiInsights(timeRange: InsightsTimeRangeInput!): AiInsights!
 }
 
-type Mutation {
+extend type Mutation {
   # Generate smart compose suggestions
   generateSmartCompose(input: SmartComposeInput!): SmartComposeResponse!
   

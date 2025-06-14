@@ -6,22 +6,21 @@ services:
   # ==========================================
   postgres:
     image: postgres:15.5-alpine
-    container_name: hastecrm-postgres
+    container_name: hasteCRM-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-hasteCRM_prod}
+      POSTGRES_DB: ${POSTGRES_DB:-hasteCRM}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - postgres-data:/var/lib/postgresql/data
-      - ./scripts/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     ports:
       - "5432:5432"
     networks:
-      - hastecrm-network
+      - hasteCRM-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-hasteCRM_prod}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-hasteCRM}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -36,7 +35,7 @@ services:
   # ==========================================
   redis:
     image: redis:7.2.4-alpine
-    container_name: hastecrm-redis
+    container_name: hasteCRM-redis
     restart: unless-stopped
     command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
     volumes:
@@ -44,52 +43,11 @@ services:
     ports:
       - "6379:6379"
     networks:
-      - hastecrm-network
+      - hasteCRM-network
     healthcheck:
-      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      test: ["CMD", "redis-cli", "--no-auth-warning", "auth", "${REDIS_PASSWORD}", "ping"]
       interval: 10s
       timeout: 5s
-      retries: 5
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-  # ==========================================
-  # Elasticsearch
-  # ==========================================
-  elasticsearch:
-    image: elasticsearch:8.11.1
-    container_name: hastecrm-elasticsearch
-    restart: unless-stopped
-    environment:
-      - discovery.type=single-node
-      - cluster.name=hastecrm-cluster
-      - node.name=hastecrm-node
-      - xpack.security.enabled=true
-      - xpack.security.enrollment.enabled=true
-      - ELASTIC_PASSWORD=${ELASTICSEARCH_PASSWORD}
-      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
-      - bootstrap.memory_lock=true
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-      nofile:
-        soft: 65536
-        hard: 65536
-    volumes:
-      - elasticsearch-data:/usr/share/elasticsearch/data
-      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
-    ports:
-      - "9200:9200"
-    networks:
-      - hastecrm-network
-    healthcheck:
-      test: ["CMD-SHELL", "curl -s -u elastic:${ELASTICSEARCH_PASSWORD} http://localhost:9200/_cluster/health || exit 1"]
-      interval: 30s
-      timeout: 10s
       retries: 5
     logging:
       driver: "json-file"
@@ -104,32 +62,34 @@ services:
     build:
       context: .
       dockerfile: ./apps/api/Dockerfile
-      args:
-        - NODE_ENV=production
-    image: hastenyc/hastecrm-api:${VERSION:-latest}
-    container_name: hastecrm-api
+    image: hasteCRM/api:${VERSION:-latest}
+    container_name: hasteCRM-api
     restart: unless-stopped
     environment:
       NODE_ENV: production
       PORT: 4000
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-hasteCRM_prod}?schema=public
-      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
-      ELASTICSEARCH_URL: http://elasticsearch:9200
-      ELASTICSEARCH_USERNAME: elastic
-      ELASTICSEARCH_PASSWORD: ${ELASTICSEARCH_PASSWORD}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-hasteCRM}?schema=public
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
       CORS_ORIGINS: ${CORS_ORIGINS}
+      # Gmail OAuth
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
+      # AI Features
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      USE_MOCK_AI: ${USE_MOCK_AI:-false}
     ports:
       - "4000:4000"
     networks:
-      - hastecrm-network
+      - hasteCRM-network
     depends_on:
       postgres:
         condition: service_healthy
       redis:
-        condition: service_healthy
-      elasticsearch:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://localhost:4000/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1))"]
@@ -151,12 +111,10 @@ services:
       context: .
       dockerfile: ./apps/web/Dockerfile
       args:
-        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-https://api.haste.nyc}
-        - NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL:-wss://api.haste.nyc}
-        - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-https://www.haste.nyc}
-        - NEXT_PUBLIC_SENTRY_DSN=${NEXT_PUBLIC_SENTRY_DSN}
-    image: hastenyc/hastecrm-web:${VERSION:-latest}
-    container_name: hastecrm-web
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:4000}
+        - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+    image: hasteCRM/web:${VERSION:-latest}
+    container_name: hasteCRM-web
     restart: unless-stopped
     environment:
       NODE_ENV: production
@@ -164,11 +122,12 @@ services:
     ports:
       - "3000:3000"
     networks:
-      - hastecrm-network
+      - hasteCRM-network
     depends_on:
-      - api
+      api:
+        condition: service_healthy
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1))"]
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health.json', (res) => process.exit(res.statusCode === 200 ? 0 : 1))"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -180,52 +139,21 @@ services:
         max-file: "5"
 
   # ==========================================
-  # Background Worker
-  # ==========================================
-  worker:
-    build:
-      context: .
-      dockerfile: ./apps/worker/Dockerfile
-      args:
-        - NODE_ENV=production
-    image: hastenyc/hastecrm-worker:${VERSION:-latest}
-    container_name: hastecrm-worker
-    restart: unless-stopped
-    environment:
-      NODE_ENV: production
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-hasteCRM_prod}?schema=public
-      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
-      QUEUE_REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/1
-    networks:
-      - hastecrm-network
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "5"
-
-  # ==========================================
-  # Nginx Reverse Proxy
+  # Nginx Reverse Proxy (Optional)
   # ==========================================
   nginx:
     image: nginx:1.25.3-alpine
-    container_name: hastecrm-nginx
+    container_name: hasteCRM-nginx
     restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro
       - ./nginx/ssl:/etc/nginx/ssl:ro
       - nginx-cache:/var/cache/nginx
     networks:
-      - hastecrm-network
+      - hasteCRM-network
     depends_on:
       - api
       - web
@@ -245,14 +173,9 @@ volumes:
     driver: local
   redis-data:
     driver: local
-  elasticsearch-data:
-    driver: local
   nginx-cache:
     driver: local
 
 networks:
-  hastecrm-network:
+  hasteCRM-network:
     driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16

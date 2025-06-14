@@ -63,6 +63,9 @@ export class EmailParserService {
     const internalDate = message.internalDate
       ? new Date(parseInt(message.internalDate))
       : new Date();
+    
+    // Use Date header if available for sentAt
+    const sentAt = headers.date ? new Date(headers.date) : internalDate;
 
     return {
       subject: headers.subject,
@@ -77,8 +80,8 @@ export class EmailParserService {
       ccNames: cc.map((a) => a.name || ""),
       bccEmails: bcc.map((a) => a.email),
       bccNames: bcc.map((a) => a.name || ""),
-      sentAt: internalDate,
-      receivedAt: internalDate,
+      sentAt: sentAt,
+      receivedAt: sentAt,
       gmailLabels: labels,
       isRead: !labels.includes("UNREAD"),
       isStarred: labels.includes("STARRED"),

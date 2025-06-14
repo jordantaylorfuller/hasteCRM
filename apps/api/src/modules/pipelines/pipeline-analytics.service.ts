@@ -320,23 +320,27 @@ export class PipelineAnalyticsService {
   // Scheduled job to calculate daily metrics
   @Cron(CronExpression.EVERY_DAY_AT_2AM)
   async calculateDailyMetrics() {
-    const pipelines = await this.prisma.pipeline.findMany({
-      where: { deletedAt: null },
-    });
+    try {
+      const pipelines = await this.prisma.pipeline.findMany({
+        where: { deletedAt: null },
+      });
 
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    yesterday.setHours(0, 0, 0, 0);
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      yesterday.setHours(0, 0, 0, 0);
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
-    for (const pipeline of pipelines) {
-      await this.calculateAndStorePipelineMetrics(
-        pipeline.id,
-        "daily",
-        yesterday,
-      );
+      for (const pipeline of pipelines) {
+        await this.calculateAndStorePipelineMetrics(
+          pipeline.id,
+          "daily",
+          yesterday,
+        );
+      }
+    } catch (error) {
+      console.error('Error calculating daily metrics:', error);
     }
   }
 

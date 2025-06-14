@@ -291,17 +291,18 @@ Generate insights about communication patterns, identify key relationships, and 
         .map((e) => e.bodyText || e.bodyHtml || "")
         .join("\n\n");
 
-      if (this.useMockAi) {
-        return this.mockEnrichContact(contact, emailContent);
-      }
+      let enrichmentData: ContactEnrichmentData;
 
-      const message = await this.anthropic.messages.create({
-        model: "claude-3-5-sonnet-20241022",
-        max_tokens: 500,
-        messages: [
-          {
-            role: "user",
-            content: `Based on the following information about a contact and their email communications, extract or infer additional details:
+      if (this.useMockAi) {
+        enrichmentData = this.mockEnrichContact(contact, emailContent);
+      } else {
+        const message = await this.anthropic.messages.create({
+          model: "claude-3-5-sonnet-20241022",
+          max_tokens: 500,
+          messages: [
+            {
+              role: "user",
+              content: `Based on the following information about a contact and their email communications, extract or infer additional details:
 
 Contact: ${contact.firstName} ${contact.lastName} (${contact.email})
 Current Info: ${JSON.stringify(contact)}
@@ -310,16 +311,17 @@ Email Communications:
 ${emailContent}
 
 Extract or infer: company name, job title, LinkedIn URL (if mentioned), a brief professional summary, and relevant tags. Format as JSON with fields: company, title, linkedInUrl, summary, tags (array).`,
-          },
-        ],
-      });
+            },
+          ],
+        });
 
-      const responseContent = message.content[0];
-      const text = responseContent.type === "text" ? responseContent.text : "";
-      const enrichmentData = JSON.parse(text);
+        const responseContent = message.content[0];
+        const text = responseContent.type === "text" ? responseContent.text : "";
+        enrichmentData = JSON.parse(text);
+      }
 
       // Update contact with enriched data
-      await this.contactsService.update(contactId, contact.workspaceId, {
+      await this.contactsService.update(contactId, workspaceId, {
         title: enrichmentData.title || contact.title,
         linkedinUrl: enrichmentData.linkedInUrl || contact.linkedinUrl,
       });

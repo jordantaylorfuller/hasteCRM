@@ -1,0 +1,410 @@
+# Base GraphQL Schema
+
+scalar DateTime
+scalar JSON
+
+# Root Query Type
+type Query {
+  _empty: String
+}
+
+# Root Mutation Type
+type Mutation {
+  _empty: String
+}
+
+# Activity Types
+type Activity {
+  id: ID!
+  type: String!
+  description: String!
+  createdAt: DateTime!
+  user: User!
+}
+
+type Task {
+  id: ID!
+  title: String!
+  description: String
+  dueDate: DateTime
+  completed: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  assignee: User!
+}
+
+type Note {
+  id: ID!
+  content: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  author: User!
+}
+
+type CustomFieldValue {
+  id: ID!
+  field: CustomField!
+  value: String!
+}
+
+type CustomField {
+  id: ID!
+  name: String!
+  type: String!
+  required: Boolean!
+}
+
+# Forward declarations for types defined in other modules
+type Pipeline
+type Stage
+type Deal
+type Email
+
+# Auth Types
+type User {
+  id: ID!
+  email: String!
+  firstName: String
+  lastName: String
+  avatarUrl: String
+  status: String!
+  emailVerified: Boolean!
+  twoFactorEnabled: Boolean!
+  workspace: Workspace!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Workspace {
+  id: ID!
+  name: String!
+  slug: String!
+  plan: String!
+  ownerId: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+# Contact Types
+type Contact {
+  id: ID!
+  firstName: String
+  lastName: String
+  email: String
+  phone: String
+  title: String
+  avatarUrl: String
+  bio: String
+  website: String
+  linkedinUrl: String
+  twitterUrl: String
+  facebookUrl: String
+  address: String
+  city: String
+  state: String
+  country: String
+  postalCode: String
+  timezone: String
+  source: ContactSource!
+  status: ContactStatus!
+  score: Int!
+  lastActivityAt: DateTime
+  company: Company
+  tags: [Tag!]!
+  emails: [Email!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Company {
+  id: ID!
+  name: String!
+  domain: String
+  website: String
+  logoUrl: String
+  industry: String
+  size: String
+  description: String
+  linkedinUrl: String
+  twitterUrl: String
+  facebookUrl: String
+  address: String
+  city: String
+  state: String
+  country: String
+  postalCode: String
+  phone: String
+  revenue: Float
+  employees: Int
+  foundedYear: Int
+  contacts: [Contact!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Tag {
+  id: ID!
+  name: String!
+  color: String!
+  contacts: [Contact!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+# Enums
+enum ContactSource {
+  MANUAL
+  IMPORT
+  API
+  GMAIL
+  WEBHOOK
+  ENRICHMENT
+}
+
+enum ContactStatus {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum EmailDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum EmailStatus {
+  SENT
+  DELIVERED
+  OPENED
+  CLICKED
+  BOUNCED
+  FAILED
+}
+
+enum DealStatus {
+  OPEN
+  WON
+  LOST
+  STALLED
+}
+
+enum PipelineType {
+  SALES
+  INVESTOR
+  RECRUITING
+  VENDOR
+  PARTNER
+  CUSTOM
+}
+
+enum TriggerType {
+  STAGE_ENTER
+  STAGE_EXIT
+  DEAL_CREATED
+  DEAL_WON
+  DEAL_LOST
+  DEAL_UPDATED
+  TIME_IN_STAGE
+  PROBABILITY_CHANGED
+  VALUE_CHANGED
+}
+
+enum ActionType {
+  SEND_EMAIL
+  CREATE_TASK
+  UPDATE_FIELD
+  ADD_TAG
+  REMOVE_TAG
+  NOTIFY_USER
+  WEBHOOK
+  MOVE_STAGE
+  UPDATE_PROBABILITY
+}
+
+# Import/Export Types
+type ImportResult {
+  success: Boolean!
+  imported: Int!
+  failed: Int!
+  errors: [ImportError!]!
+}
+
+type ImportError {
+  row: Int!
+  field: String!
+  message: String!
+}
+
+type ExportResult {
+  success: Boolean!
+  fileUrl: String!
+  expiresAt: DateTime!
+  recordCount: Int!
+}
+
+# Base Auth Queries/Mutations
+extend type Query {
+  me: User
+  workspace(id: ID!): Workspace
+}
+
+extend type Mutation {
+  updateProfile(input: UpdateProfileInput!): User!
+  updateWorkspace(id: ID!, input: UpdateWorkspaceInput!): Workspace!
+}
+
+input UpdateProfileInput {
+  firstName: String
+  lastName: String
+  avatarUrl: String
+}
+
+input UpdateWorkspaceInput {
+  name: String
+  slug: String
+}
+
+# Contact Queries/Mutations
+extend type Query {
+  contacts(skip: Int = 0, take: Int = 20, filters: ContactFiltersInput): ContactsResponse!
+  contact(id: ID!): Contact
+  companies(skip: Int = 0, take: Int = 20, search: String): CompaniesResponse!
+  company(id: ID!): Company
+  tags: [Tag!]!
+}
+
+extend type Mutation {
+  createContact(input: CreateContactInput!): Contact!
+  updateContact(id: ID!, input: UpdateContactInput!): Contact!
+  deleteContact(id: ID!): Boolean!
+  createCompany(input: CreateCompanyInput!): Company!
+  updateCompany(id: ID!, input: UpdateCompanyInput!): Company!
+  deleteCompany(id: ID!): Boolean!
+  createTag(input: CreateTagInput!): Tag!
+  updateTag(id: ID!, input: UpdateTagInput!): Tag!
+  deleteTag(id: ID!): Boolean!
+  importContacts(file: String!, mapping: JSON!): ImportResult!
+  exportContacts(format: String!, filters: ContactFiltersInput): ExportResult!
+}
+
+# Contact Input Types
+input ContactFiltersInput {
+  search: String
+  status: ContactStatus
+  source: ContactSource
+  companyId: String
+  tags: [String!]
+  city: String
+  state: String
+  country: String
+}
+
+input CreateContactInput {
+  firstName: String
+  lastName: String
+  email: String
+  phone: String
+  title: String
+  companyId: String
+  bio: String
+  website: String
+  linkedinUrl: String
+  twitterUrl: String
+  facebookUrl: String
+  address: String
+  city: String
+  state: String
+  country: String
+  postalCode: String
+  timezone: String
+  tags: [String!]
+}
+
+input UpdateContactInput {
+  firstName: String
+  lastName: String
+  email: String
+  phone: String
+  title: String
+  companyId: String
+  bio: String
+  website: String
+  linkedinUrl: String
+  twitterUrl: String
+  facebookUrl: String
+  address: String
+  city: String
+  state: String
+  country: String
+  postalCode: String
+  timezone: String
+  status: ContactStatus
+  tags: [String!]
+}
+
+input CreateCompanyInput {
+  name: String!
+  domain: String
+  website: String
+  logoUrl: String
+  industry: String
+  size: String
+  description: String
+  linkedinUrl: String
+  twitterUrl: String
+  facebookUrl: String
+  address: String
+  city: String
+  state: String
+  country: String
+  postalCode: String
+  phone: String
+  revenue: Float
+  employees: Int
+  foundedYear: Int
+}
+
+input UpdateCompanyInput {
+  name: String
+  domain: String
+  website: String
+  logoUrl: String
+  industry: String
+  size: String
+  description: String
+  linkedinUrl: String
+  twitterUrl: String
+  facebookUrl: String
+  address: String
+  city: String
+  state: String
+  country: String
+  postalCode: String
+  phone: String
+  revenue: Float
+  employees: Int
+  foundedYear: Int
+}
+
+input CreateTagInput {
+  name: String!
+  color: String!
+}
+
+input UpdateTagInput {
+  name: String
+  color: String
+}
+
+# Response Types
+type ContactsResponse {
+  contacts: [Contact!]!
+  total: Int!
+  hasMore: Boolean!
+}
+
+type CompaniesResponse {
+  companies: [Company!]!
+  total: Int!
+  hasMore: Boolean!
+}

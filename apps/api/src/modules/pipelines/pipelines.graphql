@@ -97,21 +97,7 @@ type StageMetrics {
   probability: Int!
 }
 
-enum PipelineType {
-  SALES
-  INVESTOR
-  RECRUITING
-  VENDOR
-  PARTNER
-  CUSTOM
-}
-
-enum DealStatus {
-  OPEN
-  WON
-  LOST
-  STALLED
-}
+# Enums are already defined in the main schema
 
 input CreatePipelineInput {
   name: String!
@@ -171,7 +157,7 @@ input ReorderInput {
   ids: [ID!]!
 }
 
-type Query {
+extend type Query {
   pipelines: [Pipeline!]!
   pipeline(id: ID!): Pipeline
   pipelineMetrics(id: ID!, startDate: DateTime, endDate: DateTime): PipelineMetrics!
@@ -195,7 +181,7 @@ type DealConnection {
   hasMore: Boolean!
 }
 
-type Mutation {
+extend type Mutation {
   # Pipeline mutations
   createPipeline(input: CreatePipelineInput!): Pipeline!
   updatePipeline(id: ID!, input: UpdatePipelineInput!): Pipeline!
