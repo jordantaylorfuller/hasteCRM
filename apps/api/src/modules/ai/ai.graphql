@@ -1,0 +1,76 @@
+type EmailSummary {
+  summary: String!
+  actionItems: [String!]
+  keyPoints: [String!]
+}
+
+type SmartComposeResponse {
+  suggestions: [String!]!
+  fullDraft: String
+}
+
+type CommunicationPatterns {
+  totalEmails: Int!
+  readRate: String!
+  starRate: String!
+  peakHours: [String!]!
+  avgResponseTime: String!
+}
+
+type TopContact {
+  id: ID!
+  name: String!
+  email: String!
+  interactionCount: Int!
+  lastInteraction: String!
+}
+
+type AiInsights {
+  communicationPatterns: CommunicationPatterns!
+  topContacts: [TopContact!]!
+  suggestions: [String!]!
+}
+
+type ContactEnrichment {
+  company: String
+  title: String
+  linkedInUrl: String
+  summary: String
+  tags: [String!]
+}
+
+input EmailSummarizationInput {
+  emailId: ID!
+  includeActionItems: Boolean
+  includeKeyPoints: Boolean
+  maxLength: Int
+}
+
+input SmartComposeInput {
+  emailId: ID!
+  prompt: String!
+  tone: String
+  length: String
+  includeContext: Boolean
+}
+
+input InsightsTimeRangeInput {
+  start: String!
+  end: String!
+}
+
+type Query {
+  # Summarize an email or email thread
+  summarizeEmail(input: EmailSummarizationInput!): EmailSummary!
+  
+  # Get AI insights for workspace communications
+  getAiInsights(timeRange: InsightsTimeRangeInput!): AiInsights!
+}
+
+type Mutation {
+  # Generate smart compose suggestions
+  generateSmartCompose(input: SmartComposeInput!): SmartComposeResponse!
+  
+  # Enrich a contact with AI-extracted information
+  enrichContact(contactId: ID!): ContactEnrichment
+}

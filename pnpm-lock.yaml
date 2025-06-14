@@ -33,6 +33,9 @@ importers:
 
   apps/api:
     dependencies:
+      '@anthropic-ai/sdk':
+        specifier: ^0.54.0
+        version: 0.54.0
       '@apollo/server':
         specifier: ^4.9.0
         version: 4.12.2(graphql@16.11.0)
@@ -418,6 +421,11 @@ packages:
     transitivePeerDependencies:
       - chokidar
     dev: true
+
+  /@anthropic-ai/sdk@0.54.0:
+    resolution: {integrity: sha512-xyoCtHJnt/qg5GG6IgK+UJEndz8h8ljzt/caKXmq3LfBF81nC/BW6E4x2rOWCZcvsLyVW+e8U5mtIr6UCE/kJw==}
+    hasBin: true
+    dev: false
 
   /@apollo/cache-control-types@1.0.3(graphql@16.11.0):
     resolution: {integrity: sha512-F17/vCp7QVwom9eG7ToauIKdAxpSoadsJnqIfyryLFSkLSOEqu+eC5Z3N8OXcUVStuOMcNHlyraRsA6rRICu4g==}
