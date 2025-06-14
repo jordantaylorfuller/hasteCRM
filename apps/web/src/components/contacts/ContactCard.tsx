@@ -18,13 +18,13 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
-  EnvelopeIcon,
-  PhoneIcon,
-  EllipsisHorizontalIcon,
-  PencilIcon,
-  TrashIcon,
-  BuildingOfficeIcon,
-} from "@heroicons/react/24/outline";
+  Mail,
+  Phone,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+  Building,
+} from "lucide-react";
 
 interface ContactCardProps {
   contact: Contact;
@@ -73,12 +73,12 @@ export function ContactCard({ contact, onUpdate }: ContactCardProps) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                <EllipsisHorizontalIcon className="h-4 w-4" />
+                <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => setIsEditModalOpen(true)}>
-                <PencilIcon className="mr-2 h-4 w-4" />
+                <Pencil className="mr-2 h-4 w-4" />
                 Edit
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -86,7 +86,7 @@ export function ContactCard({ contact, onUpdate }: ContactCardProps) {
                 onClick={handleDelete}
                 className="text-red-600 focus:text-red-600"
               >
-                <TrashIcon className="mr-2 h-4 w-4" />
+                <Trash2 className="mr-2 h-4 w-4" />
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -96,7 +96,7 @@ export function ContactCard({ contact, onUpdate }: ContactCardProps) {
       <CardContent className="space-y-3">
         {contact.email && (
           <div className="flex items-center text-sm text-gray-600">
-            <EnvelopeIcon className="mr-2 h-4 w-4 flex-shrink-0" />
+            <Mail className="mr-2 h-4 w-4 flex-shrink-0" />
             <a
               href={`mailto:${contact.email}`}
               className="truncate hover:text-blue-600"
@@ -107,7 +107,7 @@ export function ContactCard({ contact, onUpdate }: ContactCardProps) {
         )}
         {contact.phone && (
           <div className="flex items-center text-sm text-gray-600">
-            <PhoneIcon className="mr-2 h-4 w-4 flex-shrink-0" />
+            <Phone className="mr-2 h-4 w-4 flex-shrink-0" />
             <a
               href={`tel:${contact.phone}`}
               className="truncate hover:text-blue-600"
@@ -118,7 +118,7 @@ export function ContactCard({ contact, onUpdate }: ContactCardProps) {
         )}
         {contact.company && (
           <div className="flex items-center text-sm text-gray-600">
-            <BuildingOfficeIcon className="mr-2 h-4 w-4 flex-shrink-0" />
+            <Building className="mr-2 h-4 w-4 flex-shrink-0" />
             <span className="truncate">{contact.company.name}</span>
           </div>
         )}

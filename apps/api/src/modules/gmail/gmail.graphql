@@ -1,0 +1,186 @@
+# Email Account Management
+type EmailAccount {
+  id: ID!
+  email: String!
+  provider: String!
+  syncEnabled: Boolean!
+  syncMode: String!
+  syncStatus: String!
+  lastSyncAt: DateTime
+  lastError: String
+  watchExpiration: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  emails: [Email!]!
+  emailCount: Int!
+}
+
+type EmailSyncStatus {
+  id: ID!
+  email: String!
+  syncEnabled: Boolean!
+  syncMode: String!
+  syncStatus: String!
+  lastSyncAt: DateTime
+  lastError: String
+  emailCount: Int!
+  watchExpiration: DateTime
+}
+
+# Email Types
+type Email {
+  id: ID!
+  messageId: String!
+  threadId: String!
+  subject: String
+  snippet: String
+  bodyHtml: String
+  bodyText: String
+  fromEmail: String!
+  fromName: String
+  toEmails: [String!]!
+  toNames: [String!]!
+  ccEmails: [String!]!
+  ccNames: [String!]!
+  direction: EmailDirection!
+  status: EmailStatus!
+  sentAt: DateTime!
+  receivedAt: DateTime!
+  isRead: Boolean!
+  isStarred: Boolean!
+  isImportant: Boolean!
+  isDraft: Boolean!
+  gmailLabels: [String!]!
+  openCount: Int!
+  clickCount: Int!
+  firstOpenedAt: DateTime
+  lastOpenedAt: DateTime
+  attachments: [EmailAttachment!]!
+  contact: Contact
+  deal: Deal
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type EmailAttachment {
+  id: ID!
+  filename: String!
+  mimeType: String!
+  size: Int!
+  url: String!
+}
+
+type EmailStats {
+  total: Int!
+  unread: Int!
+  starred: Int!
+  sent: Int!
+  received: Int!
+}
+
+type EmailsResponse {
+  emails: [Email!]!
+  total: Int!
+  hasMore: Boolean!
+}
+
+# Input Types
+input EmailFiltersInput {
+  accountId: String
+  threadId: String
+  contactId: String
+  dealId: String
+  direction: EmailDirection
+  status: EmailStatus
+  isRead: Boolean
+  isStarred: Boolean
+  labelIds: [String!]
+  dateFrom: DateTime
+  dateTo: DateTime
+}
+
+input SendEmailInput {
+  from: String!
+  to: [String!]!
+  cc: [String!]
+  bcc: [String!]
+  subject: String!
+  body: String!
+  replyTo: String
+  attachments: [EmailAttachmentInput!]
+  contactId: String
+  dealId: String
+}
+
+input CreateDraftInput {
+  from: String!
+  to: [String!]!
+  subject: String!
+  body: String!
+}
+
+input EmailAttachmentInput {
+  filename: String!
+  mimeType: String!
+  data: String! # base64
+}
+
+# Response Types
+type ConnectEmailAccountResponse {
+  authUrl: String!
+}
+
+type SendEmailResponse {
+  success: Boolean!
+  messageId: String
+  error: String
+}
+
+type SyncEmailAccountResponse {
+  success: Boolean!
+  message: String!
+}
+
+type ArchiveEmailResponse {
+  success: Boolean!
+  error: String
+}
+
+# Queries
+extend type Query {
+  # Email Account Queries
+  emailAccounts: [EmailAccount!]!
+  emailAccount(id: ID!): EmailAccount
+  emailSyncStatus: [EmailSyncStatus!]!
+  
+  # Email Queries
+  emails(skip: Int = 0, take: Int = 20, filters: EmailFiltersInput): EmailsResponse!
+  email(id: ID!): Email
+  emailThread(threadId: String!): [Email!]!
+  searchEmails(query: String!, skip: Int = 0, take: Int = 20): EmailsResponse!
+  emailStats: EmailStats!
+}
+
+# Mutations
+extend type Mutation {
+  # Email Account Mutations
+  connectEmailAccount(input: ConnectEmailAccountInput!): ConnectEmailAccountResponse!
+  disconnectEmailAccount(id: ID!): Boolean!
+  enableEmailSync(id: ID!): EmailAccount!
+  disableEmailSync(id: ID!): EmailAccount!
+  syncEmailAccount(id: ID!, fullSync: Boolean): SyncEmailAccountResponse!
+  
+  # Email Mutations
+  sendEmail(input: SendEmailInput!): SendEmailResponse!
+  createDraft(input: CreateDraftInput!): SendEmailResponse!
+  markEmailAsRead(messageId: String!): Email!
+  markEmailAsUnread(messageId: String!): Email!
+  toggleEmailStar(messageId: String!): Email!
+  archiveEmail(messageId: String!): ArchiveEmailResponse!
+  trashEmail(messageId: String!): ArchiveEmailResponse!
+}
+
+input ConnectEmailAccountInput {
+  email: String!
+  provider: String!
+}

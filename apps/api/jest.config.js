@@ -7,10 +7,17 @@ module.exports = {
   },
   collectCoverageFrom: [
     '**/*.(t|j)s',
+    '!**/*.spec.ts',
+    '!**/node_modules/**',
+    '!**/dist/**',
   ],
   coverageDirectory: '../coverage',
   testEnvironment: 'node',
   moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/$1',
     '^@hasteCRM/database$': '<rootDir>/../../packages/database/src',
   },
+  setupFilesAfterEnv: ['<rootDir>/../test/jest.setup.ts'],
+  moduleDirectories: ['node_modules', '<rootDir>'],
+  clearMocks: true,
 };

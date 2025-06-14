@@ -1,4 +1,4 @@
-import { PrismaClient } from "../../../node_modules/.prisma/client";
+import { PrismaClient } from "@prisma/client";
 
 export { PrismaClient };
-export * from "../../../node_modules/.prisma/client";
+export * from "@prisma/client";

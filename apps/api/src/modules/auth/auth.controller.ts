@@ -32,14 +32,9 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   async register(@Body() registerDto: RegisterDto): Promise<AuthResponse> {
     try {
-      console.log("Registration request received:", {
-        email: registerDto.email,
-        firstName: registerDto.firstName,
-        lastName: registerDto.lastName,
-        workspaceName: registerDto.workspaceName,
-      });
+      // Registration request received
       const result = await this.authService.register(registerDto);
-      console.log("Registration successful for:", registerDto.email);
+      // Registration successful
       return result;
     } catch (error) {
       console.error("Registration error:", error);

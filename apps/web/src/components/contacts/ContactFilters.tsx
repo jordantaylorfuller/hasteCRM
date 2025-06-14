@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { FunnelIcon } from "@heroicons/react/24/outline";
+import { Filter } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface ContactFiltersProps {
@@ -49,7 +49,7 @@ export function ContactFilters({ filters, onChange }: ContactFiltersProps) {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button variant="outline" size="sm" className="relative">
-          <FunnelIcon className="mr-2 h-4 w-4" />
+          <Filter className="mr-2 h-4 w-4" />
           Filters
           {activeFiltersCount > 0 && (
             <Badge

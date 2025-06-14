@@ -38,22 +38,11 @@ export class EmailService {
       html: options.html,
     };
 
-    console.log("Attempting to send email:", {
-      to: options.to,
-      subject: options.subject,
-      from: mailOptions.from,
-      smtp: {
-        host: process.env.SMTP_HOST || "localhost",
-        port: process.env.SMTP_PORT || "1025",
-      },
-    });
+    // Attempting to send email
 
     try {
-      const info = await this.transporter.sendMail(mailOptions);
-      console.log(
-        `Email sent successfully to ${options.to}: ${options.subject}`,
-        info,
-      );
+      await this.transporter.sendMail(mailOptions);
+      // Email sent successfully
     } catch (error) {
       console.error("Error sending email:", error);
       throw error;

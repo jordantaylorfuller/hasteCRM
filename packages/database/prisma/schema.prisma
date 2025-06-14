@@ -718,21 +718,32 @@ model EmailAccount {
 
   // Sync Status
   syncEnabled Boolean   @default(true)
+  syncMode    String    @default("PUSH") // PUSH or POLLING
+  syncStatus  String    @default("ACTIVE") // ACTIVE, ERROR, PAUSED
   lastSyncAt  DateTime?
   syncCursor  String?
   historyId   String?
+  lastError   String?   @db.Text
 
   // Gmail Watch
   watchExpiration DateTime?
+  topicName       String?
+  subscriptionName String?
+  
+  // Webhook failures
+  webhookFailureCount Int       @default(0)
+  lastWebhookError    String?   @db.Text
+  lastWebhookErrorAt  DateTime?
 
   // Metadata
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Relations
-  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  emails    Email[]
+  workspace      Workspace           @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emails         Email[]
+  webhookEvents  GmailWebhookEvent[]
 
   @@unique([workspaceId, email])
   @@index([workspaceId])
@@ -846,6 +857,25 @@ model EmailTrackingEvent {
   @@index([emailId])
   @@index([type])
   @@index([timestamp])
+}
+
+model GmailWebhookEvent {
+  id             String   @id @default(cuid())
+  accountId      String
+  messageId      String   @unique
+  historyId      String
+  publishTime    DateTime
+  processingTime Int?     // milliseconds
+  status         String   @default("PENDING") // PENDING, PROCESSED, FAILED
+  error          String?  @db.Text
+  createdAt      DateTime @default(now())
+  processedAt    DateTime?
+
+  account EmailAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId])
+  @@index([status])
+  @@index([createdAt])
 }
 
 // Templates & Sequences

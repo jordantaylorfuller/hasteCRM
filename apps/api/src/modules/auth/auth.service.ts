@@ -64,11 +64,7 @@ export class AuthService {
         },
       });
 
-      console.log("Created user:", {
-        id: user.id,
-        email: user.email,
-        status: user.status,
-      });
+      // User created successfully
 
       // Create workspace user relation
       const workspaceUser = await tx.workspaceUser.create({
@@ -103,15 +99,14 @@ export class AuthService {
 
     // Send verification email
     const verificationUrl = `${process.env.FRONTEND_URL || "http://localhost:3000"}/auth/verify-email?token=${result.verificationToken}`;
-    console.log("Sending verification email to:", result.user.email);
-    console.log("Verification URL:", verificationUrl);
+    // Send verification email
 
     try {
       await this.emailService.sendVerificationEmail(
         result.user.email,
         verificationUrl,
       );
-      console.log("Verification email sent successfully");
+      // Verification email sent successfully
     } catch (error) {
       console.error("Failed to send verification email:", error);
       // Don't fail registration if email fails, but log it

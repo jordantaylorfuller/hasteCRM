@@ -32,11 +32,11 @@ export class RedisService implements OnModuleDestroy {
     });
 
     this.client.on("connect", () => {
-      console.log("Redis Client Connected");
+      this.logger.log("Redis Client Connected");
     });
 
     this.sessionClient.on("connect", () => {
-      console.log("Redis Session Client Connected");
+      this.logger.log("Redis Session Client Connected");
     });
   }
 

@@ -7,10 +7,10 @@ import { ContactFilters } from "@/components/contacts/ContactFilters";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  PlusIcon,
-  UploadIcon,
-  DownloadIcon,
-} from "@heroicons/react/24/outline";
+  Plus,
+  Upload,
+  Download,
+} from "lucide-react";
 import { GET_CONTACTS } from "@/graphql/queries/contacts";
 import { ContactFiltersInput } from "@/types/contact";
 
@@ -71,15 +71,15 @@ export default function ContactsPage() {
             size="sm"
             onClick={() => setIsImportModalOpen(true)}
           >
-            <UploadIcon className="mr-2 h-4 w-4" />
+            <Upload className="mr-2 h-4 w-4" />
             Import
           </Button>
           <Button variant="outline" size="sm" onClick={handleExport}>
-            <DownloadIcon className="mr-2 h-4 w-4" />
+            <Download className="mr-2 h-4 w-4" />
             Export
           </Button>
           <Button onClick={() => setIsCreateModalOpen(true)}>
-            <PlusIcon className="mr-2 h-4 w-4" />
+            <Plus className="mr-2 h-4 w-4" />
             Add Contact
           </Button>
         </div>
