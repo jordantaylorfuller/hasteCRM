@@ -1,0 +1,54 @@
+version: "3.8"
+
+services:
+  postgres-backup:
+    image: postgres:15-alpine
+    container_name: crm-postgres-backup
+    environment:
+      PGPASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - ./scripts/backup:/scripts
+      - ./backups:/backups
+    networks:
+      - haste_network
+    profiles:
+      - backup
+    command: /scripts/postgres-backup.sh
+
+  redis-backup:
+    image: redis:7-alpine
+    container_name: crm-redis-backup
+    volumes:
+      - ./scripts/backup:/scripts
+      - ./backups:/backups
+      - redis_data:/data:ro
+    networks:
+      - haste_network
+    profiles:
+      - backup
+    command: /scripts/redis-backup.sh
+
+  s3-sync:
+    image: amazon/aws-cli:latest
+    container_name: crm-s3-sync
+    environment:
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-us-east-1}
+      S3_BUCKET: ${S3_BACKUP_BUCKET}
+    volumes:
+      - ./backups:/backups:ro
+      - ./scripts/backup:/scripts
+    networks:
+      - haste_network
+    profiles:
+      - backup
+    entrypoint: /scripts/s3-sync.sh
+
+volumes:
+  redis_data:
+    external: true
+
+networks:
+  haste_network:
+    external: true
