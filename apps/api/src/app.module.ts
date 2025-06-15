@@ -5,6 +5,7 @@ import { ConfigModule } from "@nestjs/config";
 import { ScheduleModule } from "@nestjs/schedule";
 import { BullModule } from "@nestjs/bullmq";
 import { join } from "path";
+import { createGraphQLContext } from "./common/graphql/context";
 import { PrismaModule } from "./modules/prisma/prisma.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { HealthModule } from "./modules/health/health.module";
@@ -40,25 +41,7 @@ import { LoggerModule } from "./common/logger/logger.module";
       buildSchemaOptions: {
         numberScalarMode: "integer",
       },
-      context: ({ req, res }) => {
-        // Ensure req has necessary Passport methods for GraphQL
-        if (req) {
-          req.login =
-            req.login ||
-            (() => {
-              return undefined;
-            });
-          req.logIn = req.logIn || req.login;
-          req.logout =
-            req.logout ||
-            (() => {
-              return undefined;
-            });
-          req.logOut = req.logOut || req.logout;
-          req.isAuthenticated = req.isAuthenticated || (() => !!req.user);
-        }
-        return { req, res };
-      },
+      context: createGraphQLContext,
     }),
     LoggerModule,
     PrismaModule,

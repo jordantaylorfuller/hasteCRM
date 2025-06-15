@@ -117,6 +117,33 @@ describe("AuthController", () => {
       expect(authService.register).toHaveBeenCalledWith(registerDto);
       expect(result).toEqual(mockAuthResponse);
     });
+
+    it("should handle registration errors", async () => {
+      const registerDto = {
+        email: "existing@example.com",
+        password: "Password123!",
+        firstName: "Existing",
+        lastName: "User",
+        workspaceName: "Existing Workspace",
+      };
+
+      const mockError = new Error("Email already exists");
+      const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
+
+      (authService.register as jest.Mock).mockRejectedValue(mockError);
+
+      await expect(controller.register(registerDto)).rejects.toThrow(
+        "Email already exists",
+      );
+
+      expect(authService.register).toHaveBeenCalledWith(registerDto);
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Registration error:",
+        mockError,
+      );
+
+      consoleErrorSpy.mockRestore();
+    });
   });
 
   describe("loginWithTwoFactor", () => {

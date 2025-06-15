@@ -3,6 +3,7 @@ import { UseGuards } from "@nestjs/common";
 import { CompaniesService } from "./companies.service";
 import { Company } from "./entities/company.entity";
 import { CreateCompanyInput } from "./dto/create-company.input";
+import { CompaniesResponse } from "./dto/companies-response.dto";
 import { CustomGqlAuthGuard } from "../../common/guards/custom-gql-auth.guard";
 
 @Resolver(() => Company)
@@ -57,18 +58,4 @@ export class CompaniesResolver {
     const { workspaceId } = ctx.req.user;
     return this.companiesService.remove(id, workspaceId);
   }
-}
-
-import { ObjectType, Field, Int as GraphQLInt } from "@nestjs/graphql";
-
-@ObjectType()
-class CompaniesResponse {
-  @Field(() => [Company])
-  companies: Company[];
-
-  @Field(() => GraphQLInt)
-  total: number;
-
-  @Field()
-  hasMore: boolean;
 }
