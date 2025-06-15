@@ -1,3 +1,4 @@
+import React from "react";
 import { render, screen } from "@testing-library/react";
 import { StageColumn } from "./StageColumn";
 import { DndContext } from "@dnd-kit/core";

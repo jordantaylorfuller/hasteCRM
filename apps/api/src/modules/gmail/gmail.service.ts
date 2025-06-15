@@ -21,8 +21,14 @@ export class GmailService {
    * Get Gmail client for a user
    */
   async getGmailClient(accessToken: string): Promise<gmail_v1.Gmail> {
-    this.oauth2Client.setCredentials({ access_token: accessToken });
-    return google.gmail({ version: "v1", auth: this.oauth2Client });
+    const oauth2Client = new google.auth.OAuth2(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET,
+      process.env.GOOGLE_REDIRECT_URI ||
+        "http://localhost:3001/auth/google/callback",
+    );
+    oauth2Client.setCredentials({ access_token: accessToken });
+    return google.gmail({ version: "v1", auth: oauth2Client });
   }
 
   /**
@@ -323,6 +329,6 @@ export class GmailService {
   async refreshAccessToken(refreshToken: string): Promise<string> {
     this.oauth2Client.setCredentials({ refresh_token: refreshToken });
     const { credentials } = await this.oauth2Client.refreshAccessToken();
-    return credentials.access_token || "";
+    return credentials?.access_token || "";
   }
 }

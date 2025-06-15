@@ -6,7 +6,7 @@ import { EmailService } from "./email.service";
 import { EmailParserService } from "./email-parser.service";
 import { PrismaService } from "../prisma/prisma.service";
 import { getQueueToken } from "@nestjs/bullmq";
-import { EmailDirection } from "../prisma/prisma-client";
+import { EmailDirection } from "../prisma/prisma-client"; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 describe("GmailSyncService", () => {
   let service: GmailSyncService;

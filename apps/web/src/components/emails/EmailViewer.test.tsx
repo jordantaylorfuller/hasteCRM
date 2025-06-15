@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { EmailViewer } from "./EmailViewer";
 import { Email } from "@/types/email";
@@ -122,6 +122,8 @@ describe("EmailViewer", () => {
 
   it("hides close button when onClose is not provided", () => {
     const { onClose, ...handlersWithoutClose } = mockHandlers;
+    // onClose is intentionally not passed to component
+    void onClose;
     render(<EmailViewer email={mockEmail} {...handlersWithoutClose} />);
 
     // When onClose is not provided, there should be no X button in the header

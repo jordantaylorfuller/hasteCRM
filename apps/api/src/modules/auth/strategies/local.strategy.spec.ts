@@ -5,7 +5,7 @@ import { UnauthorizedException } from "@nestjs/common";
 
 describe("LocalStrategy", () => {
   let strategy: LocalStrategy;
-  let authService: AuthService;
+  let _authService: AuthService;
 
   const mockAuthService = {
     validateUser: jest.fn(),
@@ -23,7 +23,7 @@ describe("LocalStrategy", () => {
     }).compile();
 
     strategy = module.get<LocalStrategy>(LocalStrategy);
-    authService = module.get<AuthService>(AuthService);
+    _authService = module.get<AuthService>(AuthService);
   });
 
   afterEach(() => {

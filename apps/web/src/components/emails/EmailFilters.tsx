@@ -5,7 +5,6 @@ import {
   Search,
   Filter,
   Calendar,
-  User,
   Tag,
   Paperclip,
   Star,
@@ -17,13 +16,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   Popover,
   PopoverContent,
@@ -48,7 +40,7 @@ export interface EmailFilter {
 
 interface EmailFiltersProps {
   filters: EmailFilter;
-  onFiltersChange: (filters: EmailFilter) => void;
+  onFiltersChange: (_newFilters: EmailFilter) => void;
   availableLabels?: string[];
   emailCounts?: {
     total: number;
@@ -75,7 +67,9 @@ export function EmailFilters({
   };
 
   const clearFilter = (key: keyof EmailFilter) => {
-    const { [key]: _, ...rest } = filters;
+    const { [key]: removed, ...rest } = filters;
+    // removed value is intentionally not used
+    void removed;
     onFiltersChange(rest);
   };
 
@@ -84,7 +78,7 @@ export function EmailFilters({
   };
 
   const hasActiveFilters = Object.keys(filters).some(
-    (key) => key !== "folder" && filters[key as keyof EmailFilter],
+    (_key) => _key !== "folder" && filters[_key as keyof EmailFilter],
   );
 
   const folders = [

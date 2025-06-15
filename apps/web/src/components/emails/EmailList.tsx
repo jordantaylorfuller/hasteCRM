@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
-import { Mail, Star, Archive, Trash2, Reply, Forward } from "lucide-react";
+import { Mail, Star, Archive, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,12 +22,12 @@ interface EmailListProps {
   emails: Email[];
   loading?: boolean;
   selectedEmail?: Email | null;
-  onSelectEmail: (email: Email) => void;
-  onStarEmail: (email: Email) => void;
-  onArchiveEmail: (email: Email) => void;
-  onTrashEmail: (email: Email) => void;
-  onMarkAsRead: (email: Email) => void;
-  onMarkAsUnread: (email: Email) => void;
+  onSelectEmail: (_selectedEmail: Email) => void;
+  onStarEmail: (_starredEmail: Email) => void;
+  onArchiveEmail: (_archivedEmail: Email) => void;
+  onTrashEmail: (_trashedEmail: Email) => void;
+  onMarkAsRead: (_readEmail: Email) => void;
+  onMarkAsUnread: (_unreadEmail: Email) => void;
 }
 
 export function EmailList({

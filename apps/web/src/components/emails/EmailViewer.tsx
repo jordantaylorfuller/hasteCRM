@@ -33,13 +33,13 @@ import { Email } from "@/types/email";
 interface EmailViewerProps {
   email: Email | null;
   onClose?: () => void;
-  onReply?: (email: Email) => void;
-  onReplyAll?: (email: Email) => void;
-  onForward?: (email: Email) => void;
-  onStarEmail?: (email: Email) => void;
-  onArchiveEmail?: (email: Email) => void;
-  onTrashEmail?: (email: Email) => void;
-  onMarkAsUnread?: (email: Email) => void;
+  onReply?: (_emailToReply: Email) => void;
+  onReplyAll?: (_emailToReplyAll: Email) => void;
+  onForward?: (_emailToForward: Email) => void;
+  onStarEmail?: (_emailToStar: Email) => void;
+  onArchiveEmail?: (_email: Email) => void;
+  onTrashEmail?: (_email: Email) => void;
+  onMarkAsUnread?: (_email: Email) => void;
 }
 
 export function EmailViewer({

@@ -16,6 +16,10 @@ export default function ContactsPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
+  // Modal states are defined for future implementation
+  void isCreateModalOpen;
+  void isImportModalOpen;
+
   const { data, loading, error, refetch } = useQuery(GET_CONTACTS, {
     variables: {
       filters: {

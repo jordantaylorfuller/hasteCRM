@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ContactCard } from "./ContactCard";
 import { Contact, ContactStatus, ContactSource } from "@/types/contact";
@@ -157,7 +157,8 @@ describe("ContactCard", () => {
 
   it("cancels delete when not confirmed", async () => {
     mockConfirm.mockReturnValue(false);
-    const user = userEvent.setup();
+    // User event not needed for this test
+    // const _user = userEvent.setup();
 
     render(<ContactCard contact={mockContact} onUpdate={mockOnUpdate} />);
 

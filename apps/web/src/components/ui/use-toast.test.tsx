@@ -1,4 +1,4 @@
-import React from "react";
+import React from "react"; // eslint-disable-line no-unused-vars
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { useToast, toast, reducer } from "./use-toast";
 
@@ -406,7 +406,7 @@ describe("use-toast", () => {
 
     it("maintains counter across MAX_VALUE boundary", () => {
       // This is an edge case test for the genId function
-      const { result } = renderHook(() => useToast());
+      renderHook(() => useToast());
       const toastIds = new Set();
 
       // Generate many IDs
@@ -459,7 +459,7 @@ describe("use-toast", () => {
       });
 
       expect(result.current.toasts).toHaveLength(1);
-      const toastId = result.current.toasts[0].id;
+      // toastId is already captured above
 
       // Update the toast
       act(() => {
@@ -493,9 +493,9 @@ describe("use-toast", () => {
       });
 
       // Try to create second toast but it will replace the first due to TOAST_LIMIT=1
-      let toastInstance2: any;
+      // Try to create second toast but it will replace the first due to TOAST_LIMIT=1
       act(() => {
-        toastInstance2 = result.current.toast({ title: "Toast 2" });
+        result.current.toast({ title: "Toast 2" });
       });
 
       // Now we have one toast (Toast 2)
@@ -543,10 +543,9 @@ describe("use-toast", () => {
       const { result } = renderHook(() => useToast());
 
       // Create first toast
-      let toastId1: string;
+      // Create first toast
       act(() => {
-        const { id } = result.current.toast({ title: "Toast 1" });
-        toastId1 = id;
+        result.current.toast({ title: "Toast 1" });
       });
 
       // Wait to ensure different IDs

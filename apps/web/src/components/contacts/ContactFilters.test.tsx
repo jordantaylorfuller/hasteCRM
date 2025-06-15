@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ContactFilters } from "./ContactFilters";
 import {
@@ -8,7 +8,7 @@ import {
 } from "@/types/contact";
 
 // Create a custom mock context for testing
-let mockSelectState: Record<string, any> = {};
+// let _mockSelectState: Record<string, any> = {};
 
 // Mock the Select components to work with the test expectations
 jest.mock("@/components/ui/select", () => {
@@ -55,7 +55,7 @@ jest.mock("@/components/ui/select", () => {
   return {
     Select,
     SelectTrigger: Object.assign(
-      ({ children, id, value, isOpen, setIsOpen }: any) => {
+      ({ _children, id, value, isOpen, setIsOpen }: any) => {
         // Map values to display text
         const displayMap: Record<string, string> = {
           ACTIVE: "Active",
@@ -108,6 +108,7 @@ jest.mock("@/components/ui/select", () => {
     SelectItem: ({ value, children, onValueChange, setIsOpen }: any) => (
       <div
         role="option"
+        aria-selected="false"
         onClick={() => {
           if (onValueChange) {
             onValueChange(value);

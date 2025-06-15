@@ -1,14 +1,14 @@
 import React from "react";
-import ReactDOM from "react-dom";
 
 interface DialogProps {
   open?: boolean;
-  onOpenChange?: (open: boolean) => void;
+  onOpenChange?: (_isOpen: boolean) => void;
   children: React.ReactNode;
 }
 
-export const Root = ({ open, onOpenChange, children }: DialogProps) => {
-  return <>{open && children}</>;
+export const Root = ({ children, open = true }: DialogProps) => {
+  if (!open) return null;
+  return <>{children}</>;
 };
 
 export const Trigger = ({ children, asChild, ...props }: any) => {
@@ -21,7 +21,7 @@ export const Portal = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-export const Overlay = ({ className, forceMount, ...props }: any) => {
+export const Overlay = ({ className, ...props }: any) => {
   // forceMount is a Radix UI prop we can ignore in tests
   return <div className={className} data-testid="dialog-overlay" {...props} />;
 };
@@ -38,6 +38,10 @@ export const Content = React.forwardRef<HTMLDivElement, any>(
     },
     ref,
   ) => {
+    // These props are intentionally ignored in the mock
+    void onPointerDownOutside;
+    void onInteractOutside;
+
     React.useEffect(() => {
       const handleEscape = (e: KeyboardEvent) => {
         if (e.key === "Escape" && onEscapeKeyDown) {

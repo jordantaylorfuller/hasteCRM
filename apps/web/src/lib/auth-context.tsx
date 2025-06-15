@@ -31,8 +31,8 @@ interface AuthContextType {
   user: User | null;
   workspace: Workspace | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (data: RegisterData) => Promise<void>;
+  login: (_email: string, _password: string) => Promise<void>;
+  register: (_data: RegisterData) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }

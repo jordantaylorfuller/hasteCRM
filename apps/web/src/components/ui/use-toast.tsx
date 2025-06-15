@@ -92,7 +92,7 @@ export const reducer = (state: State, action: Action): State => {
   }
 };
 
-const listeners: Array<(state: State) => void> = [];
+const listeners: Array<(_state: State) => void> = [];
 
 let memoryState: State = { toasts: [] };
 
@@ -121,9 +121,10 @@ type Action =
       toastId?: ToasterToast["id"];
     };
 
-interface ToasterProps {
-  toasts: ToasterToast[];
-}
+// ToasterProps interface is defined but not used - keeping for potential future use
+// interface ToasterProps {
+//   toasts: ToasterToast[];
+// }
 
 let count = 0;
 

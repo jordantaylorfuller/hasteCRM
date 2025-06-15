@@ -1,16 +1,16 @@
 export enum ContactStatus {
-  ACTIVE = "ACTIVE",
-  INACTIVE = "INACTIVE",
-  ARCHIVED = "ARCHIVED",
+  ACTIVE = "ACTIVE", // eslint-disable-line no-unused-vars
+  INACTIVE = "INACTIVE", // eslint-disable-line no-unused-vars
+  ARCHIVED = "ARCHIVED", // eslint-disable-line no-unused-vars
 }
 
 export enum ContactSource {
-  MANUAL = "MANUAL",
-  IMPORT = "IMPORT",
-  API = "API",
-  GMAIL = "GMAIL",
-  WEBHOOK = "WEBHOOK",
-  ENRICHMENT = "ENRICHMENT",
+  MANUAL = "MANUAL", // eslint-disable-line no-unused-vars
+  IMPORT = "IMPORT", // eslint-disable-line no-unused-vars
+  API = "API", // eslint-disable-line no-unused-vars
+  GMAIL = "GMAIL", // eslint-disable-line no-unused-vars
+  WEBHOOK = "WEBHOOK", // eslint-disable-line no-unused-vars
+  ENRICHMENT = "ENRICHMENT", // eslint-disable-line no-unused-vars
 }
 
 export interface Contact {

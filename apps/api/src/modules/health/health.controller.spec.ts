@@ -10,11 +10,11 @@ import { RedisHealthIndicator } from "./indicators/redis.health";
 
 describe("HealthController", () => {
   let controller: HealthController;
-  let healthCheckService: HealthCheckService;
-  let memoryHealthIndicator: MemoryHealthIndicator;
-  let diskHealthIndicator: DiskHealthIndicator;
-  let prismaHealthIndicator: PrismaHealthIndicator;
-  let redisHealthIndicator: RedisHealthIndicator;
+  let _healthCheckService: HealthCheckService;
+  let _memoryHealthIndicator: MemoryHealthIndicator;
+  let _diskHealthIndicator: DiskHealthIndicator;
+  let _prismaHealthIndicator: PrismaHealthIndicator;
+  let _redisHealthIndicator: RedisHealthIndicator;
 
   const mockHealthCheckService = {
     check: jest.fn(),
@@ -66,15 +66,15 @@ describe("HealthController", () => {
     }).compile();
 
     controller = module.get<HealthController>(HealthController);
-    healthCheckService = module.get<HealthCheckService>(HealthCheckService);
-    memoryHealthIndicator = module.get<MemoryHealthIndicator>(
+    _healthCheckService = module.get<HealthCheckService>(HealthCheckService);
+    _memoryHealthIndicator = module.get<MemoryHealthIndicator>(
       MemoryHealthIndicator,
     );
-    diskHealthIndicator = module.get<DiskHealthIndicator>(DiskHealthIndicator);
-    prismaHealthIndicator = module.get<PrismaHealthIndicator>(
+    _diskHealthIndicator = module.get<DiskHealthIndicator>(DiskHealthIndicator);
+    _prismaHealthIndicator = module.get<PrismaHealthIndicator>(
       PrismaHealthIndicator,
     );
-    redisHealthIndicator =
+    _redisHealthIndicator =
       module.get<RedisHealthIndicator>(RedisHealthIndicator);
   });
 

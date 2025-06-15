@@ -4,19 +4,23 @@ import userEvent from "@testing-library/user-event";
 import { Button, buttonVariants } from "./button";
 
 // Mock the Slot component from Radix UI
-jest.mock("@radix-ui/react-slot", () => ({
-  Slot: React.forwardRef<HTMLElement, any>(({ children, ...props }, ref) => {
-    // Clone the child element with the props
-    if (React.isValidElement(children)) {
-      return React.cloneElement(children, { ...props, ref });
-    }
-    return (
-      <div {...props} ref={ref}>
-        {children}
-      </div>
-    );
-  }),
-}));
+jest.mock("@radix-ui/react-slot", () => {
+  const Slot = React.forwardRef<HTMLElement, any>(
+    ({ children, ...props }, ref) => {
+      // Clone the child element with the props
+      if (React.isValidElement(children)) {
+        return React.cloneElement(children, { ...props, ref });
+      }
+      return (
+        <div {...props} ref={ref}>
+          {children}
+        </div>
+      );
+    },
+  );
+  Slot.displayName = "Slot";
+  return { Slot };
+});
 
 describe("Button", () => {
   it("renders button with default variant", () => {

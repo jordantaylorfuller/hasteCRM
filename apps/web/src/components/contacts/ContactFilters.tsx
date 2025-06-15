@@ -23,7 +23,7 @@ import { Badge } from "@/components/ui/badge";
 
 interface ContactFiltersProps {
   filters: ContactFiltersInput;
-  onChange: (filters: ContactFiltersInput) => void;
+  onChange: (_newFilters: ContactFiltersInput) => void;
 }
 
 export function ContactFilters({ filters, onChange }: ContactFiltersProps) {

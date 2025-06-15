@@ -1,8 +1,8 @@
 import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { PipelineBoard } from "./PipelineBoard";
 import { useMutation } from "@apollo/client";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation"; // eslint-disable-line no-unused-vars
 import { toast } from "@/components/ui/use-toast";
 
 // Mock dependencies
@@ -25,13 +25,18 @@ jest.mock("@dnd-kit/core", () => ({
   useSensor: jest.fn(),
   useSensors: jest.fn(() => []),
   DragStartEvent: class DragStartEvent {
-    constructor(public active: { id: string }) {}
+    active: { id: string };
+    constructor(active: { id: string }) {
+      this.active = active;
+    }
   },
   DragEndEvent: class DragEndEvent {
-    constructor(
-      public active: { id: string },
-      public over: { id: string } | null,
-    ) {}
+    active: { id: string };
+    over: { id: string } | null;
+    constructor(active: { id: string }, over: { id: string } | null) {
+      this.active = active;
+      this.over = over;
+    }
   },
 }));
 

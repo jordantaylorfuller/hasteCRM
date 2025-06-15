@@ -6,6 +6,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { formatDistanceToNow } from "date-fns";
+import Image from "next/image";
 import {
   Building2,
   Calendar,
@@ -153,7 +154,13 @@ export function DealCard({ deal, isDragging }: DealCardProps) {
           <div className="flex items-center gap-2 pt-2 border-t">
             <Avatar className="h-6 w-6">
               {deal.owner.avatarUrl ? (
-                <img src={deal.owner.avatarUrl} alt={deal.owner.firstName} />
+                <Image
+                  src={deal.owner.avatarUrl}
+                  alt={deal.owner.firstName}
+                  width={24}
+                  height={24}
+                  className="w-full h-full object-cover"
+                />
               ) : (
                 <div className="bg-primary text-primary-foreground text-xs flex items-center justify-center w-full h-full">
                   {deal.owner.firstName[0]}

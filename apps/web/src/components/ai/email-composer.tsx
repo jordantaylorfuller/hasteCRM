@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useMutation } from "@apollo/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,7 +18,7 @@ import { GENERATE_SMART_COMPOSE } from "@/graphql/mutations/ai";
 
 interface SmartComposeProps {
   emailId?: string;
-  onCompose: (content: string) => void;
+  onCompose: (_composedContent: string) => void;
   defaultTo?: string;
   defaultSubject?: string;
 }
@@ -29,6 +29,9 @@ export function SmartEmailComposer({
   defaultTo,
   defaultSubject,
 }: SmartComposeProps) {
+  // Default values are defined for future use
+  void defaultTo;
+  void defaultSubject;
   const [prompt, setPrompt] = useState("");
   const [tone, setTone] = useState("professional");
   const [length, setLength] = useState("medium");

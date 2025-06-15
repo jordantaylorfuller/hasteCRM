@@ -412,6 +412,40 @@ describe("AiService", () => {
         service.generateSmartCompose("non-existent-email", "test"),
       ).rejects.toThrow("Email not found");
     });
+
+    it("should handle AI API errors in generateSmartCompose", async () => {
+      mockConfigService.get.mockImplementation(
+        (key: string, defaultValue?: any) => {
+          if (key === "USE_MOCK_AI") return false;
+          if (key === "ANTHROPIC_API_KEY") return "test-key";
+          return defaultValue;
+        },
+      );
+
+      const loggerSpy = jest
+        .spyOn(Logger.prototype, "error")
+        .mockImplementation();
+      mockAnthropicClient.messages.create.mockRejectedValue(
+        new Error("API Error"),
+      );
+
+      const newService = new AiService(
+        configService,
+        emailService,
+        contactsService,
+        prismaService,
+      );
+
+      await expect(
+        newService.generateSmartCompose(mockEmailId, "test"),
+      ).rejects.toThrow("API Error");
+
+      expect(loggerSpy).toHaveBeenCalledWith(
+        "Failed to generate smart compose",
+        expect.any(Error),
+      );
+      loggerSpy.mockRestore();
+    });
   });
 
   describe("generateInsights", () => {
@@ -516,6 +550,43 @@ describe("AiService", () => {
       });
       expect(Array.isArray(result.topContacts)).toBe(true);
       expect(Array.isArray(result.suggestions)).toBe(true);
+    });
+
+    it("should handle AI API errors in generateInsights", async () => {
+      mockConfigService.get.mockImplementation(
+        (key: string, defaultValue?: any) => {
+          if (key === "USE_MOCK_AI") return false;
+          if (key === "ANTHROPIC_API_KEY") return "test-key";
+          return defaultValue;
+        },
+      );
+
+      mockPrismaService.email.groupBy.mockResolvedValue([]);
+      mockPrismaService.contact.findMany.mockResolvedValue([]);
+
+      const loggerSpy = jest
+        .spyOn(Logger.prototype, "error")
+        .mockImplementation();
+      mockAnthropicClient.messages.create.mockRejectedValue(
+        new Error("API Error"),
+      );
+
+      const newService = new AiService(
+        configService,
+        emailService,
+        contactsService,
+        prismaService,
+      );
+
+      await expect(
+        newService.generateInsights(mockWorkspaceId, timeRange),
+      ).rejects.toThrow("API Error");
+
+      expect(loggerSpy).toHaveBeenCalledWith(
+        "Failed to generate insights",
+        expect.any(Error),
+      );
+      loggerSpy.mockRestore();
     });
   });
 

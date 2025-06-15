@@ -1,17 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import {
-  X,
-  Send,
-  Paperclip,
-  Image,
-  Link,
-  Bold,
-  Italic,
-  List,
-} from "lucide-react";
-import { Card } from "@/components/ui/card";
+import React, { useState, useRef, useEffect } from "react";
+import { X, Send, Paperclip, Bold, Italic, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -22,22 +12,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 import { Email } from "@/types/email";
 
 interface EmailComposerProps {
   isOpen: boolean;
   onClose: () => void;
-  onSend: (email: {
+  onSend: (_emailData: {
     to: string[];
     cc?: string[];
     bcc?: string[];

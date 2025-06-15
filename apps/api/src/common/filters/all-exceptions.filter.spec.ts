@@ -1,5 +1,10 @@
 import { Test } from "@nestjs/testing";
-import { ArgumentsHost, HttpException, HttpStatus } from "@nestjs/common";
+import {
+  ArgumentsHost,
+  HttpException,
+  HttpStatus,
+  Logger,
+} from "@nestjs/common";
 import { AllExceptionsFilter } from "./all-exceptions.filter";
 import { GraphQLError } from "graphql";
 import { GqlArgumentsHost } from "@nestjs/graphql";
@@ -21,6 +26,10 @@ describe("AllExceptionsFilter", () => {
   let mockContext: any;
 
   beforeEach(async () => {
+    // Mock the logger to prevent console output during tests
+    jest.spyOn(Logger.prototype, "error").mockImplementation();
+    jest.spyOn(Logger.prototype, "warn").mockImplementation();
+
     const module = await Test.createTestingModule({
       providers: [AllExceptionsFilter],
     }).compile();
@@ -76,6 +85,7 @@ describe("AllExceptionsFilter", () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+    jest.restoreAllMocks();
   });
 
   describe("HTTP Exceptions", () => {
@@ -134,6 +144,12 @@ describe("AllExceptionsFilter", () => {
           message: "Something went wrong",
           path: "/api/test",
           requestId: "req-123",
+          timestamp: expect.any(String),
+        }),
+      );
+      expect(mockResponse.json).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          error: expect.any(String),
         }),
       );
     });
@@ -168,6 +184,32 @@ describe("AllExceptionsFilter", () => {
           statusCode: HttpStatus.NOT_FOUND,
           message: "Record not found",
           error: "Record not found",
+        }),
+      );
+    });
+
+    it("should handle unknown Prisma error codes", () => {
+      const exception: any = new Error("Unknown database error");
+      exception.name = "PrismaClientKnownRequestError";
+      exception.code = "P1001"; // Unknown error code
+
+      filter.catch(exception, mockArgumentsHost);
+
+      expect(mockResponse.status).toHaveBeenCalledWith(
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+      expect(mockResponse.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: "Unknown database error",
+          timestamp: expect.any(String),
+          path: "/api/test",
+          requestId: "req-123",
+        }),
+      );
+      expect(mockResponse.json).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          error: expect.any(String),
         }),
       );
     });
@@ -275,12 +317,9 @@ describe("AllExceptionsFilter", () => {
     it("should handle generic errors in GraphQL context", () => {
       const exception = new Error("GraphQL generic error");
 
-      expect(() => filter.catch(exception, mockArgumentsHost)).toThrow(
-        GraphQLError,
-      );
-
       try {
         filter.catch(exception, mockArgumentsHost);
+        fail("Expected GraphQLError to be thrown");
       } catch (error) {
         expect(error).toBeInstanceOf(GraphQLError);
         expect((error as GraphQLError).message).toBe("GraphQL generic error");

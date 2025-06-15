@@ -16,7 +16,7 @@ jest.mock("bcrypt", () => ({
 
 describe("AuthService - Missing Coverage", () => {
   let service: AuthService;
-  let prismaService: PrismaService;
+  let _prismaService: PrismaService;
 
   const mockPrismaService = {
     user: {
@@ -56,7 +56,7 @@ describe("AuthService - Missing Coverage", () => {
     }).compile();
 
     service = module.get<AuthService>(AuthService);
-    prismaService = module.get<PrismaService>(PrismaService);
+    _prismaService = module.get<PrismaService>(PrismaService);
 
     jest.clearAllMocks();
   });

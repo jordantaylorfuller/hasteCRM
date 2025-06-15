@@ -436,7 +436,9 @@ describe("ContactExportService", () => {
 
       (XLSX.utils.book_new as jest.Mock).mockReturnValue(mockWorkbook);
       (XLSX.utils.json_to_sheet as jest.Mock).mockReturnValue(mockWorksheet);
-      (XLSX.utils.book_append_sheet as jest.Mock).mockImplementation(() => {});
+      (XLSX.utils.book_append_sheet as jest.Mock).mockImplementation(
+        () => undefined,
+      );
       (XLSX.write as jest.Mock).mockReturnValue(mockBuffer);
 
       const result = await exportService.exportContacts(

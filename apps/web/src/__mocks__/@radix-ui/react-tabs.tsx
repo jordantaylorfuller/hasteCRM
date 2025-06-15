@@ -2,7 +2,7 @@ import React, { useState, useContext, createContext } from "react";
 
 interface TabsContextValue {
   value: string;
-  onValueChange: (value: string) => void;
+  onValueChange: (_newValue: string) => void;
   orientation?: "horizontal" | "vertical";
   dir?: "ltr" | "rtl";
 }
@@ -14,7 +14,7 @@ export const Root = React.forwardRef<
   {
     defaultValue?: string;
     value?: string;
-    onValueChange?: (value: string) => void;
+    onValueChange?: (_newValue: string) => void;
     orientation?: "horizontal" | "vertical";
     dir?: "ltr" | "rtl";
     children: React.ReactNode;

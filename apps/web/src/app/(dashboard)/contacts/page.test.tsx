@@ -23,13 +23,17 @@ jest.mock("@/components/contacts/ContactList", () => ({
 }));
 
 jest.mock("@/components/contacts/ContactFilters", () => ({
-  ContactFilters: ({ filters, onChange }: any) => (
-    <div data-testid="contact-filters">
-      <button onClick={() => onChange({ status: "ACTIVE" })}>
-        Filter Active
-      </button>
-    </div>
-  ),
+  ContactFilters: ({ filters, onChange }: any) => {
+    // filters is intentionally not used in this mock
+    void filters;
+    return (
+      <div data-testid="contact-filters">
+        <button onClick={() => onChange({ status: "ACTIVE" })}>
+          Filter Active
+        </button>
+      </div>
+    );
+  },
 }));
 
 jest.mock("@/components/ui/button", () => ({

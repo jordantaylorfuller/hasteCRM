@@ -2,7 +2,7 @@ import React, { useState, useContext, createContext } from "react";
 
 interface DropdownMenuContextValue {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onOpenChange: (_value: boolean) => void;
 }
 
 const DropdownMenuContext = createContext<DropdownMenuContextValue | null>(
@@ -16,7 +16,7 @@ export const Root = ({
   children,
 }: {
   open?: boolean;
-  onOpenChange?: (open: boolean) => void;
+  onOpenChange?: (_value: boolean) => void;
   defaultOpen?: boolean;
   children: React.ReactNode;
 }) => {
@@ -44,7 +44,7 @@ export const Trigger = React.forwardRef<
   {
     children: React.ReactNode;
     asChild?: boolean;
-    onClick?: (e: React.MouseEvent) => void;
+    onClick?: (_event: React.MouseEvent) => void;
     [key: string]: any;
   }
 >(({ children, asChild, onClick, ...props }, ref) => {
@@ -100,8 +100,8 @@ export const Content = React.forwardRef<
     className?: string;
     sideOffset?: number;
     align?: "start" | "center" | "end";
-    onEscapeKeyDown?: (e: KeyboardEvent) => void;
-    onPointerDownOutside?: (e: PointerEvent) => void;
+    onEscapeKeyDown?: (_event: KeyboardEvent) => void;
+    onPointerDownOutside?: (_event: PointerEvent) => void;
     [key: string]: any;
   }
 >(
@@ -112,12 +112,17 @@ export const Content = React.forwardRef<
       sideOffset = 4,
       align = "center",
       onEscapeKeyDown,
+      onPointerDownOutside,
       ...props
     },
     ref,
   ) => {
     const context = useContext(DropdownMenuContext);
     const contentRef = React.useRef<HTMLDivElement>(null);
+
+    // onPointerDownOutside and sideOffset are intentionally ignored in this mock
+    void onPointerDownOutside;
+    void sideOffset;
 
     React.useImperativeHandle(ref, () => contentRef.current!);
 
@@ -162,7 +167,7 @@ export const Content = React.forwardRef<
 
       document.addEventListener("keydown", handleKeyDown);
       return () => document.removeEventListener("keydown", handleKeyDown);
-    }, [context?.open, onEscapeKeyDown]);
+    }, [context?.open, context, onEscapeKeyDown]);
 
     if (!context?.open) return null;
 
@@ -195,74 +200,69 @@ export const Item = React.forwardRef<
     children: React.ReactNode;
     className?: string;
     disabled?: boolean;
-    onSelect?: (e: Event) => void;
-    onClick?: (e: React.MouseEvent) => void;
+    onSelect?: (_event: Event) => void;
+    onClick?: (_event: React.MouseEvent) => void;
     textValue?: string;
     [key: string]: any;
   }
->(
-  (
-    { children, className, disabled, onSelect, onClick, textValue, ...props },
-    ref,
-  ) => {
-    const context = useContext(DropdownMenuContext);
+>(({ children, className, disabled, onSelect, onClick, ...props }, ref) => {
+  const context = useContext(DropdownMenuContext);
 
-    const handleClick = (e: React.MouseEvent) => {
-      if (disabled) {
-        e.preventDefault();
-        return;
-      }
+  const handleClick = (e: React.MouseEvent) => {
+    if (disabled) {
+      e.preventDefault();
+      return;
+    }
 
-      // Call onClick if provided
-      onClick?.(e);
+    // Call onClick if provided
+    onClick?.(e);
 
-      const selectEvent = e as any;
-      let defaultPrevented = false;
-      selectEvent.preventDefault = () => {
-        defaultPrevented = true;
-      };
-      selectEvent.defaultPrevented = false;
-      Object.defineProperty(selectEvent, "defaultPrevented", {
-        get: () => defaultPrevented,
-      });
-
-      onSelect?.(selectEvent);
-
-      // Only close menu if default wasn't prevented
-      if (!defaultPrevented) {
-        context?.onOpenChange(false);
-      }
+    const selectEvent = e as any;
+    let defaultPrevented = false;
+    selectEvent.preventDefault = () => {
+      defaultPrevented = true;
     };
+    selectEvent.defaultPrevented = false;
+    Object.defineProperty(selectEvent, "defaultPrevented", {
+      get: () => defaultPrevented,
+    });
 
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        handleClick(e as any);
-      }
-    };
+    onSelect?.(selectEvent);
 
-    // Apply disabled styles directly since the component uses data attribute selectors
-    const finalClassName = disabled
-      ? `${className || ""} pointer-events-none opacity-50`.trim()
-      : className;
+    // Only close menu if default wasn't prevented
+    if (!defaultPrevented) {
+      context?.onOpenChange(false);
+    }
+  };
 
-    return (
-      <div
-        ref={ref}
-        role="menuitem"
-        className={finalClassName}
-        aria-disabled={disabled}
-        data-disabled={disabled ? "" : undefined}
-        onClick={handleClick}
-        onKeyDown={handleKeyDown}
-        tabIndex={disabled ? -1 : 0}
-        {...props}
-      >
-        {children}
-      </div>
-    );
-  },
-);
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleClick(e as any);
+    }
+  };
+
+  // Apply disabled styles directly since the component uses data attribute selectors
+  const finalClassName = disabled
+    ? `${className || ""} pointer-events-none opacity-50`.trim()
+    : className;
+
+  return (
+    <div
+      ref={ref}
+      role="menuitem"
+      className={finalClassName}
+      aria-disabled={disabled}
+      data-disabled={disabled ? "" : undefined}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
+      tabIndex={disabled ? -1 : 0}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+});
 Item.displayName = "DropdownMenu.Item";
 
 // Create a context for checkbox items to share their checked state
@@ -273,7 +273,7 @@ export const CheckboxItem = React.forwardRef<
   {
     children: React.ReactNode;
     checked?: boolean;
-    onCheckedChange?: (checked: boolean) => void;
+    onCheckedChange?: (_value: boolean) => void;
     className?: string;
     disabled?: boolean;
     [key: string]: any;
@@ -314,7 +314,7 @@ export const RadioGroup = ({
 }: {
   children: React.ReactNode;
   value?: string;
-  onValueChange?: (value: string) => void;
+  onValueChange?: (_newValue: string) => void;
 }) => {
   return (
     <div role="group">
@@ -356,7 +356,8 @@ export const RadioItem = React.forwardRef<
     { children, value, className, disabled, checked, onSelect, ...props },
     ref,
   ) => {
-    const context = useContext(DropdownMenuContext);
+    // Context and value are not needed in this mock implementation
+    void value;
 
     const handleSelect = (e: Event) => {
       e.preventDefault(); // Prevent menu from closing
@@ -440,18 +441,19 @@ export const Group = ({ children }: { children: React.ReactNode }) => {
 
 export const Sub = ({
   children,
-  open,
+  open: controlledOpen,
   onOpenChange,
 }: {
   children: React.ReactNode;
   open?: boolean;
-  onOpenChange?: (open: boolean) => void;
+  onOpenChange?: (_value: boolean) => void;
 }) => {
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
-  const isOpen = open !== undefined ? open : uncontrolledOpen;
+  const isOpen =
+    controlledOpen !== undefined ? controlledOpen : uncontrolledOpen;
 
   const handleOpenChange = (newOpen: boolean) => {
-    if (open === undefined) {
+    if (controlledOpen === undefined) {
       setUncontrolledOpen(newOpen);
     }
     onOpenChange?.(newOpen);

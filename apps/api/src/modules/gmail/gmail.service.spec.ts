@@ -2,7 +2,7 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { GmailService } from "./gmail.service";
 import { PrismaService } from "../prisma/prisma.service";
 import { google } from "googleapis";
-import { OAuth2Client } from "google-auth-library";
+import { OAuth2Client } from "google-auth-library"; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 // Mock googleapis
 jest.mock("googleapis");

@@ -46,7 +46,8 @@ describe("Common Utils", () => {
         const result = await hashPassword(password);
 
         expect(result).toBe("hashed_password");
-        expect(require("bcrypt").hash).toHaveBeenCalledWith(password, 10);
+        const bcrypt = jest.requireMock("bcrypt");
+        expect(bcrypt.hash).toHaveBeenCalledWith(password, 10);
       });
 
       it("should handle empty password", async () => {
@@ -62,11 +63,13 @@ describe("Common Utils", () => {
         const result = await comparePassword(password, hash);
 
         expect(result).toBe(true);
-        expect(require("bcrypt").compare).toHaveBeenCalledWith(password, hash);
+        const bcrypt = jest.requireMock("bcrypt");
+        expect(bcrypt.compare).toHaveBeenCalledWith(password, hash);
       });
 
       it("should return false for incorrect password", async () => {
-        require("bcrypt").compare = jest.fn().mockResolvedValue(false);
+        const bcrypt = jest.requireMock("bcrypt");
+        bcrypt.compare = jest.fn().mockResolvedValue(false);
 
         const result = await comparePassword("wrongPassword", "hash");
 
@@ -79,14 +82,16 @@ describe("Common Utils", () => {
         const result = generateRandomToken();
 
         expect(result).toBe("random_token_123");
-        expect(require("crypto").randomBytes).toHaveBeenCalledWith(32);
+        const crypto = jest.requireMock("crypto");
+        expect(crypto.randomBytes).toHaveBeenCalledWith(32);
       });
 
       it("should generate token with custom length", () => {
         const result = generateRandomToken(16);
 
         expect(result).toBe("random_token_123");
-        expect(require("crypto").randomBytes).toHaveBeenCalledWith(16);
+        const crypto = jest.requireMock("crypto");
+        expect(crypto.randomBytes).toHaveBeenCalledWith(16);
       });
     });
   });

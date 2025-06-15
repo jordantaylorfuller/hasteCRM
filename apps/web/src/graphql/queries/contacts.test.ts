@@ -309,14 +309,15 @@ describe("Contact Queries", () => {
     });
 
     it("GET_CONTACTS should work with optional variables", () => {
-      const variables = {
-        filters: {
-          status: "active",
-          source: "manual",
-        },
-        skip: 0,
-        take: 20,
-      };
+      // Example variables structure for reference
+      // const variables = {
+      //   filters: {
+      //     status: "active",
+      //     source: "manual",
+      //   },
+      //   skip: 0,
+      //   take: 20,
+      // };
 
       // This test ensures the query can be used with Apollo Client
       expect(() => {
@@ -335,9 +336,10 @@ describe("Contact Queries", () => {
     });
 
     it("GET_CONTACT should require id variable", () => {
-      const variables = {
-        id: "test-contact-id",
-      };
+      // Example variables structure for reference
+      // const variables = {
+      //   id: "test-contact-id",
+      // };
 
       // This test ensures the query can be used with Apollo Client
       expect(() => {
@@ -353,12 +355,13 @@ describe("Contact Queries", () => {
     });
 
     it("SEARCH_CONTACTS should require query variable but others optional", () => {
-      const variables = {
-        query: "john doe",
-        filters: { status: "active" },
-        skip: 0,
-        take: 10,
-      };
+      // Example variables structure for reference
+      // const variables = {
+      //   query: "john doe",
+      //   filters: { status: "active" },
+      //   skip: 0,
+      //   take: 10,
+      // };
 
       // This test ensures the query can be used with Apollo Client
       expect(() => {

@@ -174,12 +174,7 @@ describe("CompaniesResolver", () => {
 
       mockCompaniesService.findAll.mockResolvedValue(mockResponse);
 
-      const result = await resolver.findAll(
-        undefined,
-        undefined,
-        undefined,
-        mockContext,
-      );
+      await resolver.findAll(undefined, undefined, undefined, mockContext);
 
       expect(companiesService.findAll).toHaveBeenCalledWith(
         "workspace-123",

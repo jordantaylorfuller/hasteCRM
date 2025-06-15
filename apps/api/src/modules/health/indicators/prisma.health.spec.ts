@@ -5,7 +5,7 @@ import { PrismaService } from "@/modules/prisma/prisma.service";
 
 describe("PrismaHealthIndicator", () => {
   let indicator: PrismaHealthIndicator;
-  let prismaService: PrismaService;
+  let _prismaService: PrismaService;
 
   const mockPrismaService = {
     $queryRaw: jest.fn(),
@@ -23,7 +23,7 @@ describe("PrismaHealthIndicator", () => {
     }).compile();
 
     indicator = module.get<PrismaHealthIndicator>(PrismaHealthIndicator);
-    prismaService = module.get<PrismaService>(PrismaService);
+    _prismaService = module.get<PrismaService>(PrismaService);
   });
 
   afterEach(() => {
@@ -32,7 +32,7 @@ describe("PrismaHealthIndicator", () => {
 
   describe("isHealthy", () => {
     it("should return healthy status when database is accessible", async () => {
-      const startTime = Date.now();
+      const _startTime = Date.now();
       mockPrismaService.$queryRaw
         .mockResolvedValueOnce([{ 1: 1 }]) // SELECT 1
         .mockResolvedValueOnce([{ version: "PostgreSQL 14.5" }]) // version query

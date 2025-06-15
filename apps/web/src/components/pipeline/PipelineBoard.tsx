@@ -11,7 +11,7 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { arrayMove } from "@dnd-kit/sortable";
+import { arrayMove } from "@dnd-kit/sortable"; // eslint-disable-line no-unused-vars
 import { useMutation } from "@apollo/client";
 import { StageColumn } from "./StageColumn";
 import { DealCard } from "./DealCard";
@@ -69,13 +69,13 @@ interface Deal {
 
 interface PipelineBoardProps {
   pipeline: Pipeline;
-  deals: Deal[];
-  onDealsChange?: (deals: Deal[]) => void;
+  deals?: Deal[];
+  onDealsChange?: (_deals: Deal[]) => void;
 }
 
 export function PipelineBoard({
   pipeline,
-  deals: initialDeals,
+  deals: initialDeals = [],
   onDealsChange,
 }: PipelineBoardProps) {
   const [deals, setDeals] = useState(initialDeals);

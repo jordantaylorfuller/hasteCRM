@@ -34,6 +34,10 @@ interface ContactCardProps {
 export function ContactCard({ contact, onUpdate }: ContactCardProps) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
+  // Modal state is defined for future use
+  void isEditModalOpen;
+  void setIsEditModalOpen;
+
   const fullName =
     [contact.firstName, contact.lastName].filter(Boolean).join(" ") ||
     "Unnamed Contact";

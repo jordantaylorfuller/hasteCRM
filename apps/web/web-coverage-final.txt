@@ -1,0 +1,3 @@
+ ERROR  Unknown option: 'coverage'
+Did you mean 'reverse'? Use "--config.unknown=value" to force an unknown option.
+For help, run: pnpm help test

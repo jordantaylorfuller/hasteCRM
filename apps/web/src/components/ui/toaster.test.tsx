@@ -1,7 +1,7 @@
 import React from "react";
-import { render, screen, act } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { Toaster } from "./toaster";
-import { toast } from "./use-toast";
+import { toast } from "./use-toast"; // eslint-disable-line no-unused-vars
 
 // Mock the use-toast hook
 jest.mock("./use-toast", () => ({

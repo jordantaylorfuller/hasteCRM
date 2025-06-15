@@ -5,8 +5,8 @@ import { JwtService } from "@nestjs/jwt";
 import { EmailService } from "../email/email.service";
 import { TwoFactorService } from "./two-factor.service";
 import { SessionService } from "./session.service";
-import * as bcrypt from "bcrypt";
-import * as crypto from "crypto";
+import * as bcrypt from "bcrypt"; // eslint-disable-line @typescript-eslint/no-unused-vars
+import * as crypto from "crypto"; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 // Mock bcrypt
 jest.mock("bcrypt", () => ({
@@ -14,15 +14,15 @@ jest.mock("bcrypt", () => ({
 }));
 
 // Create a local mock for crypto
-const mockCrypto = {
+const _mockCrypto = {
   randomBytes: jest.fn().mockReturnValue(Buffer.from("verification_token_123")),
 };
 
 describe("AuthService - OAuth", () => {
   let service: AuthService;
-  let prismaService: PrismaService;
-  let jwtService: JwtService;
-  let emailService: EmailService;
+  let _prismaService: PrismaService;
+  let _jwtService: JwtService;
+  let _emailService: EmailService;
 
   const mockPrismaService = {
     user: {
@@ -85,9 +85,9 @@ describe("AuthService - OAuth", () => {
     }).compile();
 
     service = module.get<AuthService>(AuthService);
-    prismaService = module.get<PrismaService>(PrismaService);
-    jwtService = module.get<JwtService>(JwtService);
-    emailService = module.get<EmailService>(EmailService);
+    _prismaService = module.get<PrismaService>(PrismaService);
+    _jwtService = module.get<JwtService>(JwtService);
+    _emailService = module.get<EmailService>(EmailService);
 
     // Reset all mocks
     jest.clearAllMocks();
@@ -195,13 +195,15 @@ describe("AuthService - OAuth", () => {
       // Mock the findUnique call after transaction
       const userWithWorkspaces = {
         ...newUser,
-        workspaces: [{
-          workspaceId: newWorkspace.id,
-          userId: newUser.id,
-          role: "ADMIN",
-          isDefault: true,
-          workspace: newWorkspace,
-        }],
+        workspaces: [
+          {
+            workspaceId: newWorkspace.id,
+            userId: newUser.id,
+            role: "ADMIN",
+            isDefault: true,
+            workspace: newWorkspace,
+          },
+        ],
       };
       mockPrismaService.user.findUnique
         .mockResolvedValueOnce(null) // First call - user doesn't exist
@@ -315,13 +317,15 @@ describe("AuthService - OAuth", () => {
       // Mock the findUnique calls
       const userWithWorkspaces = {
         ...newUser,
-        workspaces: [{
-          workspaceId: newWorkspace.id,
-          userId: newUser.id,
-          role: "ADMIN",
-          isDefault: true,
-          workspace: newWorkspace,
-        }],
+        workspaces: [
+          {
+            workspaceId: newWorkspace.id,
+            userId: newUser.id,
+            role: "ADMIN",
+            isDefault: true,
+            workspace: newWorkspace,
+          },
+        ],
       };
       mockPrismaService.user.findUnique
         .mockResolvedValueOnce(null) // First call - user doesn't exist
@@ -368,8 +372,9 @@ describe("AuthService - OAuth", () => {
       mockPrismaService.user.findUnique.mockResolvedValue(unverifiedUser);
       mockPrismaService.token.deleteMany.mockResolvedValue({ count: 1 });
       // The actual token will be a hex string
-      const expectedToken = Buffer.from("verification_token_123").toString("hex");
-      
+      const expectedToken = Buffer.from("verification_token_123").toString(
+        "hex",
+      );
       mockPrismaService.token.create.mockResolvedValue({
         id: "token-123",
         userId: unverifiedUser.id,

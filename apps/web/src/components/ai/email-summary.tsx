@@ -18,6 +18,10 @@ export function EmailSummary({ emailId, isThread = false }: EmailSummaryProps) {
   const [includeActionItems, setIncludeActionItems] = useState(true);
   const [includeKeyPoints, setIncludeKeyPoints] = useState(true);
 
+  // Settings are defined for future UI controls
+  void setIncludeActionItems;
+  void setIncludeKeyPoints;
+
   const { data, loading, error, refetch } = useQuery(SUMMARIZE_EMAIL, {
     variables: {
       input: {

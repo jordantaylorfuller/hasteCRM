@@ -6,7 +6,7 @@ import { PipelineType } from "../prisma/prisma-client";
 
 describe("PipelinesService", () => {
   let service: PipelinesService;
-  let prisma: PrismaService;
+  let _prisma: PrismaService;
 
   const mockPrismaService = {
     pipeline: {
@@ -46,7 +46,7 @@ describe("PipelinesService", () => {
     }).compile();
 
     service = module.get<PipelinesService>(PipelinesService);
-    prisma = module.get<PrismaService>(PrismaService);
+    _prisma = module.get<PrismaService>(PrismaService);
 
     // Reset all mocks
     Object.values(mockPrismaService).forEach((mock) => {
@@ -930,6 +930,13 @@ describe("PipelinesService", () => {
         workspaceId,
         name: createData.name,
         type: createData.type,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        deletedAt: null,
+        settings: {},
+        isDefault: false,
+        color: "#4F46E5",
+        order: 0,
         stages: [
           { name: "Stage 1", order: 0 },
           { name: "Stage 2", order: 1 },
@@ -967,6 +974,13 @@ describe("PipelinesService", () => {
         workspaceId,
         name: createData.name,
         type: createData.type,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        deletedAt: null,
+        settings: {},
+        isDefault: false,
+        color: "#4F46E5",
+        order: 0,
         stages: createData.stages,
       });
 
@@ -1025,6 +1039,13 @@ describe("PipelinesService", () => {
         workspaceId,
         name: createData.name,
         type: createData.type,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        deletedAt: null,
+        settings: {},
+        isDefault: false,
+        color: "#4F46E5",
+        order: 0,
         stages: [
           { name: "Stage 1", order: 0 },
           { name: "Stage 2", order: 1 },

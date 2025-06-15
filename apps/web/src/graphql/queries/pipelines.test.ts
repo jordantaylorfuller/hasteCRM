@@ -485,14 +485,15 @@ describe("Pipeline Queries", () => {
     });
 
     it("GET_DEALS should work with all optional variables", () => {
-      const variables = {
-        pipelineId: "test-pipeline-id",
-        stageId: "test-stage-id",
-        status: "open",
-        ownerId: "test-owner-id",
-        skip: 0,
-        take: 20,
-      };
+      // Example variables structure for reference
+      // const variables = {
+      //   pipelineId: "test-pipeline-id",
+      //   stageId: "test-stage-id",
+      //   status: "open",
+      //   ownerId: "test-owner-id",
+      //   skip: 0,
+      //   take: 20,
+      // };
 
       // This test ensures the query can be used with Apollo Client
       expect(() => {

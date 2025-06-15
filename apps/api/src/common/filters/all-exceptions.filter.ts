@@ -39,7 +39,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
-    const { status, error } = this.getErrorInfo(exception);
+    const { status } = this.getErrorInfo(exception);
     const errorResponse = this.buildErrorResponse(
       exception,
       status,

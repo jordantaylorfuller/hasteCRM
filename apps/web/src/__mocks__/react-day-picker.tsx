@@ -4,12 +4,12 @@ import { format } from "date-fns";
 export interface DayPickerProps {
   mode?: "single" | "multiple" | "range";
   selected?: Date | Date[] | { from?: Date; to?: Date };
-  onSelect?: (date: any) => void;
+  onSelect?: (_selectedDate: any) => void;
   className?: string;
   classNames?: any;
   showOutsideDays?: boolean;
   numberOfMonths?: number;
-  disabled?: boolean | ((date: Date) => boolean);
+  disabled?: boolean | ((_dateToCheck: Date) => boolean);
   locale?: any;
   fromDate?: Date;
   toDate?: Date;
@@ -33,9 +33,10 @@ export function DayPicker({
   footer,
   ...props
 }: DayPickerProps) {
+  // locale is intentionally not used in this mock
+  void locale;
   const currentDate =
     selected instanceof Date ? selected : new Date(2024, 0, 15);
-  const monthYear = format(currentDate, "MMMM yyyy");
 
   // Generate calendar days for testing
   const days = [];
@@ -239,7 +240,7 @@ export function DayPicker({
                               className={classNames?.cell || ""}
                             >
                               <button
-                                role="button"
+                                role="gridcell"
                                 aria-selected={selected}
                                 aria-label={format(date, "EEEE, MMMM d, yyyy")}
                                 className={dayClassName.trim()}

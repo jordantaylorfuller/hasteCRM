@@ -5,7 +5,7 @@ import { UnauthorizedException } from "@nestjs/common";
 
 describe("RefreshJwtStrategy", () => {
   let strategy: RefreshJwtStrategy;
-  let configService: ConfigService;
+  let _configService: ConfigService;
 
   const mockConfigService = {
     get: jest.fn(),
@@ -23,7 +23,7 @@ describe("RefreshJwtStrategy", () => {
     }).compile();
 
     strategy = module.get<RefreshJwtStrategy>(RefreshJwtStrategy);
-    configService = module.get<ConfigService>(ConfigService);
+    _configService = module.get<ConfigService>(ConfigService);
 
     mockConfigService.get.mockImplementation((key: string) => {
       if (key === "JWT_REFRESH_SECRET") return "test-refresh-secret";

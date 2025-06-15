@@ -27,7 +27,7 @@ export default function PipelinesPage() {
 
   const {
     data: dealsData,
-    loading: dealsLoading,
+    // loading: dealsLoading, // Not currently used but available if needed
     refetch,
   } = useQuery(GET_DEALS, {
     variables: {

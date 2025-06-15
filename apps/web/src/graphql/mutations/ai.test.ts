@@ -1,5 +1,5 @@
 import { GENERATE_SMART_COMPOSE, ENRICH_CONTACT } from "./ai";
-import { DocumentNode } from "graphql";
+import { DocumentNode } from "graphql"; // eslint-disable-line no-unused-vars
 
 describe("AI Mutations", () => {
   describe("GENERATE_SMART_COMPOSE", () => {
@@ -144,15 +144,16 @@ describe("AI Mutations", () => {
 
   describe("Integration with Apollo Client", () => {
     it("GENERATE_SMART_COMPOSE should be compatible with Apollo Client", () => {
-      const variables = {
-        input: {
-          emailId: "test-email-id",
-          prompt: "Test prompt",
-          tone: "professional",
-          length: "medium",
-          includeContext: true,
-        },
-      };
+      // Example variables structure for reference
+      // const variables = {
+      //   input: {
+      //     emailId: "test-email-id",
+      //     prompt: "Test prompt",
+      //     tone: "professional",
+      //     length: "medium",
+      //     includeContext: true,
+      //   },
+      // };
 
       // This test ensures the mutation can be used with Apollo Client
       expect(() => {
@@ -165,9 +166,10 @@ describe("AI Mutations", () => {
     });
 
     it("ENRICH_CONTACT should be compatible with Apollo Client", () => {
-      const variables = {
-        contactId: "test-contact-id",
-      };
+      // Example variables structure for reference
+      // const variables = {
+      //   contactId: "test-contact-id",
+      // };
 
       // This test ensures the mutation can be used with Apollo Client
       expect(() => {

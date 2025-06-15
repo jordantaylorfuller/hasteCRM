@@ -41,6 +41,8 @@ export default function RegisterPage() {
       setError(null);
       setIsLoading(true);
       const { confirmPassword, ...registerData } = data;
+      // confirmPassword is used for validation but not sent to API
+      void confirmPassword;
       await registerUser(registerData as RegisterData);
     } catch (err: any) {
       setError(err);

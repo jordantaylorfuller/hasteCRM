@@ -40,6 +40,7 @@ export const Trigger = React.forwardRef(
       ref={ref}
       className={className}
       role="combobox"
+      aria-controls="listbox"
       aria-expanded="false"
       {...props}
     >
@@ -55,6 +56,7 @@ Trigger.displayName = "SelectTrigger";
 
 export const Icon = ({ children, className, asChild, ...props }: any) => {
   // asChild is a Radix UI prop we ignore in mocks
+  void asChild;
   const { ...cleanProps } = props;
   return (
     <span className={className} {...cleanProps}>
@@ -116,6 +118,7 @@ export const Item = React.forwardRef(
         ref={ref}
         className={className}
         role="option"
+        aria-selected="false"
         onClick={handleClick}
         {...props}
       >

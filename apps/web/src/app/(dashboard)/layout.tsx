@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/lib/auth-context";
 import { useRouter, usePathname } from "next/navigation";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import {
   LayoutDashboard,

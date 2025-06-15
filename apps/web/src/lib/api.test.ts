@@ -280,7 +280,7 @@ describe("API Client", () => {
   describe("Request interceptor error handling", () => {
     it("handles request interceptor errors", async () => {
       // Force an error by making the config invalid
-      const invalidConfig = { headers: null };
+      // Invalid config not used directly in test
 
       // Test error handling in request interceptor
       try {

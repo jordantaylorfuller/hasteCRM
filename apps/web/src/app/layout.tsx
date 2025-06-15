@@ -1,3 +1,4 @@
+import React from "react";
 import { AuthProvider } from "@/lib/auth-context";
 import { ErrorBoundary } from "@/components/error-boundary";
 import "./globals.css";

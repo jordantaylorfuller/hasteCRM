@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery } from "@apollo/client";
 import {
   Card,
@@ -20,6 +20,9 @@ export function AiInsightsDashboard() {
     start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
     end: new Date().toISOString(),
   });
+
+  // Time range setter defined for future UI controls
+  void setTimeRange;
 
   const { data, loading, error } = useQuery(GET_AI_INSIGHTS, {
     variables: { timeRange },

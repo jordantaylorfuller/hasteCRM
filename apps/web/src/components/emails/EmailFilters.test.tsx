@@ -8,7 +8,7 @@ import {
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { EmailFilters, EmailFilter } from "./EmailFilters";
-import { format } from "date-fns";
+// import { format } from "date-fns"; // Not used in this test
 
 // Mock lucide-react icons
 jest.mock("lucide-react", () => ({
@@ -617,7 +617,7 @@ describe("EmailFilters", () => {
             onFiltersChange={(newFilters) => {
               // Simulate a case where labels becomes undefined
               if (newFilters.labels?.length === 0) {
-                const { labels, ...rest } = filters;
+                const { labels: _labels, ...rest } = filters;
                 setFilters(rest);
               } else {
                 setFilters(newFilters);
@@ -667,9 +667,9 @@ describe("EmailFilters", () => {
       // Format is "LLL dd, y" so it should be "Jan 01, 2024"
       const dateText = screen.getByText(/Jan 01, 2024/);
       expect(dateText).toBeInTheDocument();
-      
+
       // Find the button that contains this date
-      const dateRangeButton = dateText.closest('button');
+      const dateRangeButton = dateText.closest("button");
       expect(dateRangeButton).toBeInTheDocument();
 
       // Should display only the from date when to is undefined
@@ -986,7 +986,7 @@ describe("EmailFilters", () => {
       );
 
       // Manually trigger the removal by simulating direct filter update
-      const { rerender } = render(
+      render(
         <EmailFilters
           {...defaultProps}
           filters={{ labels: ["Work"] }}
@@ -1013,7 +1013,7 @@ describe("EmailFilters", () => {
       const user = userEvent.setup();
       const onFiltersChange = jest.fn();
 
-      const { rerender } = render(
+      render(
         <EmailFilters
           {...defaultProps}
           filters={{ isStarred: true }}
@@ -1080,7 +1080,7 @@ describe("EmailFilters", () => {
     });
 
     it("handles undefined labels when removing a label", async () => {
-      const user = userEvent.setup();
+      // const user = userEvent.setup(); // Not used in this test
       const onFiltersChange = jest.fn();
 
       // Start with no labels defined

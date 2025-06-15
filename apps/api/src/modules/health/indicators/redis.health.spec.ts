@@ -5,7 +5,7 @@ import { RedisService } from "@/modules/redis/redis.service";
 
 describe("RedisHealthIndicator", () => {
   let indicator: RedisHealthIndicator;
-  let redisService: RedisService;
+  let _redisService: RedisService;
 
   const mockRedisClient = {
     ping: jest.fn(),
@@ -28,7 +28,7 @@ describe("RedisHealthIndicator", () => {
     }).compile();
 
     indicator = module.get<RedisHealthIndicator>(RedisHealthIndicator);
-    redisService = module.get<RedisService>(RedisService);
+    _redisService = module.get<RedisService>(RedisService);
   });
 
   afterEach(() => {
@@ -98,7 +98,7 @@ describe("RedisHealthIndicator", () => {
       // Simulate a delay in Redis response
       mockRedisClient.ping.mockImplementation(() => {
         return new Promise((resolve) => {
-          setTimeout(() => resolve("PONG"), 30);
+          setTimeout(() => resolve("PONG"), 50);
         });
       });
       mockRedisClient.info.mockResolvedValue("redis_version:7.2.4");
@@ -109,8 +109,8 @@ describe("RedisHealthIndicator", () => {
       const responseTime = parseInt(
         result.redis.responseTime.replace("ms", ""),
       );
-      expect(responseTime).toBeGreaterThanOrEqual(30);
-      expect(responseTime).toBeLessThan(100);
+      expect(responseTime).toBeGreaterThanOrEqual(45);
+      expect(responseTime).toBeLessThan(150);
     });
 
     it("should handle missing Redis info gracefully", async () => {

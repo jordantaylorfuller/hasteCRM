@@ -190,12 +190,13 @@ describe("AI Queries", () => {
 
   describe("Integration with Apollo Client", () => {
     it("SUMMARIZE_EMAIL should be compatible with Apollo Client", () => {
-      const variables = {
-        input: {
-          emailId: "test-email-id",
-          language: "en",
-        },
-      };
+      // Example variables structure for reference
+      // const variables = {
+      //   input: {
+      //     emailId: "test-email-id",
+      //     language: "en",
+      //   },
+      // };
 
       // This test ensures the query can be used with Apollo Client
       expect(() => {
@@ -208,12 +209,13 @@ describe("AI Queries", () => {
     });
 
     it("GET_AI_INSIGHTS should be compatible with Apollo Client", () => {
-      const variables = {
-        timeRange: {
-          startDate: new Date().toISOString(),
-          endDate: new Date().toISOString(),
-        },
-      };
+      // Example variables structure for reference
+      // const variables = {
+      //   timeRange: {
+      //     startDate: new Date().toISOString(),
+      //     endDate: new Date().toISOString(),
+      //   },
+      // };
 
       // This test ensures the query can be used with Apollo Client
       expect(() => {

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { ContactsService } from "./contacts.service";
 import { PrismaService } from "../prisma/prisma.service";
-import { BadRequestException, NotFoundException } from "@nestjs/common";
+import { BadRequestException, NotFoundException } from "@nestjs/common"; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 describe("ContactsService", () => {
   let service: ContactsService;

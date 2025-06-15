@@ -1,9 +1,9 @@
-import { Test } from "@nestjs/testing";
+import { Test } from "@nestjs/testing"; // eslint-disable-line @typescript-eslint/no-unused-vars
 import { NestFactory } from "@nestjs/core";
 import { ValidationPipe, BadRequestException, Logger } from "@nestjs/common";
 import { bootstrap } from "./main";
 import { AppModule } from "./app.module";
-import * as dotenv from "dotenv";
+import * as dotenv from "dotenv"; // eslint-disable-line @typescript-eslint/no-unused-vars
 import compression from "compression";
 import helmet from "helmet";
 import { AllExceptionsFilter } from "./common/filters/all-exceptions.filter";
@@ -23,7 +23,6 @@ jest.mock("./common/filters/validation-exception.filter");
 jest.mock("./common/interceptors/error-logging.interceptor");
 
 // Prevent automatic bootstrap on import
-const originalBootstrap = process.env.NODE_ENV;
 process.env.NODE_ENV = "test";
 
 describe("Main Bootstrap", () => {
@@ -58,7 +57,7 @@ describe("Main Bootstrap", () => {
     // Mock process.exit
     processExitSpy = jest
       .spyOn(process, "exit")
-      .mockImplementation((() => {}) as any);
+      .mockImplementation((() => undefined) as any);
 
     // Mock console.error
     consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
@@ -316,7 +315,7 @@ describe("Main Bootstrap", () => {
       });
 
       const reason = "Test rejection reason";
-      const promise = Promise.reject(reason).catch(() => {}); // Catch to prevent actual unhandled rejection
+      const promise = Promise.reject(reason).catch(() => undefined); // Catch to prevent actual unhandled rejection
       process.emit("unhandledRejection", reason, promise);
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
@@ -340,7 +339,7 @@ describe("Main Bootstrap", () => {
       // Import the module fresh
       require("./main");
 
-      const dotenvMock = require("dotenv");
+      const dotenvMock = jest.requireMock("dotenv");
       expect(dotenvMock.config).toHaveBeenCalledWith({
         path: expect.stringContaining(".env"),
       });
@@ -353,13 +352,26 @@ describe("Main Bootstrap", () => {
       // The actual bootstrap call when run as main is tested by running the file directly
 
       // Verify the bootstrap function is exported and callable
-      const { bootstrap } = require("./main");
+      const mainModule = jest.requireActual("./main");
+      const { bootstrap } = mainModule;
       expect(bootstrap).toBeDefined();
       expect(typeof bootstrap).toBe("function");
 
       // The conditional execution (line 104) is tested implicitly
       // by the fact that bootstrap() is not called during test imports
       expect(NestFactory.create).not.toHaveBeenCalled();
+    });
+
+    it("should export bootstrap function for testing", () => {
+      // We can't easily test the require.main condition in Jest
+      // So we just verify the module structure is correct
+      const mainModule = jest.requireActual("./main");
+      expect(mainModule.bootstrap).toBeDefined();
+      expect(typeof mainModule.bootstrap).toBe("function");
+
+      // The actual conditional execution is tested by:
+      // 1. Bootstrap not being called during test imports (verified above)
+      // 2. Manual testing when running the app
     });
   });
 });

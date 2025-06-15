@@ -24,22 +24,22 @@ const ThrowError = ({ shouldThrow }: { shouldThrow: boolean }) => {
   return <div>Component rendered successfully</div>;
 };
 
-// Component with controlled error state
-const ControlledErrorComponent = () => {
-  const [shouldThrow, setShouldThrow] = React.useState(false);
-
-  return (
-    <>
-      {shouldThrow && <ThrowError shouldThrow={true} />}
-      {!shouldThrow && (
-        <div>
-          <div>Component rendered successfully</div>
-          <button onClick={() => setShouldThrow(true)}>Trigger Error</button>
-        </div>
-      )}
-    </>
-  );
-};
+// Component with controlled error state - commented out as it's not used
+// const ControlledErrorComponent = () => {
+//   const [shouldThrow, setShouldThrow] = React.useState(false);
+//
+//   return (
+//     <>
+//       {shouldThrow && <ThrowError shouldThrow={true} />}
+//       {!shouldThrow && (
+//         <div>
+//           <div>Component rendered successfully</div>
+//           <button onClick={() => setShouldThrow(true)}>Trigger Error</button>
+//         </div>
+//       )}
+//     </>
+//   );
+// };
 
 describe("ErrorBoundary", () => {
   beforeEach(() => {
@@ -129,7 +129,7 @@ describe("ErrorBoundary", () => {
 
   it("should reset when Try again button is clicked", () => {
     // This component will throw an error on first render
-    const { rerender } = render(
+    render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
       </ErrorBoundary>,

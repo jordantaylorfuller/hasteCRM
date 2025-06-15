@@ -4,7 +4,7 @@ import { PrismaService } from "../prisma/prisma.service";
 
 describe("EmailService", () => {
   let service: EmailService;
-  let prismaService: PrismaService;
+  let _prismaService: PrismaService;
 
   const mockPrismaService = {
     email: {
@@ -38,8 +38,8 @@ describe("EmailService", () => {
   };
 
   const mockWorkspaceId = "workspace-123";
-  const mockUserId = "user-123";
-  const mockEmailAccountId = "email-account-123";
+  const _mockUserId = "user-123";
+  const _mockEmailAccountId = "email-account-123";
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -53,7 +53,7 @@ describe("EmailService", () => {
     }).compile();
 
     service = module.get<EmailService>(EmailService);
-    prismaService = module.get<PrismaService>(PrismaService);
+    _prismaService = module.get<PrismaService>(PrismaService);
 
     jest.clearAllMocks();
   });

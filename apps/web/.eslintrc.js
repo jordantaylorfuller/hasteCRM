@@ -6,5 +6,9 @@ module.exports = {
   rules: {
     "react/no-unescaped-entities": "off",
     "@next/next/no-html-link-for-pages": "off",
+    "no-unused-vars": [
+      "error",
+      { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+    ],
   },
 };

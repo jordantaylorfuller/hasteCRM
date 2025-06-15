@@ -14,67 +14,81 @@ import {
 } from "./select";
 
 // Mock Radix UI select
-jest.mock("@radix-ui/react-select", () => ({
-  Root: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-  Group: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-  Value: ({ children, placeholder, ...props }: any) => (
-    <span {...props}>{children || placeholder}</span>
-  ),
-  Trigger: React.forwardRef(
-    ({ children, className, ...props }: any, ref: any) => (
-      <button ref={ref} className={className} {...props}>
-        {children}
-      </button>
+jest.mock("@radix-ui/react-select", () => {
+  const React = require("react");
+
+  const MockSelectTrigger = React.forwardRef((props, ref) => (
+    <button ref={ref} className={props.className} {...props}>
+      {props.children}
+    </button>
+  ));
+  MockSelectTrigger.displayName = "SelectTrigger";
+
+  const MockSelectContent = React.forwardRef((props, ref) => (
+    <div
+      ref={ref}
+      className={props.className}
+      data-position={props.position || "popper"}
+      {...props}
+    >
+      {props.children}
+    </div>
+  ));
+  MockSelectContent.displayName = "SelectContent";
+
+  const MockSelectItem = React.forwardRef((props, ref) => (
+    <div ref={ref} className={props.className} {...props}>
+      {props.children}
+    </div>
+  ));
+  MockSelectItem.displayName = "SelectItem";
+
+  return {
+    Root: ({ children, ...props }) => <div {...props}>{children}</div>,
+    Group: ({ children, ...props }) => <div {...props}>{children}</div>,
+    Value: ({ children, placeholder, ...props }) => (
+      <span {...props}>{children || placeholder}</span>
     ),
-  ),
-  Icon: ({ children, className, ...props }: any) => (
-    <span className={className} {...props}>
-      {children}
-    </span>
-  ),
-  Portal: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-  Content: React.forwardRef(
-    ({ children, className, position = "popper", ...props }: any, ref: any) => (
-      <div ref={ref} className={className} data-position={position} {...props}>
+    Trigger: MockSelectTrigger,
+    Icon: ({ children, className, ...props }) => (
+      <span className={className} {...props}>
+        {children}
+      </span>
+    ),
+    Portal: ({ children, ...props }) => <div {...props}>{children}</div>,
+    Content: MockSelectContent,
+    Label: ({ children, className, ...props }) => (
+      <div className={className} {...props}>
         {children}
       </div>
     ),
-  ),
-  Label: ({ children, className, ...props }: any) => (
-    <div className={className} {...props}>
-      {children}
-    </div>
-  ),
-  Item: React.forwardRef(({ children, className, ...props }: any, ref: any) => (
-    <div ref={ref} className={className} {...props}>
-      {children}
-    </div>
-  )),
-  ItemText: ({ children, ...props }: any) => <span {...props}>{children}</span>,
-  ItemIndicator: ({ children, className, ...props }: any) => (
-    <span className={className} {...props}>
-      {children}
-    </span>
-  ),
-  ScrollUpButton: ({ children, className, ...props }: any) => (
-    <button className={className} {...props}>
-      {children}
-    </button>
-  ),
-  ScrollDownButton: ({ children, className, ...props }: any) => (
-    <button className={className} {...props}>
-      {children}
-    </button>
-  ),
-  Separator: ({ className, ...props }: any) => (
-    <div className={className} {...props} />
-  ),
-  Viewport: ({ children, className, ...props }: any) => (
-    <div className={className} {...props}>
-      {children}
-    </div>
-  ),
-}));
+    Item: MockSelectItem,
+    ItemText: ({ children, ...props }) => <span {...props}>{children}</span>,
+    ItemIndicator: ({ children, className, ...props }) => (
+      <span className={className} {...props}>
+        {children}
+      </span>
+    ),
+    ScrollUpButton: ({ children, className, ...props }) => (
+      <button className={className} {...props}>
+        {children}
+      </button>
+    ),
+    ScrollDownButton: ({ children, className, ...props }) => (
+      <button className={className} {...props}>
+        {children}
+      </button>
+    ),
+    Separator: ({ className, ...props }) => (
+      <div className={className} {...props} />
+    ),
+    Viewport: ({ children, className, ...props }) => (
+      <div className={className} {...props}>
+        {children}
+      </div>
+    ),
+  };
+});
 
 // Mock lucide-react icons
 jest.mock("lucide-react", () => ({

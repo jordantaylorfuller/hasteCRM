@@ -185,7 +185,7 @@ describe("AiResolver", () => {
 
       mockAiService.generateSmartCompose.mockResolvedValue(mockCompose);
 
-      const result = await resolver.generateSmartCompose(input, mockContext);
+      await resolver.generateSmartCompose(input, mockContext);
 
       expect(aiService.generateSmartCompose).toHaveBeenCalledWith(
         "email-456",

@@ -10,7 +10,7 @@ describe("GmailHistoryService", () => {
   let service: GmailHistoryService;
   let gmailService: GmailService;
   let emailAccountService: EmailAccountService;
-  let emailService: EmailService;
+  let _emailService: EmailService;
   let gmailSyncQueue: Queue;
 
   const mockGmailService = {
@@ -67,7 +67,7 @@ describe("GmailHistoryService", () => {
     service = module.get<GmailHistoryService>(GmailHistoryService);
     gmailService = module.get<GmailService>(GmailService);
     emailAccountService = module.get<EmailAccountService>(EmailAccountService);
-    emailService = module.get<EmailService>(EmailService);
+    _emailService = module.get<EmailService>(EmailService);
     gmailSyncQueue = module.get<Queue>(getQueueToken("gmail-sync"));
   });
 
@@ -261,7 +261,7 @@ describe("GmailHistoryService", () => {
         },
       ];
 
-      const processHistorySpy = jest
+      const _processHistorySpy = jest
         .spyOn(service as any, "processHistory")
         .mockResolvedValue({
           messagesAdded: 2,

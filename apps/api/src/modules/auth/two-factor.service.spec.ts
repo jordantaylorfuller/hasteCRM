@@ -108,6 +108,46 @@ describe("TwoFactorService", () => {
       expect(result).toHaveProperty("backupCodes");
     });
 
+    it("should update existing 2FA setup if user already has one", async () => {
+      const secret = {
+        ascii: "secret",
+        hex: "123456",
+        base32: "JBSWY3DPEHPK3PXP",
+        otpauth_url:
+          "otpauth://totp/hasteCRM:test@example.com?secret=JBSWY3DPEHPK3PXP",
+      };
+      const qrCodeUrl = "data:image/png;base64,qrcode";
+      const userWithDisabled2FA = {
+        ...mockUser,
+        twoFactorAuth: { ...mockTwoFactorAuth, isEnabled: false },
+      };
+
+      (prismaService.user.findUnique as jest.Mock).mockResolvedValue(
+        userWithDisabled2FA,
+      );
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+      (speakeasy.generateSecret as jest.Mock).mockReturnValue(secret);
+      (qrcode.toDataURL as jest.Mock).mockResolvedValue(qrCodeUrl);
+      (bcrypt.hash as jest.Mock).mockResolvedValue("hashed-backup-code");
+      (prismaService.twoFactorAuth.update as jest.Mock).mockResolvedValue(
+        mockTwoFactorAuth,
+      );
+
+      const result = await service.setupTwoFactor(mockUser.id, "password");
+
+      expect(prismaService.twoFactorAuth.update).toHaveBeenCalledWith({
+        where: { userId: mockUser.id },
+        data: {
+          secret: secret.base32,
+          backupCodes: expect.any(Array),
+          isEnabled: false,
+        },
+      });
+      expect(result).toHaveProperty("secret");
+      expect(result).toHaveProperty("qrCode", qrCodeUrl);
+      expect(result).toHaveProperty("backupCodes");
+    });
+
     it("should throw error if password is invalid", async () => {
       (prismaService.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
@@ -172,6 +212,17 @@ describe("TwoFactorService", () => {
       ).rejects.toThrow(BadRequestException);
     });
 
+    it("should throw error if 2FA is already enabled", async () => {
+      (prismaService.twoFactorAuth.findUnique as jest.Mock).mockResolvedValue({
+        ...mockTwoFactorAuth,
+        isEnabled: true,
+      });
+
+      await expect(
+        service.verifyAndEnableTwoFactor(mockUser.id, "123456"),
+      ).rejects.toThrow(BadRequestException);
+    });
+
     it("should throw error if token is invalid", async () => {
       (prismaService.twoFactorAuth.findUnique as jest.Mock).mockResolvedValue({
         ...mockTwoFactorAuth,
@@ -186,7 +237,7 @@ describe("TwoFactorService", () => {
   });
 
   describe("disableTwoFactor", () => {
-    it("should disable 2FA with valid password", async () => {
+    it("should disable 2FA with valid password and token", async () => {
       const userWith2FA = {
         ...mockUser,
         twoFactorAuth: { ...mockTwoFactorAuth, isEnabled: true },
@@ -224,6 +275,58 @@ describe("TwoFactorService", () => {
           isEnabled: false,
         },
       });
+    });
+
+    it("should disable 2FA without token verification", async () => {
+      const userWith2FA = {
+        ...mockUser,
+        twoFactorAuth: { ...mockTwoFactorAuth, isEnabled: true },
+      };
+
+      (prismaService.user.findUnique as jest.Mock).mockResolvedValue(
+        userWith2FA,
+      );
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+      (prismaService.twoFactorAuth.update as jest.Mock).mockResolvedValue({
+        ...mockTwoFactorAuth,
+        isEnabled: false,
+      });
+
+      await service.disableTwoFactor(mockUser.id, "password", "");
+
+      expect(bcrypt.compare).toHaveBeenCalledWith(
+        "password",
+        mockUser.passwordHash,
+      );
+      expect(speakeasy.totp.verify).not.toHaveBeenCalled();
+      expect(prismaService.twoFactorAuth.update).toHaveBeenCalledWith({
+        where: { userId: mockUser.id },
+        data: {
+          isEnabled: false,
+        },
+      });
+    });
+
+    it("should throw error if token verification fails", async () => {
+      const userWith2FA = {
+        ...mockUser,
+        twoFactorAuth: { ...mockTwoFactorAuth, isEnabled: true },
+      };
+
+      (prismaService.user.findUnique as jest.Mock).mockResolvedValue(
+        userWith2FA,
+      );
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+      (prismaService.twoFactorAuth.findUnique as jest.Mock).mockResolvedValue({
+        ...mockTwoFactorAuth,
+        isEnabled: true,
+      });
+      (speakeasy.totp.verify as jest.Mock).mockReturnValue(false);
+      (bcrypt.compare as jest.Mock).mockResolvedValue(false);
+
+      await expect(
+        service.disableTwoFactor(mockUser.id, "password", "123456"),
+      ).rejects.toThrow(UnauthorizedException);
     });
 
     it("should throw error if password is invalid", async () => {
@@ -274,6 +377,29 @@ describe("TwoFactorService", () => {
       });
     });
 
+    it("should verify valid backup code", async () => {
+      (prismaService.twoFactorAuth.findUnique as jest.Mock).mockResolvedValue({
+        ...mockTwoFactorAuth,
+        isEnabled: true,
+      });
+      (speakeasy.totp.verify as jest.Mock).mockReturnValue(false);
+      (bcrypt.compare as jest.Mock)
+        .mockResolvedValueOnce(false)
+        .mockResolvedValueOnce(true);
+
+      const result = await service.verifyToken(mockUser.id, "BACKUP123");
+
+      expect(result).toBe(true);
+      expect(bcrypt.compare).toHaveBeenCalledTimes(2);
+      expect(prismaService.twoFactorAuth.update).toHaveBeenCalledWith({
+        where: { userId: mockUser.id },
+        data: {
+          backupCodes: expect.any(Array),
+          lastUsedAt: expect.any(Date),
+        },
+      });
+    });
+
     it("should return false for invalid token", async () => {
       (prismaService.twoFactorAuth.findUnique as jest.Mock).mockResolvedValue({
         ...mockTwoFactorAuth,
@@ -292,6 +418,16 @@ describe("TwoFactorService", () => {
         ...mockTwoFactorAuth,
         isEnabled: false,
       });
+
+      const result = await service.verifyToken(mockUser.id, "123456");
+
+      expect(result).toBe(false);
+    });
+
+    it("should return false if 2FA not found", async () => {
+      (prismaService.twoFactorAuth.findUnique as jest.Mock).mockResolvedValue(
+        null,
+      );
 
       const result = await service.verifyToken(mockUser.id, "123456");
 
@@ -333,17 +469,18 @@ describe("TwoFactorService", () => {
   });
 
   describe("getTwoFactorStatus", () => {
-    it("should return 2FA status", async () => {
+    it("should return 2FA status with method", async () => {
       (prismaService.twoFactorAuth.findUnique as jest.Mock).mockResolvedValue({
         ...mockTwoFactorAuth,
         isEnabled: true,
+        method: "totp",
       });
 
       const result = await service.getTwoFactorStatus(mockUser.id);
 
       expect(result).toEqual({
         enabled: true,
-        method: undefined,
+        method: "totp",
       });
     });
 
@@ -358,6 +495,168 @@ describe("TwoFactorService", () => {
         enabled: false,
         method: undefined,
       });
+    });
+  });
+
+  describe("regenerateBackupCodes", () => {
+    it("should regenerate backup codes with valid password", async () => {
+      const userWith2FA = {
+        ...mockUser,
+        twoFactorAuth: { ...mockTwoFactorAuth, isEnabled: true },
+      };
+
+      (prismaService.user.findUnique as jest.Mock).mockResolvedValue(
+        userWith2FA,
+      );
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+      (bcrypt.hash as jest.Mock).mockResolvedValue("hashed-backup-code");
+      (prismaService.twoFactorAuth.update as jest.Mock).mockResolvedValue({
+        ...mockTwoFactorAuth,
+        backupCodes: ["hashed1", "hashed2", "hashed3"],
+      });
+
+      const result = await service.regenerateBackupCodes(
+        mockUser.id,
+        "password",
+      );
+
+      expect(bcrypt.compare).toHaveBeenCalledWith(
+        "password",
+        mockUser.passwordHash,
+      );
+      expect(result).toHaveLength(10);
+      expect(result[0]).toMatch(/^[A-Z0-9]{8}$/);
+      expect(prismaService.twoFactorAuth.update).toHaveBeenCalledWith({
+        where: { userId: mockUser.id },
+        data: {
+          backupCodes: expect.any(Array),
+        },
+      });
+    });
+
+    it("should throw error if user not found", async () => {
+      (prismaService.user.findUnique as jest.Mock).mockResolvedValue(null);
+
+      await expect(
+        service.regenerateBackupCodes(mockUser.id, "password"),
+      ).rejects.toThrow(UnauthorizedException);
+    });
+
+    it("should throw error if user has no password", async () => {
+      const userWithoutPassword = {
+        ...mockUser,
+        passwordHash: null,
+      };
+      (prismaService.user.findUnique as jest.Mock).mockResolvedValue(
+        userWithoutPassword,
+      );
+
+      await expect(
+        service.regenerateBackupCodes(mockUser.id, "password"),
+      ).rejects.toThrow(UnauthorizedException);
+    });
+
+    it("should throw error if password is invalid", async () => {
+      (prismaService.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
+      (bcrypt.compare as jest.Mock).mockResolvedValue(false);
+
+      await expect(
+        service.regenerateBackupCodes(mockUser.id, "wrong-password"),
+      ).rejects.toThrow(UnauthorizedException);
+    });
+
+    it("should throw error if 2FA not enabled", async () => {
+      const userWithout2FA = {
+        ...mockUser,
+        twoFactorAuth: { ...mockTwoFactorAuth, isEnabled: false },
+      };
+      (prismaService.user.findUnique as jest.Mock).mockResolvedValue(
+        userWithout2FA,
+      );
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+
+      await expect(
+        service.regenerateBackupCodes(mockUser.id, "password"),
+      ).rejects.toThrow(BadRequestException);
+    });
+  });
+
+  describe("verifyBackupCode", () => {
+    it("should verify valid backup code", async () => {
+      const userWith2FA = {
+        ...mockUser,
+        twoFactorAuth: { ...mockTwoFactorAuth, isEnabled: true },
+      };
+
+      (prismaService.user.findUnique as jest.Mock).mockResolvedValue(
+        userWith2FA,
+      );
+      (bcrypt.compare as jest.Mock)
+        .mockResolvedValueOnce(false)
+        .mockResolvedValueOnce(true);
+      (prismaService.twoFactorAuth.update as jest.Mock).mockResolvedValue({
+        ...mockTwoFactorAuth,
+        backupCodes: [
+          "hashed-code2",
+          "hashed-code3",
+          "hashed-code4",
+          "hashed-code5",
+        ],
+      });
+
+      const result = await service.verifyBackupCode(
+        mockUser.email,
+        "BACKUP123",
+      );
+
+      expect(result).toBe(true);
+      expect(bcrypt.compare).toHaveBeenCalledTimes(2);
+      expect(prismaService.twoFactorAuth.update).toHaveBeenCalledWith({
+        where: { userId: mockUser.id },
+        data: {
+          backupCodes: expect.any(Array),
+          lastUsedAt: expect.any(Date),
+        },
+      });
+    });
+
+    it("should return false for invalid backup code", async () => {
+      const userWith2FA = {
+        ...mockUser,
+        twoFactorAuth: { ...mockTwoFactorAuth, isEnabled: true },
+      };
+
+      (prismaService.user.findUnique as jest.Mock).mockResolvedValue(
+        userWith2FA,
+      );
+      (bcrypt.compare as jest.Mock).mockResolvedValue(false);
+
+      const result = await service.verifyBackupCode(mockUser.email, "INVALID");
+
+      expect(result).toBe(false);
+      expect(bcrypt.compare).toHaveBeenCalledTimes(5); // All backup codes
+    });
+
+    it("should throw error if user not found", async () => {
+      (prismaService.user.findUnique as jest.Mock).mockResolvedValue(null);
+
+      await expect(
+        service.verifyBackupCode("nonexistent@example.com", "BACKUP123"),
+      ).rejects.toThrow(UnauthorizedException);
+    });
+
+    it("should throw error if 2FA not enabled", async () => {
+      const userWithout2FA = {
+        ...mockUser,
+        twoFactorAuth: { ...mockTwoFactorAuth, isEnabled: false },
+      };
+      (prismaService.user.findUnique as jest.Mock).mockResolvedValue(
+        userWithout2FA,
+      );
+
+      await expect(
+        service.verifyBackupCode(mockUser.email, "BACKUP123"),
+      ).rejects.toThrow(UnauthorizedException);
     });
   });
 });

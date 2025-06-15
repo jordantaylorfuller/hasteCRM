@@ -235,4 +235,192 @@ describe("SessionService", () => {
       expect(result).toBe(false);
     });
   });
+
+  describe("getActiveSessionCount", () => {
+    it("should return count of active sessions", async () => {
+      const mockRedisClient = redisService.getClient();
+      (mockRedisClient.smembers as jest.Mock).mockResolvedValue([
+        "session-1",
+        "session-2",
+        "session-3",
+      ]);
+      (mockRedisClient.ttl as jest.Mock).mockResolvedValue(3600);
+      (redisService.getSession as jest.Mock)
+        .mockResolvedValueOnce(mockSessionData)
+        .mockResolvedValueOnce({ ...mockSessionData, sessionId: "session-2" })
+        .mockResolvedValueOnce({ ...mockSessionData, sessionId: "session-3" });
+
+      const result = await service.getActiveSessionCount("user-123");
+
+      expect(result).toBe(3);
+      expect(mockRedisClient.smembers).toHaveBeenCalledWith(
+        "user:sessions:user-123",
+      );
+    });
+
+    it("should return 0 if no active sessions", async () => {
+      const mockRedisClient = redisService.getClient();
+      (mockRedisClient.smembers as jest.Mock).mockResolvedValue([]);
+
+      const result = await service.getActiveSessionCount("user-123");
+
+      expect(result).toBe(0);
+    });
+  });
+
+  describe("enforceSessionLimit", () => {
+    it("should remove oldest sessions when limit exceeded", async () => {
+      const sessions = [
+        {
+          ...mockSessionData,
+          sessionId: "session-1",
+          lastActivity: new Date("2023-01-01"),
+        },
+        {
+          ...mockSessionData,
+          sessionId: "session-2",
+          lastActivity: new Date("2023-01-02"),
+        },
+        {
+          ...mockSessionData,
+          sessionId: "session-3",
+          lastActivity: new Date("2023-01-03"),
+        },
+        {
+          ...mockSessionData,
+          sessionId: "session-4",
+          lastActivity: new Date("2023-01-04"),
+        },
+        {
+          ...mockSessionData,
+          sessionId: "session-5",
+          lastActivity: new Date("2023-01-05"),
+        },
+        {
+          ...mockSessionData,
+          sessionId: "session-6",
+          lastActivity: new Date("2023-01-06"),
+        },
+      ];
+
+      const mockRedisClient = redisService.getClient();
+      (mockRedisClient.smembers as jest.Mock).mockResolvedValue(
+        sessions.map((s) => s.sessionId),
+      );
+      (mockRedisClient.ttl as jest.Mock).mockResolvedValue(3600);
+      (mockRedisClient.srem as jest.Mock).mockResolvedValue(1);
+      (mockRedisClient.del as jest.Mock).mockResolvedValue(1);
+
+      // Mock getSession to return sessions in order
+      sessions.forEach((session) => {
+        (redisService.getSession as jest.Mock).mockResolvedValueOnce(session);
+      });
+
+      // Spy on invalidateSession
+      const invalidateSessionSpy = jest.spyOn(service, "invalidateSession");
+
+      await service.enforceSessionLimit("user-123", 5);
+
+      // Should remove the oldest session (session-1)
+      expect(invalidateSessionSpy).toHaveBeenCalledTimes(1);
+      expect(invalidateSessionSpy).toHaveBeenCalledWith("session-1");
+    });
+
+    it("should not remove sessions if under limit", async () => {
+      const sessions = [
+        { ...mockSessionData, sessionId: "session-1" },
+        { ...mockSessionData, sessionId: "session-2" },
+        { ...mockSessionData, sessionId: "session-3" },
+      ];
+
+      const mockRedisClient = redisService.getClient();
+      (mockRedisClient.smembers as jest.Mock).mockResolvedValue(
+        sessions.map((s) => s.sessionId),
+      );
+      (mockRedisClient.ttl as jest.Mock).mockResolvedValue(3600);
+      (mockRedisClient.srem as jest.Mock).mockResolvedValue(1);
+      (mockRedisClient.del as jest.Mock).mockResolvedValue(1);
+
+      sessions.forEach((session) => {
+        (redisService.getSession as jest.Mock).mockResolvedValueOnce(session);
+      });
+
+      // Spy on invalidateSession
+      const invalidateSessionSpy = jest.spyOn(service, "invalidateSession");
+
+      await service.enforceSessionLimit("user-123", 5);
+
+      expect(invalidateSessionSpy).not.toHaveBeenCalled();
+    });
+
+    it("should use default limit of 5 sessions", async () => {
+      const sessions = Array(6)
+        .fill(null)
+        .map((_, i) => ({
+          ...mockSessionData,
+          sessionId: `session-${i + 1}`,
+          lastActivity: new Date(2023, 0, i + 1),
+        }));
+
+      const mockRedisClient = redisService.getClient();
+      (mockRedisClient.smembers as jest.Mock).mockResolvedValue(
+        sessions.map((s) => s.sessionId),
+      );
+      (mockRedisClient.ttl as jest.Mock).mockResolvedValue(3600);
+      (mockRedisClient.srem as jest.Mock).mockResolvedValue(1);
+      (mockRedisClient.del as jest.Mock).mockResolvedValue(1);
+
+      sessions.forEach((session) => {
+        (redisService.getSession as jest.Mock).mockResolvedValueOnce(session);
+      });
+
+      // Spy on invalidateSession
+      const invalidateSessionSpy = jest.spyOn(service, "invalidateSession");
+
+      await service.enforceSessionLimit("user-123");
+
+      expect(invalidateSessionSpy).toHaveBeenCalledTimes(1);
+      expect(invalidateSessionSpy).toHaveBeenCalledWith("session-1");
+    });
+  });
+
+  describe("blacklistToken", () => {
+    it("should blacklist token with default expiry", async () => {
+      await service.blacklistToken("token-123");
+
+      expect(redisService.blacklistToken).toHaveBeenCalledWith(
+        "token-123",
+        86400,
+      );
+    });
+
+    it("should blacklist token with custom expiry", async () => {
+      await service.blacklistToken("token-123", 3600);
+
+      expect(redisService.blacklistToken).toHaveBeenCalledWith(
+        "token-123",
+        3600,
+      );
+    });
+  });
+
+  describe("isTokenBlacklisted", () => {
+    it("should return true for blacklisted token", async () => {
+      (redisService.isTokenBlacklisted as jest.Mock).mockResolvedValue(true);
+
+      const result = await service.isTokenBlacklisted("token-123");
+
+      expect(result).toBe(true);
+      expect(redisService.isTokenBlacklisted).toHaveBeenCalledWith("token-123");
+    });
+
+    it("should return false for non-blacklisted token", async () => {
+      (redisService.isTokenBlacklisted as jest.Mock).mockResolvedValue(false);
+
+      const result = await service.isTokenBlacklisted("token-456");
+
+      expect(result).toBe(false);
+      expect(redisService.isTokenBlacklisted).toHaveBeenCalledWith("token-456");
+    });
+  });
 });

@@ -12,7 +12,7 @@ import {
   BadRequestException,
   ConflictException,
 } from "@nestjs/common";
-import * as crypto from "crypto";
+import * as crypto from "crypto"; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 // Mock bcrypt
 jest.mock("bcrypt", () => ({
@@ -20,13 +20,13 @@ jest.mock("bcrypt", () => ({
   hash: jest.fn(),
 }));
 
-const bcrypt = require("bcrypt");
+const bcrypt = jest.requireMock("bcrypt");
 
 describe("AuthService", () => {
   let service: AuthService;
   let prismaService: PrismaService;
   let jwtService: JwtService;
-  let redisService: RedisService;
+  let _redisService: RedisService;
   let emailService: EmailService;
   let configService: ConfigService;
   let twoFactorService: any;
@@ -138,7 +138,7 @@ describe("AuthService", () => {
     service = module.get<AuthService>(AuthService);
     prismaService = module.get<PrismaService>(PrismaService);
     jwtService = module.get<JwtService>(JwtService);
-    redisService = module.get<RedisService>(RedisService);
+    _redisService = module.get<RedisService>(RedisService);
     emailService = module.get<EmailService>(EmailService);
     configService = module.get<ConfigService>(ConfigService);
     twoFactorService = module.get<TwoFactorService>(TwoFactorService);

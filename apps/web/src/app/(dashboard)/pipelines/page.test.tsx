@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useQuery } from "@apollo/client";
 import PipelinesPage from "./page";
-import { GET_PIPELINES, GET_DEALS } from "@/graphql/queries/pipelines";
+import { GET_PIPELINES } from "@/graphql/queries/pipelines";
 
 // Mock dependencies
 jest.mock("@apollo/client", () => ({
@@ -88,9 +88,13 @@ jest.mock("@/components/ui/tabs", () => ({
     children,
     currentValue,
     onValueChange,
-  }: any) => (
-    <button onClick={() => onValueChange?.(triggerValue)}>{children}</button>
-  ),
+  }: any) => {
+    // currentValue is intentionally not used in this mock
+    void currentValue;
+    return (
+      <button onClick={() => onValueChange?.(triggerValue)}>{children}</button>
+    );
+  },
 }));
 
 jest.mock("@/components/ui/input", () => ({
@@ -206,6 +210,8 @@ describe("Pipelines Page", () => {
   it("selects default pipeline on load", async () => {
     const mockRefetch = jest.fn();
     (useQuery as jest.Mock).mockImplementation((query, options) => {
+      // options is used to check query type
+      void options;
       if (query === GET_PIPELINES) {
         return { data: { pipelines: mockPipelines }, loading: false };
       }
@@ -228,8 +234,11 @@ describe("Pipelines Page", () => {
   it("switches between pipelines", async () => {
     const mockRefetch = jest.fn();
     let selectedPipelineId = "1";
+    // Used to track pipeline changes in mock
+    void selectedPipelineId;
 
     (useQuery as jest.Mock).mockImplementation((query, options) => {
+      // options is used to check query type and variables
       if (query === GET_PIPELINES) {
         return { data: { pipelines: mockPipelines }, loading: false };
       }
@@ -243,7 +252,7 @@ describe("Pipelines Page", () => {
       };
     });
 
-    const { rerender } = render(<PipelinesPage />);
+    render(<PipelinesPage />);
 
     // Simulate pipeline change
     // Note: In real implementation, this would be handled by the Select component
