@@ -1,0 +1,70 @@
+{
+  "index_patterns": ["hastecrm-*"],
+  "template": {
+    "settings": {
+      "number_of_shards": 1,
+      "number_of_replicas": 0,
+      "index.lifecycle.name": "hastecrm-policy",
+      "index.lifecycle.rollover_alias": "hastecrm"
+    },
+    "mappings": {
+      "properties": {
+        "@timestamp": {
+          "type": "date"
+        },
+        "log_level": {
+          "type": "keyword"
+        },
+        "severity": {
+          "type": "keyword"
+        },
+        "service": {
+          "type": "keyword"
+        },
+        "container_name": {
+          "type": "keyword"
+        },
+        "container_id": {
+          "type": "keyword"
+        },
+        "log_message": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword"
+            }
+          }
+        },
+        "request_method": {
+          "type": "keyword"
+        },
+        "request_url": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword"
+            }
+          }
+        },
+        "request_ip": {
+          "type": "ip"
+        },
+        "user_id": {
+          "type": "keyword"
+        },
+        "graphql_operation": {
+          "type": "keyword"
+        },
+        "graphql_type": {
+          "type": "keyword"
+        },
+        "app": {
+          "type": "object"
+        },
+        "docker": {
+          "type": "object"
+        }
+      }
+    }
+  }
+}
