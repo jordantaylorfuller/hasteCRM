@@ -56,12 +56,13 @@ describe("PrismaService", () => {
     it("should setup shutdown hooks", async () => {
       const onSpy = jest
         .spyOn(service, "$on")
-        .mockImplementation((event, callback) => {
+        .mockImplementation((event: any, callback: any) => {
           // Simulate beforeExit event
           if (event === "beforeExit") {
-            callback();
+            callback({} as any);
           }
-        });
+          return service;
+        }) as any;
 
       await service.enableShutdownHooks(app);
 
@@ -108,7 +109,7 @@ describe("PrismaService", () => {
           data: { email: "test@example.com" },
         });
         const workspace = await prisma.workspace.create({
-          data: { name: "Test Workspace" },
+          data: { name: "Test Workspace", slug: "test-workspace" },
         });
         return { user, workspace };
       });
