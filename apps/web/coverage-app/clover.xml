@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1749924071640" clover="3.2.0">
+  <project timestamp="1749924071640" name="All files">
+    <metrics statements="195" coveredstatements="193" conditionals="79" coveredconditionals="75" methods="47" coveredmethods="45" elements="321" coveredelements="313" complexity="0" loc="195" ncloc="195" packages="11" files="15" classes="15"/>
+    <package name="app">
+      <metrics statements="29" coveredstatements="29" conditionals="6" coveredconditionals="6" methods="7" coveredmethods="7"/>
+      <file name="error.tsx" path="/Users/haste/Cursor/hasteCRM/apps/web/src/app/error.tsx">
+        <metrics statements="8" coveredstatements="8" conditionals="3" coveredconditionals="3" methods="2" coveredmethods="2"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="8" count="9" type="stmt"/>
+        <line num="15" count="9" type="stmt"/>
+        <line num="17" count="9" type="stmt"/>
+        <line num="20" count="9" type="cond" truecount="1" falsecount="0"/>
+      </file>
+      <file name="layout.tsx" path="/Users/haste/Cursor/hasteCRM/apps/web/src/app/layout.tsx">
+        <metrics statements="5" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="5" count="3" type="stmt"/>
+        <line num="10" count="2" type="stmt"/>
+      </file>
+      <file name="loading.tsx" path="/Users/haste/Cursor/hasteCRM/apps/web/src/app/loading.tsx">
+        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="1" count="5" type="stmt"/>
+      </file>
+      <file name="not-found.tsx" path="/Users/haste/Cursor/hasteCRM/apps/web/src/app/not-found.tsx">
+        <metrics statements="4" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="5" count="8" type="stmt"/>
+      </file>
+      <file name="page.tsx" path="/Users/haste/Cursor/hasteCRM/apps/web/src/app/page.tsx">
+        <metrics statements="11" coveredstatements="11" conditionals="3" coveredconditionals="3" methods="2" coveredmethods="2"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="7" count="7" type="stmt"/>
+        <line num="8" count="7" type="stmt"/>
+        <line num="9" count="7" type="stmt"/>
+        <line num="11" count="7" type="stmt"/>
+        <line num="12" count="6" type="cond" truecount="1" falsecount="0"/>
+        <line num="13" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="14" count="2" type="stmt"/>
+        <line num="16" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="app.(dashboard)">
+      <metrics statements="30" coveredstatements="29" conditionals="15" coveredconditionals="14" methods="9" coveredmethods="8"/>
+      <file name="layout.tsx" path="/Users/haste/Cursor/hasteCRM/apps/web/src/app/(dashboard)/layout.tsx">
+        <metrics statements="30" coveredstatements="29" conditionals="15" coveredconditionals="14" methods="9" coveredmethods="8"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="17" count="1" type="stmt"/>
+        <line num="18" count="1" type="stmt"/>
+        <line num="19" count="1" type="stmt"/>
+        <line num="22" count="1" type="stmt"/>
+        <line num="31" count="12" type="stmt"/>
+        <line num="36" count="17" type="stmt"/>
+        <line num="37" count="17" type="stmt"/>
+        <line num="38" count="17" type="stmt"/>
+        <line num="39" count="17" type="stmt"/>
+        <line num="41" count="17" type="stmt"/>
+        <line num="42" count="12" type="cond" truecount="3" falsecount="0"/>
+        <line num="43" count="2" type="stmt"/>
+        <line num="47" count="17" type="cond" truecount="1" falsecount="0"/>
+        <line num="55" count="16" type="cond" truecount="3" falsecount="0"/>
+        <line num="56" count="2" type="stmt"/>
+        <line num="70" count="1" type="stmt"/>
+        <line num="78" count="1" type="stmt"/>
+        <line num="85" count="84" type="stmt"/>
+        <line num="86" count="84" type="stmt"/>
+        <line num="87" count="84" type="stmt"/>
+        <line num="97" count="0" type="stmt"/>
+        <line num="134" count="84" type="stmt"/>
+        <line num="135" count="84" type="stmt"/>
+        <line num="136" count="84" type="stmt"/>
+        <line num="181" count="3" type="stmt"/>
+        <line num="186" count="18" type="cond" truecount="1" falsecount="1"/>
+      </file>
+    </package>
+    <package name="app.(dashboard).companies">
+      <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+      <file name="page.tsx" path="/Users/haste/Cursor/hasteCRM/apps/web/src/app/(dashboard)/companies/page.tsx">
+        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="1" count="4" type="stmt"/>
+      </file>
+    </package>
+    <package name="app.(dashboard).contacts">
+      <metrics statements="24" coveredstatements="24" conditionals="3" coveredconditionals="2" methods="8" coveredmethods="8"/>
+      <file name="page.tsx" path="/Users/haste/Cursor/hasteCRM/apps/web/src/app/(dashboard)/contacts/page.tsx">
+        <metrics statements="24" coveredstatements="24" conditionals="3" coveredconditionals="2" methods="8" coveredmethods="8"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="8" count="1" type="stmt"/>
+        <line num="9" count="1" type="stmt"/>
+        <line num="10" count="1" type="stmt"/>
+        <line num="13" count="17" type="stmt"/>
+        <line num="14" count="29" type="stmt"/>
+        <line num="15" count="29" type="stmt"/>
+        <line num="16" count="29" type="stmt"/>
+        <line num="17" count="29" type="stmt"/>
+        <line num="19" count="29" type="stmt"/>
+        <line num="30" count="29" type="stmt"/>
+        <line num="31" count="8" type="stmt"/>
+        <line num="34" count="29" type="stmt"/>
+        <line num="35" count="2" type="stmt"/>
+        <line num="38" count="29" type="stmt"/>
+        <line num="40" count="1" type="stmt"/>
+        <line num="58" count="8" type="stmt"/>
+        <line num="68" count="1" type="stmt"/>
+        <line num="77" count="1" type="stmt"/>
+        <line num="95" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="app.(dashboard).dashboard">
+      <metrics statements="5" coveredstatements="5" conditionals="7" coveredconditionals="7" methods="1" coveredmethods="1"/>
+      <file name="page.tsx" path="/Users/haste/Cursor/hasteCRM/apps/web/src/app/(dashboard)/dashboard/page.tsx">
+        <metrics statements="5" coveredstatements="5" conditionals="7" coveredconditionals="7" methods="1" coveredmethods="1"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="5" count="12" type="stmt"/>
+        <line num="6" count="12" type="stmt"/>
+        <line num="8" count="12" type="cond" truecount="3" falsecount="0"/>
+        <line num="9" count="2" type="stmt"/>
+      </file>
+    </package>
+    <package name="app.(dashboard).emails">
+      <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+      <file name="page.tsx" path="/Users/haste/Cursor/hasteCRM/apps/web/src/app/(dashboard)/emails/page.tsx">
+        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="1" count="4" type="stmt"/>
+      </file>
+    </package>
+    <package name="app.(dashboard).pipelines">
+      <metrics statements="33" coveredstatements="32" conditionals="18" coveredconditionals="18" methods="10" coveredmethods="9"/>
+      <file name="page.tsx" path="/Users/haste/Cursor/hasteCRM/apps/web/src/app/(dashboard)/pipelines/page.tsx">
+        <metrics statements="33" coveredstatements="32" conditionals="18" coveredconditionals="18" methods="10" coveredmethods="9"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="14" count="1" type="stmt"/>
+        <line num="15" count="1" type="stmt"/>
+        <line num="16" count="1" type="stmt"/>
+        <line num="17" count="1" type="stmt"/>
+        <line num="18" count="1" type="stmt"/>
+        <line num="20" count="12" type="stmt"/>
+        <line num="21" count="31" type="stmt"/>
+        <line num="22" count="31" type="stmt"/>
+        <line num="23" count="31" type="stmt"/>
+        <line num="26" count="31" type="stmt"/>
+        <line num="32" count="31" type="stmt"/>
+        <line num="41" count="31" type="cond" truecount="3" falsecount="0"/>
+        <line num="43" count="11" type="cond" truecount="2" falsecount="0"/>
+        <line num="45" count="11" type="cond" truecount="1" falsecount="0"/>
+        <line num="46" count="10" type="stmt"/>
+        <line num="50" count="31" type="stmt"/>
+        <line num="51" count="39" type="stmt"/>
+        <line num="55" count="31" type="cond" truecount="2" falsecount="0"/>
+        <line num="56" count="54" type="cond" truecount="1" falsecount="0"/>
+        <line num="57" count="16" type="stmt"/>
+        <line num="58" count="16" type="stmt"/>
+        <line num="62" count="11" type="stmt"/>
+        <line num="67" count="31" type="cond" truecount="1" falsecount="0"/>
+        <line num="77" count="4" type="stmt"/>
+        <line num="116" count="58" type="stmt"/>
+        <line num="138" count="9" type="stmt"/>
+        <line num="144" count="0" type="stmt"/>
+        <line num="165" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="app.(dashboard).settings">
+      <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+      <file name="page.tsx" path="/Users/haste/Cursor/hasteCRM/apps/web/src/app/(dashboard)/settings/page.tsx">
+        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="1" count="4" type="stmt"/>
+      </file>
+    </package>
+    <package name="app.login">
+      <metrics statements="19" coveredstatements="19" conditionals="7" coveredconditionals="6" methods="2" coveredmethods="2"/>
+      <file name="page.tsx" path="/Users/haste/Cursor/hasteCRM/apps/web/src/app/login/page.tsx">
+        <metrics statements="19" coveredstatements="19" conditionals="7" coveredconditionals="6" methods="2" coveredmethods="2"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="8" count="1" type="stmt"/>
+        <line num="10" count="1" type="stmt"/>
+        <line num="17" count="12" type="stmt"/>
+        <line num="18" count="34" type="stmt"/>
+        <line num="19" count="34" type="stmt"/>
+        <line num="20" count="34" type="stmt"/>
+        <line num="26" count="34" type="stmt"/>
+        <line num="30" count="34" type="stmt"/>
+        <line num="31" count="5" type="stmt"/>
+        <line num="32" count="5" type="stmt"/>
+        <line num="33" count="5" type="stmt"/>
+        <line num="34" count="5" type="stmt"/>
+        <line num="36" count="2" type="stmt"/>
+        <line num="38" count="5" type="stmt"/>
+      </file>
+    </package>
+    <package name="app.register">
+      <metrics statements="21" coveredstatements="21" conditionals="11" coveredconditionals="10" methods="3" coveredmethods="3"/>
+      <file name="page.tsx" path="/Users/haste/Cursor/hasteCRM/apps/web/src/app/register/page.tsx">
+        <metrics statements="21" coveredstatements="21" conditionals="11" coveredconditionals="10" methods="3" coveredmethods="3"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="8" count="1" type="stmt"/>
+        <line num="10" count="1" type="stmt"/>
+        <line num="19" count="30" type="stmt"/>
+        <line num="26" count="13" type="stmt"/>
+        <line num="27" count="38" type="stmt"/>
+        <line num="28" count="38" type="stmt"/>
+        <line num="29" count="38" type="stmt"/>
+        <line num="35" count="38" type="stmt"/>
+        <line num="39" count="38" type="stmt"/>
+        <line num="40" count="6" type="stmt"/>
+        <line num="41" count="6" type="stmt"/>
+        <line num="42" count="6" type="stmt"/>
+        <line num="43" count="6" type="stmt"/>
+        <line num="44" count="6" type="stmt"/>
+        <line num="46" count="3" type="stmt"/>
+        <line num="48" count="6" type="stmt"/>
+      </file>
+    </package>
+    <package name="app.verify-email">
+      <metrics statements="31" coveredstatements="31" conditionals="12" coveredconditionals="12" methods="4" coveredmethods="4"/>
+      <file name="page.tsx" path="/Users/haste/Cursor/hasteCRM/apps/web/src/app/verify-email/page.tsx">
+        <metrics statements="31" coveredstatements="31" conditionals="12" coveredconditionals="12" methods="4" coveredmethods="4"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="9" count="18" type="stmt"/>
+        <line num="10" count="38" type="stmt"/>
+        <line num="11" count="38" type="stmt"/>
+        <line num="12" count="38" type="stmt"/>
+        <line num="13" count="38" type="stmt"/>
+        <line num="14" count="37" type="stmt"/>
+        <line num="15" count="37" type="stmt"/>
+        <line num="17" count="37" type="stmt"/>
+        <line num="18" count="18" type="stmt"/>
+        <line num="19" count="18" type="cond" truecount="1" falsecount="0"/>
+        <line num="20" count="8" type="stmt"/>
+        <line num="21" count="8" type="stmt"/>
+        <line num="22" count="8" type="stmt"/>
+        <line num="23" count="8" type="stmt"/>
+        <line num="24" count="4" type="stmt"/>
+        <line num="25" count="4" type="stmt"/>
+        <line num="27" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="29" count="8" type="stmt"/>
+        <line num="32" count="18" type="stmt"/>
+        <line num="35" count="37" type="stmt"/>
+        <line num="36" count="3" type="stmt"/>
+        <line num="37" count="3" type="stmt"/>
+        <line num="38" count="3" type="stmt"/>
+        <line num="39" count="1" type="stmt"/>
+        <line num="41" count="2" type="stmt"/>
+        <line num="48" count="37" type="cond" truecount="1" falsecount="0"/>
+      </file>
+    </package>
+  </project>
+</coverage>

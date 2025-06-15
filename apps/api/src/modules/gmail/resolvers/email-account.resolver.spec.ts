@@ -1,10 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { EmailAccountResolver } from './email-account.resolver';
-import { EmailAccountService } from '../email-account.service';
-import { GmailSyncService } from '../gmail-sync.service';
-import { CustomGqlAuthGuard } from '../../../common/guards/custom-gql-auth.guard';
+import { Test, TestingModule } from "@nestjs/testing";
+import { EmailAccountResolver } from "./email-account.resolver";
+import { EmailAccountService } from "../email-account.service";
+import { GmailSyncService } from "../gmail-sync.service";
+import { CustomGqlAuthGuard } from "../../../common/guards/custom-gql-auth.guard";
 
-describe('EmailAccountResolver', () => {
+describe("EmailAccountResolver", () => {
   let resolver: EmailAccountResolver;
   let emailAccountService: EmailAccountService;
   let gmailSyncService: GmailSyncService;
@@ -25,18 +25,18 @@ describe('EmailAccountResolver', () => {
   const mockContext = {
     req: {
       user: {
-        workspaceId: 'workspace-123',
-        userId: 'user-123',
-        email: 'test@example.com',
+        workspaceId: "workspace-123",
+        userId: "user-123",
+        email: "test@example.com",
       },
     },
   };
 
   const mockEmailAccount = {
-    id: 'account-123',
-    workspaceId: 'workspace-123',
-    email: 'user@example.com',
-    provider: 'GMAIL',
+    id: "account-123",
+    workspaceId: "workspace-123",
+    email: "user@example.com",
+    provider: "GMAIL",
     isActive: true,
     syncEnabled: true,
     lastSyncedAt: new Date(),
@@ -69,18 +69,23 @@ describe('EmailAccountResolver', () => {
     jest.clearAllMocks();
   });
 
-  describe('emailAccounts', () => {
-    it('should return email accounts for workspace', async () => {
-      const mockAccounts = [mockEmailAccount, { ...mockEmailAccount, id: 'account-456' }];
+  describe("emailAccounts", () => {
+    it("should return email accounts for workspace", async () => {
+      const mockAccounts = [
+        mockEmailAccount,
+        { ...mockEmailAccount, id: "account-456" },
+      ];
       mockEmailAccountService.findByWorkspace.mockResolvedValue(mockAccounts);
 
       const result = await resolver.emailAccounts(mockContext);
 
-      expect(emailAccountService.findByWorkspace).toHaveBeenCalledWith('workspace-123');
+      expect(emailAccountService.findByWorkspace).toHaveBeenCalledWith(
+        "workspace-123",
+      );
       expect(result).toEqual(mockAccounts);
     });
 
-    it('should return empty array when no accounts', async () => {
+    it("should return empty array when no accounts", async () => {
       mockEmailAccountService.findByWorkspace.mockResolvedValue([]);
 
       const result = await resolver.emailAccounts(mockContext);
@@ -89,31 +94,31 @@ describe('EmailAccountResolver', () => {
     });
   });
 
-  describe('emailAccount', () => {
-    it('should return a single email account', async () => {
+  describe("emailAccount", () => {
+    it("should return a single email account", async () => {
       mockEmailAccountService.findOne.mockResolvedValue(mockEmailAccount);
 
-      const result = await resolver.emailAccount('account-123', mockContext);
+      const result = await resolver.emailAccount("account-123", mockContext);
 
-      expect(emailAccountService.findOne).toHaveBeenCalledWith('account-123');
+      expect(emailAccountService.findOne).toHaveBeenCalledWith("account-123");
       expect(result).toEqual(mockEmailAccount);
     });
 
-    it('should return null when account not found', async () => {
+    it("should return null when account not found", async () => {
       mockEmailAccountService.findOne.mockResolvedValue(null);
 
-      const result = await resolver.emailAccount('non-existent', mockContext);
+      const result = await resolver.emailAccount("non-existent", mockContext);
 
       expect(result).toBeNull();
     });
   });
 
-  describe('emailSyncStatus', () => {
-    it('should return sync status for workspace', async () => {
+  describe("emailSyncStatus", () => {
+    it("should return sync status for workspace", async () => {
       const mockStatus = [
         {
-          accountId: 'account-123',
-          status: 'SYNCING',
+          accountId: "account-123",
+          status: "SYNCING",
           lastSync: new Date(),
           nextSync: new Date(),
         },
@@ -122,123 +127,155 @@ describe('EmailAccountResolver', () => {
 
       const result = await resolver.emailSyncStatus(mockContext);
 
-      expect(gmailSyncService.getSyncStatus).toHaveBeenCalledWith('workspace-123');
+      expect(gmailSyncService.getSyncStatus).toHaveBeenCalledWith(
+        "workspace-123",
+      );
       expect(result).toEqual(mockStatus);
     });
   });
 
-  describe('connectEmailAccount', () => {
-    it('should return OAuth URL for connecting email', async () => {
-      const input = { email: 'new@example.com', provider: 'GMAIL' };
-      process.env.API_URL = 'http://localhost:3000';
+  describe("connectEmailAccount", () => {
+    it("should return OAuth URL for connecting email", async () => {
+      const input = { email: "new@example.com", provider: "GMAIL" };
+      process.env.API_URL = "http://localhost:3000";
 
       const result = await resolver.connectEmailAccount(input, mockContext);
 
-      expect(result.authUrl).toContain('/auth/google/connect');
-      expect(result.authUrl).toContain('email=new@example.com');
-      expect(result.authUrl).toContain('workspace=workspace-123');
+      expect(result.authUrl).toContain("/auth/google/connect");
+      expect(result.authUrl).toContain("email=new@example.com");
+      expect(result.authUrl).toContain("workspace=workspace-123");
     });
 
-    it('should handle missing API_URL', async () => {
-      const input = { email: 'new@example.com', provider: 'GMAIL' };
+    it("should handle missing API_URL", async () => {
+      const input = { email: "new@example.com", provider: "GMAIL" };
       process.env.API_URL = undefined;
 
       const result = await resolver.connectEmailAccount(input, mockContext);
 
-      expect(result.authUrl).toContain('undefined/auth/google/connect');
+      expect(result.authUrl).toContain("undefined/auth/google/connect");
     });
   });
 
-  describe('disconnectEmailAccount', () => {
-    it('should disconnect email account', async () => {
+  describe("disconnectEmailAccount", () => {
+    it("should disconnect email account", async () => {
       mockEmailAccountService.delete.mockResolvedValue(undefined);
 
-      const result = await resolver.disconnectEmailAccount('account-123', mockContext);
+      const result = await resolver.disconnectEmailAccount(
+        "account-123",
+        mockContext,
+      );
 
-      expect(emailAccountService.delete).toHaveBeenCalledWith('account-123');
+      expect(emailAccountService.delete).toHaveBeenCalledWith("account-123");
       expect(result).toBe(true);
     });
 
-    it('should handle delete errors', async () => {
-      mockEmailAccountService.delete.mockRejectedValue(new Error('Delete failed'));
+    it("should handle delete errors", async () => {
+      mockEmailAccountService.delete.mockRejectedValue(
+        new Error("Delete failed"),
+      );
 
       await expect(
-        resolver.disconnectEmailAccount('account-123', mockContext),
-      ).rejects.toThrow('Delete failed');
+        resolver.disconnectEmailAccount("account-123", mockContext),
+      ).rejects.toThrow("Delete failed");
     });
   });
 
-  describe('enableEmailSync', () => {
-    it('should enable email sync', async () => {
+  describe("enableEmailSync", () => {
+    it("should enable email sync", async () => {
       const enabledAccount = { ...mockEmailAccount, syncEnabled: true };
       mockEmailAccountService.enableSync.mockResolvedValue(enabledAccount);
 
-      const result = await resolver.enableEmailSync('account-123', mockContext);
+      const result = await resolver.enableEmailSync("account-123", mockContext);
 
-      expect(emailAccountService.enableSync).toHaveBeenCalledWith('account-123');
+      expect(emailAccountService.enableSync).toHaveBeenCalledWith(
+        "account-123",
+      );
       expect(result).toEqual(enabledAccount);
     });
   });
 
-  describe('disableEmailSync', () => {
-    it('should disable email sync', async () => {
+  describe("disableEmailSync", () => {
+    it("should disable email sync", async () => {
       const disabledAccount = { ...mockEmailAccount, syncEnabled: false };
       mockEmailAccountService.disableSync.mockResolvedValue(disabledAccount);
 
-      const result = await resolver.disableEmailSync('account-123', mockContext);
+      const result = await resolver.disableEmailSync(
+        "account-123",
+        mockContext,
+      );
 
-      expect(emailAccountService.disableSync).toHaveBeenCalledWith('account-123');
+      expect(emailAccountService.disableSync).toHaveBeenCalledWith(
+        "account-123",
+      );
       expect(result).toEqual(disabledAccount);
     });
   });
 
-  describe('syncEmailAccount', () => {
-    it('should sync email account successfully', async () => {
+  describe("syncEmailAccount", () => {
+    it("should sync email account successfully", async () => {
       mockGmailSyncService.syncAccount.mockResolvedValue(undefined);
 
-      const result = await resolver.syncEmailAccount('account-123', false, mockContext);
+      const result = await resolver.syncEmailAccount(
+        "account-123",
+        false,
+        mockContext,
+      );
 
-      expect(gmailSyncService.syncAccount).toHaveBeenCalledWith('account-123', {
+      expect(gmailSyncService.syncAccount).toHaveBeenCalledWith("account-123", {
         fullSync: false,
-        source: 'manual',
+        source: "manual",
       });
       expect(result).toEqual({
         success: true,
-        message: 'Sync started successfully',
+        message: "Sync started successfully",
       });
     });
 
-    it('should handle full sync', async () => {
+    it("should handle full sync", async () => {
       mockGmailSyncService.syncAccount.mockResolvedValue(undefined);
 
-      const result = await resolver.syncEmailAccount('account-123', true, mockContext);
+      const result = await resolver.syncEmailAccount(
+        "account-123",
+        true,
+        mockContext,
+      );
 
-      expect(gmailSyncService.syncAccount).toHaveBeenCalledWith('account-123', {
+      expect(gmailSyncService.syncAccount).toHaveBeenCalledWith("account-123", {
         fullSync: true,
-        source: 'manual',
+        source: "manual",
       });
       expect(result.success).toBe(true);
     });
 
-    it('should handle sync errors', async () => {
-      mockGmailSyncService.syncAccount.mockRejectedValue(new Error('Sync failed'));
+    it("should handle sync errors", async () => {
+      mockGmailSyncService.syncAccount.mockRejectedValue(
+        new Error("Sync failed"),
+      );
 
-      const result = await resolver.syncEmailAccount('account-123', false, mockContext);
+      const result = await resolver.syncEmailAccount(
+        "account-123",
+        false,
+        mockContext,
+      );
 
       expect(result).toEqual({
         success: false,
-        message: 'Sync failed',
+        message: "Sync failed",
       });
     });
 
-    it('should handle sync errors without message', async () => {
+    it("should handle sync errors without message", async () => {
       mockGmailSyncService.syncAccount.mockRejectedValue({});
 
-      const result = await resolver.syncEmailAccount('account-123', false, mockContext);
+      const result = await resolver.syncEmailAccount(
+        "account-123",
+        false,
+        mockContext,
+      );
 
       expect(result).toEqual({
         success: false,
-        message: 'Sync failed',
+        message: "Sync failed",
       });
     });
   });

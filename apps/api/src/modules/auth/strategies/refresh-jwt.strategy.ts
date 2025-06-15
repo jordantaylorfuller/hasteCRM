@@ -28,7 +28,7 @@ export class RefreshJwtStrategy extends PassportStrategy(
     }
 
     // Check if it's a refresh token
-    if (payload.type !== 'refresh') {
+    if (payload.type !== "refresh") {
       throw new UnauthorizedException("Invalid token type");
     }
 

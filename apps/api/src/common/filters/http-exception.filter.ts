@@ -4,9 +4,9 @@ import {
   ArgumentsHost,
   HttpException,
   Logger,
-} from '@nestjs/common';
-import { Request, Response } from 'express';
-import { GqlArgumentsHost, GqlContextType } from '@nestjs/graphql';
+} from "@nestjs/common";
+import { Request, Response } from "express";
+import { GqlArgumentsHost, GqlContextType } from "@nestjs/graphql";
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -15,7 +15,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
     const contextType = host.getType<GqlContextType>();
 
-    if (contextType === 'graphql') {
+    if (contextType === "graphql") {
       return this.handleGraphQLException(exception, host);
     }
 
@@ -35,11 +35,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
       path: request.url,
       method: request.method,
       message:
-        typeof exceptionResponse === 'string'
+        typeof exceptionResponse === "string"
           ? exceptionResponse
           : (exceptionResponse as any).message || exception.message,
       error:
-        typeof exceptionResponse === 'object'
+        typeof exceptionResponse === "object"
           ? (exceptionResponse as any).error
           : exception.name,
       requestId: request.id,
@@ -50,7 +50,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
     response.status(status).json(errorResponse);
   }
 
-  private handleGraphQLException(exception: HttpException, host: ArgumentsHost) {
+  private handleGraphQLException(
+    exception: HttpException,
+    host: ArgumentsHost,
+  ) {
     const gqlHost = GqlArgumentsHost.create(host);
     const context = gqlHost.getContext();
     const info = gqlHost.getInfo();
@@ -62,7 +65,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       timestamp: new Date().toISOString(),
       path: info.path?.key,
       message:
-        typeof exceptionResponse === 'string'
+        typeof exceptionResponse === "string"
           ? exceptionResponse
           : (exceptionResponse as any).message || exception.message,
       requestId: context.req?.id,

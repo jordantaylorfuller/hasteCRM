@@ -7,6 +7,112 @@ import {
   ContactSource,
 } from "@/types/contact";
 
+// Create a custom mock context for testing
+let mockSelectState: Record<string, any> = {};
+
+// Mock the Select components to work with the test expectations
+jest.mock("@/components/ui/select", () => {
+  const React = require("react");
+  
+  // Create a stateful select component that properly manages open/close state
+  const Select = ({ children, value, onValueChange }: any) => {
+    const [isOpen, setIsOpen] = React.useState(false);
+    
+    // Pass down all props to children
+    return (
+      <div data-testid="select-wrapper">
+        {React.Children.map(children, (child: any) => {
+          if (React.isValidElement(child)) {
+            // Pass the onValueChange to SelectContent/SelectItem through context
+            if (child.type && (child.type as any).displayName === 'SelectTrigger') {
+              return React.cloneElement(child, { 
+                value,
+                isOpen,
+                setIsOpen,
+              } as any);
+            } else if (child.type && (child.type as any).displayName === 'SelectContent') {
+              return React.cloneElement(child, { 
+                isOpen,
+                onValueChange,
+                setIsOpen,
+              } as any);
+            }
+          }
+          return child;
+        })}
+      </div>
+    );
+  };
+  
+  Select.displayName = 'Select';
+  
+  return {
+    Select,
+    SelectTrigger: Object.assign(({ children, id, value, isOpen, setIsOpen }: any) => {
+      // Map values to display text
+      const displayMap: Record<string, string> = {
+        ACTIVE: "Active",
+        INACTIVE: "Inactive", 
+        ARCHIVED: "Archived",
+        MANUAL: "Manual",
+        IMPORT: "Import",
+        API: "API",
+        GMAIL: "Gmail",
+        WEBHOOK: "Webhook",
+        ENRICHMENT: "Enrichment",
+        all: "All"
+      };
+      
+      return (
+        <button
+          id={id}
+          aria-label={id === "status" ? "Status" : "Source"}
+          onClick={() => setIsOpen && setIsOpen(!isOpen)}
+          data-value={value}
+        >
+          {displayMap[value] || value || "All"}
+        </button>
+      );
+    }, { displayName: 'SelectTrigger' }),
+    
+    SelectContent: Object.assign(({ children, isOpen, onValueChange, setIsOpen }: any) => {
+      if (!isOpen) return null;
+      
+      return (
+        <div role="listbox">
+          {React.Children.map(children, (child: any) => {
+            if (React.isValidElement(child)) {
+              return React.cloneElement(child, { 
+                onValueChange,
+                setIsOpen 
+              } as any);
+            }
+            return child;
+          })}
+        </div>
+      );
+    }, { displayName: 'SelectContent' }),
+    
+    SelectItem: ({ value, children, onValueChange, setIsOpen }: any) => (
+      <div
+        role="option"
+        onClick={() => {
+          if (onValueChange) {
+            onValueChange(value);
+            // Close the select after selection
+            if (setIsOpen) setIsOpen(false);
+          }
+        }}
+        data-value={value}
+      >
+        {children}
+      </div>
+    ),
+    
+    SelectValue: ({ placeholder }: any) => <span>{placeholder}</span>,
+  };
+});
+
 const mockOnChange = jest.fn();
 
 const defaultFilters: ContactFiltersInput = {};
@@ -66,12 +172,13 @@ describe("ContactFilters", () => {
     // Open popover
     await user.click(screen.getByRole("button", { name: /filters/i }));
 
-    // Click on status select
+    // Click on status select trigger to open options
     const statusSelect = screen.getByLabelText("Status");
     await user.click(statusSelect);
 
     // Select Active status
-    await user.click(screen.getByRole("option", { name: "Active" }));
+    const activeOption = screen.getByRole("option", { name: "Active" });
+    await user.click(activeOption);
 
     // Apply filters
     await user.click(screen.getByRole("button", { name: "Apply" }));
@@ -90,12 +197,13 @@ describe("ContactFilters", () => {
     // Open popover
     await user.click(screen.getByRole("button", { name: /filters/i }));
 
-    // Click on source select
+    // Click on source select trigger to open options
     const sourceSelect = screen.getByLabelText("Source");
     await user.click(sourceSelect);
 
     // Select Gmail source
-    await user.click(screen.getByRole("option", { name: "Gmail" }));
+    const gmailOption = screen.getByRole("option", { name: "Gmail" });
+    await user.click(gmailOption);
 
     // Apply filters
     await user.click(screen.getByRole("button", { name: "Apply" }));
@@ -145,8 +253,9 @@ describe("ContactFilters", () => {
     await user.click(screen.getByRole("button", { name: /filters/i }));
 
     // Check that the selects show the current values
-    expect(screen.getByDisplayValue("Active")).toBeInTheDocument();
-    expect(screen.getByDisplayValue("Manual")).toBeInTheDocument();
+    // Select components show the selected value as text
+    expect(screen.getByText("Active")).toBeInTheDocument();
+    expect(screen.getByText("Manual")).toBeInTheDocument();
   });
 
   it("resets all filters when reset button is clicked", async () => {

@@ -1,6 +1,6 @@
-import { Controller, Get } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { RedisService } from '../redis/redis.service';
+import { Controller, Get } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { RedisService } from "../redis/redis.service";
 
 interface AppMetrics {
   timestamp: string;
@@ -30,7 +30,7 @@ interface AppMetrics {
   };
 }
 
-@Controller('metrics')
+@Controller("metrics")
 export class MetricsController {
   private requestCount = 0;
   private errorCount = 0;
@@ -49,7 +49,7 @@ export class MetricsController {
 
     // Get database metrics
     const dbMetrics = await this.getDatabaseMetrics();
-    
+
     // Get Redis metrics
     const redisMetrics = await this.getRedisMetrics();
 
@@ -71,17 +71,18 @@ export class MetricsController {
       requests: {
         total: this.requestCount,
         errors: this.errorCount,
-        avgResponseTime: this.requestCount > 0 
-          ? Math.round(this.totalResponseTime / this.requestCount) 
-          : 0,
+        avgResponseTime:
+          this.requestCount > 0
+            ? Math.round(this.totalResponseTime / this.requestCount)
+            : 0,
       },
     };
   }
 
-  @Get('prometheus')
+  @Get("prometheus")
   async getPrometheusMetrics(): Promise<string> {
     const metrics = await this.getMetrics();
-    
+
     return `
 # HELP app_uptime_seconds Application uptime in seconds
 # TYPE app_uptime_seconds gauge
@@ -136,7 +137,7 @@ app_redis_connected_clients ${metrics.redis.connectedClients || 0}
         FROM pg_stat_activity 
         WHERE datname = current_database()
       `;
-      
+
       return {
         activeConnections: Number(result[0]?.count || 0),
       };
@@ -148,12 +149,12 @@ app_redis_connected_clients ${metrics.redis.connectedClients || 0}
   private async getRedisMetrics() {
     try {
       const client = this.redis.getClient();
-      const info = await client.info('clients');
-      const memInfo = await client.info('memory');
-      
+      const info = await client.info("clients");
+      const memInfo = await client.info("memory");
+
       const clientsMatch = info.match(/connected_clients:(\d+)/);
       const memMatch = memInfo.match(/used_memory:(\d+)/);
-      
+
       return {
         connectedClients: clientsMatch ? parseInt(clientsMatch[1]) : undefined,
         usedMemory: memMatch ? parseInt(memMatch[1]) : undefined,

@@ -1,11 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { TwoFactorController } from './two-factor.controller';
-import { TwoFactorService } from './two-factor.service';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
-import { RateLimitGuard } from '../../common/guards/rate-limit.guard';
-import { UnauthorizedException } from '@nestjs/common';
+import { Test, TestingModule } from "@nestjs/testing";
+import { TwoFactorController } from "./two-factor.controller";
+import { TwoFactorService } from "./two-factor.service";
+import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
+import { RateLimitGuard } from "../../common/guards/rate-limit.guard";
+import { UnauthorizedException } from "@nestjs/common";
 
-describe('TwoFactorController', () => {
+describe("TwoFactorController", () => {
   let controller: TwoFactorController;
   let twoFactorService: TwoFactorService;
 
@@ -19,9 +19,9 @@ describe('TwoFactorController', () => {
 
   const mockRequest = {
     user: {
-      sub: 'user-123',
-      userId: 'user-123',
-      email: 'test@example.com',
+      sub: "user-123",
+      userId: "user-123",
+      email: "test@example.com",
     },
   };
 
@@ -49,179 +49,197 @@ describe('TwoFactorController', () => {
     jest.clearAllMocks();
   });
 
-  describe('setupTwoFactor', () => {
-    it('should setup two-factor authentication', async () => {
+  describe("setupTwoFactor", () => {
+    it("should setup two-factor authentication", async () => {
       const mockSetupResult = {
-        secret: 'secret-key',
-        qrCode: 'data:image/png;base64,...',
-        backupCodes: ['code1', 'code2', 'code3'],
+        secret: "secret-key",
+        qrCode: "data:image/png;base64,...",
+        backupCodes: ["code1", "code2", "code3"],
       };
 
       mockTwoFactorService.setupTwoFactor.mockResolvedValue(mockSetupResult);
 
-      const result = await controller.setupTwoFactor(mockRequest, 'password123');
+      const result = await controller.setupTwoFactor(
+        mockRequest,
+        "password123",
+      );
 
       expect(twoFactorService.setupTwoFactor).toHaveBeenCalledWith(
-        'user-123',
-        'password123',
+        "user-123",
+        "password123",
       );
       expect(result).toEqual(mockSetupResult);
     });
 
-    it('should handle invalid password', async () => {
+    it("should handle invalid password", async () => {
       mockTwoFactorService.setupTwoFactor.mockRejectedValue(
-        new UnauthorizedException('Invalid password'),
+        new UnauthorizedException("Invalid password"),
       );
 
       await expect(
-        controller.setupTwoFactor(mockRequest, 'wrongpassword'),
+        controller.setupTwoFactor(mockRequest, "wrongpassword"),
       ).rejects.toThrow(UnauthorizedException);
     });
   });
 
-  describe('enableTwoFactor', () => {
-    it('should enable two-factor authentication', async () => {
-      mockTwoFactorService.verifyAndEnableTwoFactor.mockResolvedValue(undefined);
+  describe("enableTwoFactor", () => {
+    it("should enable two-factor authentication", async () => {
+      mockTwoFactorService.verifyAndEnableTwoFactor.mockResolvedValue(
+        undefined,
+      );
 
-      const result = await controller.enableTwoFactor(mockRequest, '123456');
+      const result = await controller.enableTwoFactor(mockRequest, "123456");
 
       expect(twoFactorService.verifyAndEnableTwoFactor).toHaveBeenCalledWith(
-        'user-123',
-        '123456',
+        "user-123",
+        "123456",
       );
       expect(result).toEqual({
-        message: 'Two-factor authentication enabled successfully',
+        message: "Two-factor authentication enabled successfully",
       });
     });
 
-    it('should handle invalid token', async () => {
+    it("should handle invalid token", async () => {
       mockTwoFactorService.verifyAndEnableTwoFactor.mockRejectedValue(
-        new UnauthorizedException('Invalid token'),
+        new UnauthorizedException("Invalid token"),
       );
 
       await expect(
-        controller.enableTwoFactor(mockRequest, '000000'),
+        controller.enableTwoFactor(mockRequest, "000000"),
       ).rejects.toThrow(UnauthorizedException);
     });
   });
 
-  describe('disableTwoFactor', () => {
-    it('should disable two-factor authentication with token', async () => {
+  describe("disableTwoFactor", () => {
+    it("should disable two-factor authentication with token", async () => {
       mockTwoFactorService.disableTwoFactor.mockResolvedValue(undefined);
 
       const result = await controller.disableTwoFactor(
         mockRequest,
-        'password123',
-        '123456',
+        "password123",
+        "123456",
       );
 
       expect(twoFactorService.disableTwoFactor).toHaveBeenCalledWith(
-        'user-123',
-        'password123',
-        '123456',
+        "user-123",
+        "password123",
+        "123456",
       );
       expect(result).toEqual({
-        message: 'Two-factor authentication disabled successfully',
+        message: "Two-factor authentication disabled successfully",
       });
     });
 
-    it('should disable two-factor authentication without token', async () => {
+    it("should disable two-factor authentication without token", async () => {
       mockTwoFactorService.disableTwoFactor.mockResolvedValue(undefined);
 
       const result = await controller.disableTwoFactor(
         mockRequest,
-        'password123',
+        "password123",
         undefined,
       );
 
       expect(twoFactorService.disableTwoFactor).toHaveBeenCalledWith(
-        'user-123',
-        'password123',
-        '',
+        "user-123",
+        "password123",
+        "",
       );
       expect(result).toEqual({
-        message: 'Two-factor authentication disabled successfully',
+        message: "Two-factor authentication disabled successfully",
       });
     });
 
-    it('should handle invalid credentials', async () => {
+    it("should handle invalid credentials", async () => {
       mockTwoFactorService.disableTwoFactor.mockRejectedValue(
-        new UnauthorizedException('Invalid password or token'),
+        new UnauthorizedException("Invalid password or token"),
       );
 
       await expect(
-        controller.disableTwoFactor(mockRequest, 'wrongpassword', '000000'),
+        controller.disableTwoFactor(mockRequest, "wrongpassword", "000000"),
       ).rejects.toThrow(UnauthorizedException);
     });
   });
 
-  describe('verifyTwoFactor', () => {
-    it('should verify two-factor login', async () => {
+  describe("verifyTwoFactor", () => {
+    it("should verify two-factor login", async () => {
       const mockVerifyResult = {
-        accessToken: 'access-token',
-        refreshToken: 'refresh-token',
-        user: { id: 'user-123', email: 'test@example.com' },
+        accessToken: "access-token",
+        refreshToken: "refresh-token",
+        user: { id: "user-123", email: "test@example.com" },
       };
 
-      mockTwoFactorService.verifyTwoFactorLogin.mockResolvedValue(mockVerifyResult);
+      mockTwoFactorService.verifyTwoFactorLogin.mockResolvedValue(
+        mockVerifyResult,
+      );
 
-      const result = await controller.verifyTwoFactor('test@example.com', '123456');
+      const result = await controller.verifyTwoFactor(
+        "test@example.com",
+        "123456",
+      );
 
       expect(twoFactorService.verifyTwoFactorLogin).toHaveBeenCalledWith(
-        'test@example.com',
-        '123456',
+        "test@example.com",
+        "123456",
       );
       expect(result).toEqual(mockVerifyResult);
     });
 
-    it('should handle invalid token', async () => {
+    it("should handle invalid token", async () => {
       mockTwoFactorService.verifyTwoFactorLogin.mockRejectedValue(
-        new UnauthorizedException('Invalid token'),
+        new UnauthorizedException("Invalid token"),
       );
 
       await expect(
-        controller.verifyTwoFactor('test@example.com', '000000'),
+        controller.verifyTwoFactor("test@example.com", "000000"),
       ).rejects.toThrow(UnauthorizedException);
     });
   });
 
-  describe('recoverWithBackupCode', () => {
-    it('should recover with valid backup code', async () => {
+  describe("recoverWithBackupCode", () => {
+    it("should recover with valid backup code", async () => {
       mockTwoFactorService.verifyBackupCode.mockResolvedValue(true);
 
       const result = await controller.recoverWithBackupCode(
         mockRequest,
-        'password123',
-        'backup-code-123',
+        "password123",
+        "backup-code-123",
       );
 
       expect(twoFactorService.verifyBackupCode).toHaveBeenCalledWith(
-        'test@example.com',
-        'backup-code-123',
+        "test@example.com",
+        "backup-code-123",
       );
-      expect(result).toEqual({ message: 'Backup code verified successfully' });
+      expect(result).toEqual({ message: "Backup code verified successfully" });
     });
 
-    it('should throw error for invalid backup code', async () => {
+    it("should throw error for invalid backup code", async () => {
       mockTwoFactorService.verifyBackupCode.mockResolvedValue(false);
 
       await expect(
-        controller.recoverWithBackupCode(mockRequest, 'password123', 'invalid-code'),
+        controller.recoverWithBackupCode(
+          mockRequest,
+          "password123",
+          "invalid-code",
+        ),
       ).rejects.toThrow(UnauthorizedException);
-      
+
       expect(twoFactorService.verifyBackupCode).toHaveBeenCalledWith(
-        'test@example.com',
-        'invalid-code',
+        "test@example.com",
+        "invalid-code",
       );
     });
 
-    it('should handle service errors', async () => {
+    it("should handle service errors", async () => {
       mockTwoFactorService.verifyBackupCode.mockRejectedValue(
-        new Error('Database error'),
+        new Error("Database error"),
       );
 
       await expect(
-        controller.recoverWithBackupCode(mockRequest, 'password123', 'backup-code'),
+        controller.recoverWithBackupCode(
+          mockRequest,
+          "password123",
+          "backup-code",
+        ),
       ).rejects.toThrow(Error);
     });
   });

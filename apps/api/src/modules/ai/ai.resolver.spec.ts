@@ -1,9 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { AiResolver } from './ai.resolver';
-import { AiService } from './ai.service';
-import { CustomGqlAuthGuard } from '../../common/guards/custom-gql-auth.guard';
+import { Test, TestingModule } from "@nestjs/testing";
+import { AiResolver } from "./ai.resolver";
+import { AiService } from "./ai.service";
+import { CustomGqlAuthGuard } from "../../common/guards/custom-gql-auth.guard";
 
-describe('AiResolver', () => {
+describe("AiResolver", () => {
   let resolver: AiResolver;
   let aiService: AiService;
 
@@ -17,9 +17,9 @@ describe('AiResolver', () => {
   const mockContext = {
     req: {
       user: {
-        workspaceId: 'workspace-123',
-        userId: 'user-123',
-        email: 'test@example.com',
+        workspaceId: "workspace-123",
+        userId: "user-123",
+        email: "test@example.com",
       },
     },
   };
@@ -46,19 +46,19 @@ describe('AiResolver', () => {
     jest.clearAllMocks();
   });
 
-  describe('summarizeEmail', () => {
-    it('should summarize email with all options', async () => {
+  describe("summarizeEmail", () => {
+    it("should summarize email with all options", async () => {
       const input = {
-        emailId: 'email-123',
+        emailId: "email-123",
         includeActionItems: true,
         includeKeyPoints: true,
         maxLength: 500,
       };
 
       const mockSummary = {
-        summary: 'This is a summary of the email...',
-        actionItems: ['Follow up with client', 'Send proposal'],
-        keyPoints: ['Budget approved', 'Timeline confirmed'],
+        summary: "This is a summary of the email...",
+        actionItems: ["Follow up with client", "Send proposal"],
+        keyPoints: ["Budget approved", "Timeline confirmed"],
         originalLength: 2500,
         summaryLength: 150,
       };
@@ -67,7 +67,7 @@ describe('AiResolver', () => {
 
       const result = await resolver.summarizeEmail(input, mockContext);
 
-      expect(aiService.summarizeEmail).toHaveBeenCalledWith('email-123', {
+      expect(aiService.summarizeEmail).toHaveBeenCalledWith("email-123", {
         includeActionItems: true,
         includeKeyPoints: true,
         maxLength: 500,
@@ -75,13 +75,13 @@ describe('AiResolver', () => {
       expect(result).toEqual(mockSummary);
     });
 
-    it('should summarize email with minimal options', async () => {
+    it("should summarize email with minimal options", async () => {
       const input = {
-        emailId: 'email-456',
+        emailId: "email-456",
       };
 
       const mockSummary = {
-        summary: 'Basic email summary...',
+        summary: "Basic email summary...",
         originalLength: 1000,
         summaryLength: 100,
       };
@@ -90,7 +90,7 @@ describe('AiResolver', () => {
 
       const result = await resolver.summarizeEmail(input, mockContext);
 
-      expect(aiService.summarizeEmail).toHaveBeenCalledWith('email-456', {
+      expect(aiService.summarizeEmail).toHaveBeenCalledWith("email-456", {
         includeActionItems: undefined,
         includeKeyPoints: undefined,
         maxLength: undefined,
@@ -99,21 +99,21 @@ describe('AiResolver', () => {
     });
   });
 
-  describe('getAiInsights', () => {
-    it('should get AI insights for time range', async () => {
+  describe("getAiInsights", () => {
+    it("should get AI insights for time range", async () => {
       const timeRange = {
-        start: '2024-01-01T00:00:00Z',
-        end: '2024-01-31T23:59:59Z',
+        start: "2024-01-01T00:00:00Z",
+        end: "2024-01-31T23:59:59Z",
       };
 
       const mockInsights = {
         emailPatterns: {
           totalEmails: 500,
-          peakHours: ['9AM', '2PM'],
-          topSenders: ['client@example.com', 'partner@example.com'],
+          peakHours: ["9AM", "2PM"],
+          topSenders: ["client@example.com", "partner@example.com"],
         },
         contactInsights: {
-          mostActive: ['John Doe', 'Jane Smith'],
+          mostActive: ["John Doe", "Jane Smith"],
           newContacts: 25,
         },
         dealInsights: {
@@ -127,31 +127,34 @@ describe('AiResolver', () => {
 
       const result = await resolver.getAiInsights(timeRange, mockContext);
 
-      expect(aiService.generateInsights).toHaveBeenCalledWith('workspace-123', {
-        start: new Date('2024-01-01T00:00:00Z'),
-        end: new Date('2024-01-31T23:59:59Z'),
+      expect(aiService.generateInsights).toHaveBeenCalledWith("workspace-123", {
+        start: new Date("2024-01-01T00:00:00Z"),
+        end: new Date("2024-01-31T23:59:59Z"),
       });
       expect(result).toEqual(mockInsights);
     });
   });
 
-  describe('generateSmartCompose', () => {
-    it('should generate smart compose with all options', async () => {
+  describe("generateSmartCompose", () => {
+    it("should generate smart compose with all options", async () => {
       const input = {
-        emailId: 'email-123',
-        prompt: 'Reply thanking for the proposal',
-        tone: 'professional',
-        length: 'medium',
+        emailId: "email-123",
+        prompt: "Reply thanking for the proposal",
+        tone: "professional",
+        length: "medium",
         includeContext: true,
       };
 
       const mockCompose = {
-        suggestion: 'Thank you for sending over the proposal...',
+        suggestion: "Thank you for sending over the proposal...",
         alternativeSuggestions: [
-          'I appreciate you taking the time to send the proposal...',
-          'Thanks for the detailed proposal...',
+          "I appreciate you taking the time to send the proposal...",
+          "Thanks for the detailed proposal...",
         ],
-        contextUsed: ['Previous email mentioned budget', 'Sender is key client'],
+        contextUsed: [
+          "Previous email mentioned budget",
+          "Sender is key client",
+        ],
       };
 
       mockAiService.generateSmartCompose.mockResolvedValue(mockCompose);
@@ -159,25 +162,25 @@ describe('AiResolver', () => {
       const result = await resolver.generateSmartCompose(input, mockContext);
 
       expect(aiService.generateSmartCompose).toHaveBeenCalledWith(
-        'email-123',
-        'Reply thanking for the proposal',
+        "email-123",
+        "Reply thanking for the proposal",
         {
-          tone: 'professional',
-          length: 'medium',
+          tone: "professional",
+          length: "medium",
           includeContext: true,
         },
       );
       expect(result).toEqual(mockCompose);
     });
 
-    it('should generate smart compose with minimal options', async () => {
+    it("should generate smart compose with minimal options", async () => {
       const input = {
-        emailId: 'email-456',
-        prompt: 'Quick follow up',
+        emailId: "email-456",
+        prompt: "Quick follow up",
       };
 
       const mockCompose = {
-        suggestion: 'Following up on our previous conversation...',
+        suggestion: "Following up on our previous conversation...",
       };
 
       mockAiService.generateSmartCompose.mockResolvedValue(mockCompose);
@@ -185,8 +188,8 @@ describe('AiResolver', () => {
       const result = await resolver.generateSmartCompose(input, mockContext);
 
       expect(aiService.generateSmartCompose).toHaveBeenCalledWith(
-        'email-456',
-        'Quick follow up',
+        "email-456",
+        "Quick follow up",
         {
           tone: undefined,
           length: undefined,
@@ -196,30 +199,27 @@ describe('AiResolver', () => {
     });
   });
 
-  describe('enrichContact', () => {
-    it('should enrich contact information', async () => {
-      const contactId = 'contact-123';
+  describe("enrichContact", () => {
+    it("should enrich contact information", async () => {
+      const contactId = "contact-123";
 
       const mockEnrichedData = {
-        contactId: 'contact-123',
+        contactId: "contact-123",
         enrichedData: {
           company: {
-            name: 'Tech Corp',
-            size: '100-500',
-            industry: 'Software',
-            website: 'techcorp.com',
+            name: "Tech Corp",
+            size: "100-500",
+            industry: "Software",
+            website: "techcorp.com",
           },
           social: {
-            linkedin: 'linkedin.com/in/johndoe',
-            twitter: '@johndoe',
+            linkedin: "linkedin.com/in/johndoe",
+            twitter: "@johndoe",
           },
-          insights: [
-            'Senior decision maker',
-            'Interested in automation tools',
-          ],
+          insights: ["Senior decision maker", "Interested in automation tools"],
         },
         confidence: 0.85,
-        sources: ['Public data', 'Email signature analysis'],
+        sources: ["Public data", "Email signature analysis"],
       };
 
       mockAiService.enrichContact.mockResolvedValue(mockEnrichedData);
@@ -227,22 +227,22 @@ describe('AiResolver', () => {
       const result = await resolver.enrichContact(contactId, mockContext);
 
       expect(aiService.enrichContact).toHaveBeenCalledWith(
-        'contact-123',
-        'workspace-123',
+        "contact-123",
+        "workspace-123",
       );
       expect(result).toEqual(mockEnrichedData);
     });
 
-    it('should handle enrichment failures', async () => {
-      const contactId = 'contact-456';
+    it("should handle enrichment failures", async () => {
+      const contactId = "contact-456";
 
       mockAiService.enrichContact.mockRejectedValue(
-        new Error('Enrichment service unavailable'),
+        new Error("Enrichment service unavailable"),
       );
 
       await expect(
         resolver.enrichContact(contactId, mockContext),
-      ).rejects.toThrow('Enrichment service unavailable');
+      ).rejects.toThrow("Enrichment service unavailable");
     });
   });
 });

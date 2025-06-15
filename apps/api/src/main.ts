@@ -20,30 +20,35 @@ dotenv.config({ path: path.join(__dirname, "../../../.env") });
 
 async function bootstrap() {
   const logger = new Logger("Bootstrap");
-  
+
   const app = await NestFactory.create(AppModule, {
     logger: ["error", "warn", "log", "debug", "verbose"],
   });
 
   // Security middleware
-  app.use(helmet({
-    contentSecurityPolicy: process.env.NODE_ENV === 'production' ? undefined : false,
-    crossOriginEmbedderPolicy: false,
-  }));
+  app.use(
+    helmet({
+      contentSecurityPolicy:
+        process.env.NODE_ENV === "production" ? undefined : false,
+      crossOriginEmbedderPolicy: false,
+    }),
+  );
   app.use(compression());
 
   // Enable CORS with proper configuration
   app.enableCors({
-    origin: process.env.CORS_ORIGINS?.split(',') || true,
+    origin: process.env.CORS_ORIGINS?.split(",") || true,
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-ID'],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Request-ID"],
   });
 
   // Add request ID middleware
   app.use((req: any, res: any, next: () => void) => {
-    req.id = req.headers['x-request-id'] || `req-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    res.setHeader('X-Request-ID', req.id);
+    req.id =
+      req.headers["x-request-id"] ||
+      `req-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    res.setHeader("X-Request-ID", req.id);
     next();
   });
 
@@ -77,24 +82,27 @@ async function bootstrap() {
 
   const port = process.env.PORT || 4000;
   await app.listen(port);
-  
+
   logger.log(`🚀 API running on http://localhost:${port}`);
   logger.log(`📝 GraphQL playground: http://localhost:${port}/graphql`);
-  logger.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  logger.log(`🌍 Environment: ${process.env.NODE_ENV || "development"}`);
 }
 
 // Handle uncaught exceptions
-process.on('uncaughtException', (error) => {
-  console.error('Uncaught Exception:', error);
+process.on("uncaughtException", (error) => {
+  console.error("Uncaught Exception:", error);
   process.exit(1);
 });
 
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled Rejection at:", promise, "reason:", reason);
   process.exit(1);
 });
 
-bootstrap();
+// Only bootstrap if not in test mode or being imported
+if (require.main === module) {
+  bootstrap();
+}
 
 // Export for testing
 export { bootstrap };

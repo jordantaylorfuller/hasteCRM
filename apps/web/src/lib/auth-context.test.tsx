@@ -212,24 +212,43 @@ describe('AuthContext', () => {
         expect(result.current.loading).toBe(false);
       });
 
-      await expect(
-        act(async () => {
+      try {
+        await act(async () => {
           await result.current.login('test@example.com', 'wrong-password');
-        })
-      ).rejects.toThrow('Invalid email or password');
+        });
+        // Should not reach here
+        expect(true).toBe(false);
+      } catch (error: any) {
+        expect(error).toBe('Invalid email or password');
+      }
     });
 
     it('handles login failure', async () => {
       mockCookies.get.mockReturnValue(null);
-      mockApi.post.mockRejectedValue(new Error('Invalid credentials'));
+      mockApi.post.mockRejectedValue({
+        response: {
+          data: {
+            message: 'Invalid credentials'
+          }
+        }
+      });
 
       const { result } = renderHook(() => useAuth(), { wrapper });
 
-      await expect(
-        act(async () => {
+      // Wait for initial load
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false);
+      });
+
+      try {
+        await act(async () => {
           await result.current.login('test@example.com', 'wrong-password');
-        })
-      ).rejects.toThrow('Invalid credentials');
+        });
+        // Should not reach here
+        expect(true).toBe(false);
+      } catch (error: any) {
+        expect(error).toBe('Invalid credentials');
+      }
 
       expect(result.current.user).toBeNull();
       expect(mockPush).not.toHaveBeenCalled();
@@ -313,8 +332,8 @@ describe('AuthContext', () => {
         expect(result.current.loading).toBe(false);
       });
 
-      await expect(
-        act(async () => {
+      try {
+        await act(async () => {
           await result.current.register({
             email: 'existing@example.com',
             password: 'password123',
@@ -322,8 +341,12 @@ describe('AuthContext', () => {
             lastName: 'User',
             workspaceName: 'Test Workspace',
           });
-        })
-      ).rejects.toThrow('Email already exists');
+        });
+        // Should not reach here
+        expect(true).toBe(false);
+      } catch (error: any) {
+        expect(error).toBe('Email already exists');
+      }
 
       expect(result.current.user).toBeNull();
     });
@@ -431,6 +454,100 @@ describe('AuthContext', () => {
       );
 
       consoleError.mockRestore();
+    });
+  });
+
+  describe('Error handling edge cases', () => {
+    it('handles login error without response property', async () => {
+      mockCookies.get.mockReturnValue(null);
+      mockApi.post.mockRejectedValue(new Error('Network error'));
+
+      const { result } = renderHook(() => useAuth(), { wrapper });
+
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false);
+      });
+
+      try {
+        await act(async () => {
+          await result.current.login('test@example.com', 'password');
+        });
+        expect(true).toBe(false);
+      } catch (error: any) {
+        expect(error).toBe('Login failed');
+      }
+    });
+
+    it('handles login error with empty response data', async () => {
+      mockCookies.get.mockReturnValue(null);
+      mockApi.post.mockRejectedValue({ response: { data: {} } });
+
+      const { result } = renderHook(() => useAuth(), { wrapper });
+
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false);
+      });
+
+      try {
+        await act(async () => {
+          await result.current.login('test@example.com', 'password');
+        });
+        expect(true).toBe(false);
+      } catch (error: any) {
+        expect(error).toBe('Login failed');
+      }
+    });
+
+    it('handles register error without response property', async () => {
+      mockCookies.get.mockReturnValue(null);
+      mockApi.post.mockRejectedValue(new Error('Network error'));
+
+      const { result } = renderHook(() => useAuth(), { wrapper });
+
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false);
+      });
+
+      try {
+        await act(async () => {
+          await result.current.register({
+            email: 'test@example.com',
+            password: 'password123',
+            firstName: 'Test',
+            lastName: 'User',
+            workspaceName: 'Test Workspace',
+          });
+        });
+        expect(true).toBe(false);
+      } catch (error: any) {
+        expect(error).toBe('Registration failed');
+      }
+    });
+
+    it('handles register error with empty response data', async () => {
+      mockCookies.get.mockReturnValue(null);
+      mockApi.post.mockRejectedValue({ response: { data: {} } });
+
+      const { result } = renderHook(() => useAuth(), { wrapper });
+
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false);
+      });
+
+      try {
+        await act(async () => {
+          await result.current.register({
+            email: 'test@example.com',
+            password: 'password123',
+            firstName: 'Test',
+            lastName: 'User',
+            workspaceName: 'Test Workspace',
+          });
+        });
+        expect(true).toBe(false);
+      } catch (error: any) {
+        expect(error).toBe('Registration failed');
+      }
     });
   });
 });

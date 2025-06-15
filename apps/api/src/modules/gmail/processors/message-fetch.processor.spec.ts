@@ -1,9 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { MessageFetchProcessor } from './message-fetch.processor';
-import { GmailSyncService } from '../gmail-sync.service';
-import { Job } from 'bullmq';
+import { Test, TestingModule } from "@nestjs/testing";
+import { MessageFetchProcessor } from "./message-fetch.processor";
+import { GmailSyncService } from "../gmail-sync.service";
+import { Job } from "bullmq";
 
-describe('MessageFetchProcessor', () => {
+describe("MessageFetchProcessor", () => {
   let processor: MessageFetchProcessor;
   let gmailSyncService: GmailSyncService;
 
@@ -32,35 +32,35 @@ describe('MessageFetchProcessor', () => {
     jest.clearAllMocks();
   });
 
-  describe('process', () => {
-    it('should process fetch-message job', async () => {
+  describe("process", () => {
+    it("should process fetch-message job", async () => {
       const mockJob: Partial<Job> = {
-        name: 'fetch-message',
+        name: "fetch-message",
         data: {
-          accountId: 'account-123',
-          messageId: 'msg-123',
-          threadId: 'thread-123',
+          accountId: "account-123",
+          messageId: "msg-123",
+          threadId: "thread-123",
         },
       };
 
       await processor.process(mockJob as Job);
 
       expect(gmailSyncService.fetchAndStoreMessage).toHaveBeenCalledWith(
-        'account-123',
-        'msg-123',
-        'thread-123',
+        "account-123",
+        "msg-123",
+        "thread-123",
       );
     });
 
-    it('should process download-attachment job', async () => {
+    it("should process download-attachment job", async () => {
       const mockJob: Partial<Job> = {
-        name: 'download-attachment',
+        name: "download-attachment",
         data: {
-          accountId: 'account-123',
-          messageId: 'msg-123',
-          attachmentId: 'attach-123',
-          filename: 'document.pdf',
-          mimeType: 'application/pdf',
+          accountId: "account-123",
+          messageId: "msg-123",
+          attachmentId: "attach-123",
+          filename: "document.pdf",
+          mimeType: "application/pdf",
           size: 102400,
         },
       };
@@ -68,35 +68,35 @@ describe('MessageFetchProcessor', () => {
       await processor.process(mockJob as Job);
 
       expect(gmailSyncService.downloadAttachment).toHaveBeenCalledWith(
-        'account-123',
-        'msg-123',
-        'attach-123',
-        'document.pdf',
-        'application/pdf',
+        "account-123",
+        "msg-123",
+        "attach-123",
+        "document.pdf",
+        "application/pdf",
         102400,
       );
     });
 
-    it('should process full-sync job', async () => {
+    it("should process full-sync job", async () => {
       const mockJob: Partial<Job> = {
-        name: 'full-sync',
+        name: "full-sync",
         data: {
-          accountId: 'account-123',
+          accountId: "account-123",
           maxResults: 500,
         },
       };
 
       await processor.process(mockJob as Job);
 
-      expect(gmailSyncService.syncAccount).toHaveBeenCalledWith('account-123', {
+      expect(gmailSyncService.syncAccount).toHaveBeenCalledWith("account-123", {
         fullSync: true,
-        source: 'job',
+        source: "job",
       });
     });
 
-    it('should return undefined for unknown job types', async () => {
+    it("should return undefined for unknown job types", async () => {
       const mockJob: Partial<Job> = {
-        name: 'unknown-job',
+        name: "unknown-job",
         data: {},
       };
 
@@ -107,13 +107,13 @@ describe('MessageFetchProcessor', () => {
     });
   });
 
-  describe('processFetchMessage', () => {
-    it('should fetch and store message successfully', async () => {
+  describe("processFetchMessage", () => {
+    it("should fetch and store message successfully", async () => {
       const mockJob: Partial<Job> = {
         data: {
-          accountId: 'account-123',
-          messageId: 'msg-456',
-          threadId: 'thread-456',
+          accountId: "account-123",
+          messageId: "msg-456",
+          threadId: "thread-456",
         },
       };
 
@@ -122,39 +122,39 @@ describe('MessageFetchProcessor', () => {
       await processor.processFetchMessage(mockJob as Job);
 
       expect(gmailSyncService.fetchAndStoreMessage).toHaveBeenCalledWith(
-        'account-123',
-        'msg-456',
-        'thread-456',
+        "account-123",
+        "msg-456",
+        "thread-456",
       );
     });
 
-    it('should throw error when fetch fails', async () => {
+    it("should throw error when fetch fails", async () => {
       const mockJob: Partial<Job> = {
         data: {
-          accountId: 'account-123',
-          messageId: 'msg-789',
-          threadId: 'thread-789',
+          accountId: "account-123",
+          messageId: "msg-789",
+          threadId: "thread-789",
         },
       };
 
-      const error = new Error('Fetch failed');
+      const error = new Error("Fetch failed");
       mockGmailSyncService.fetchAndStoreMessage.mockRejectedValue(error);
 
       await expect(
         processor.processFetchMessage(mockJob as Job),
-      ).rejects.toThrow('Fetch failed');
+      ).rejects.toThrow("Fetch failed");
     });
   });
 
-  describe('processDownloadAttachment', () => {
-    it('should download attachment successfully', async () => {
+  describe("processDownloadAttachment", () => {
+    it("should download attachment successfully", async () => {
       const mockJob: Partial<Job> = {
         data: {
-          accountId: 'account-123',
-          messageId: 'msg-123',
-          attachmentId: 'attach-456',
-          filename: 'image.png',
-          mimeType: 'image/png',
+          accountId: "account-123",
+          messageId: "msg-123",
+          attachmentId: "attach-456",
+          filename: "image.png",
+          mimeType: "image/png",
           size: 204800,
         },
       };
@@ -164,28 +164,28 @@ describe('MessageFetchProcessor', () => {
       await processor.processDownloadAttachment(mockJob as Job);
 
       expect(gmailSyncService.downloadAttachment).toHaveBeenCalledWith(
-        'account-123',
-        'msg-123',
-        'attach-456',
-        'image.png',
-        'image/png',
+        "account-123",
+        "msg-123",
+        "attach-456",
+        "image.png",
+        "image/png",
         204800,
       );
     });
 
-    it('should not throw error when attachment download fails', async () => {
+    it("should not throw error when attachment download fails", async () => {
       const mockJob: Partial<Job> = {
         data: {
-          accountId: 'account-123',
-          messageId: 'msg-123',
-          attachmentId: 'attach-789',
-          filename: 'large-file.zip',
-          mimeType: 'application/zip',
+          accountId: "account-123",
+          messageId: "msg-123",
+          attachmentId: "attach-789",
+          filename: "large-file.zip",
+          mimeType: "application/zip",
           size: 10485760,
         },
       };
 
-      const error = new Error('Download failed');
+      const error = new Error("Download failed");
       mockGmailSyncService.downloadAttachment.mockRejectedValue(error);
 
       // Should not throw
@@ -197,11 +197,11 @@ describe('MessageFetchProcessor', () => {
     });
   });
 
-  describe('processFullSync', () => {
-    it('should perform full sync successfully', async () => {
+  describe("processFullSync", () => {
+    it("should perform full sync successfully", async () => {
       const mockJob: Partial<Job> = {
         data: {
-          accountId: 'account-123',
+          accountId: "account-123",
         },
       };
 
@@ -209,25 +209,25 @@ describe('MessageFetchProcessor', () => {
 
       await processor.processFullSync(mockJob as Job);
 
-      expect(gmailSyncService.syncAccount).toHaveBeenCalledWith('account-123', {
+      expect(gmailSyncService.syncAccount).toHaveBeenCalledWith("account-123", {
         fullSync: true,
-        source: 'job',
+        source: "job",
       });
     });
 
-    it('should throw error when full sync fails', async () => {
+    it("should throw error when full sync fails", async () => {
       const mockJob: Partial<Job> = {
         data: {
-          accountId: 'account-456',
+          accountId: "account-456",
         },
       };
 
-      const error = new Error('Full sync failed');
+      const error = new Error("Full sync failed");
       mockGmailSyncService.syncAccount.mockRejectedValue(error);
 
-      await expect(
-        processor.processFullSync(mockJob as Job),
-      ).rejects.toThrow('Full sync failed');
+      await expect(processor.processFullSync(mockJob as Job)).rejects.toThrow(
+        "Full sync failed",
+      );
     });
   });
 });

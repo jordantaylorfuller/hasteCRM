@@ -149,6 +149,19 @@ export class GmailWebhookService {
     await this.redisService.expire(key, 30 * 24 * 60 * 60);
   }
 
+  async getWebhookStats(accountId: string) {
+    const key = `webhook:stats:${accountId}`;
+    const count = await this.redisService.hget(key, "count");
+    const totalTime = await this.redisService.hget(key, "totalTime");
+
+    return {
+      totalReceived: parseInt(count || "0"),
+      averageProcessingTime: count && totalTime 
+        ? parseInt(totalTime) / parseInt(count)
+        : 0,
+    };
+  }
+
   async getWebhookMetrics(date?: string) {
     const targetDate = date || new Date().toISOString().split("T")[0];
     const key = `metrics:gmail:webhooks:${targetDate}`;

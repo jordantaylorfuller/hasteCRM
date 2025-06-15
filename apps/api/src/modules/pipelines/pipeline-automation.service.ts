@@ -102,10 +102,14 @@ export class PipelineAutomationService implements OnModuleInit {
       // Execute each action
       for (const action of automation.actions) {
         try {
+          // Extract action type and config from action object
+          const actionType = typeof action === 'string' ? action : action.type || action;
+          const actionConfig = typeof action === 'object' ? action.config || action : automation.actionConfig;
+          
           const result = await this.executeAction(
-            action,
+            actionType,
             context.deal,
-            automation.actionConfig,
+            actionConfig,
           );
           results.push({ action, success: true, result });
         } catch (error: any) {
@@ -116,7 +120,7 @@ export class PipelineAutomationService implements OnModuleInit {
             error: error.message,
           });
           this.logger.error(
-            `Failed to execute action ${action} for automation ${automationId}`,
+            `Failed to execute action ${typeof action === 'object' ? action.type : action} for automation ${automationId}`,
             error,
           );
         }
@@ -165,7 +169,7 @@ export class PipelineAutomationService implements OnModuleInit {
     }
 
     // Value conditions
-    const dealValue = parseFloat(context.deal.value || '0');
+    const dealValue = parseFloat(context.deal.value || "0");
     if (conditions.minValue && dealValue < conditions.minValue) {
       return false;
     }
@@ -215,28 +219,28 @@ export class PipelineAutomationService implements OnModuleInit {
   ): Promise<any> {
     switch (action) {
       case AutomationAction.SEND_EMAIL:
-        return this.sendEmailAction(deal, config.email);
+        return this.sendEmailAction(deal, config.email || config);
 
       case AutomationAction.CREATE_TASK:
-        return this.createTaskAction(deal, config.task);
+        return this.createTaskAction(deal, config.task || config);
 
       case AutomationAction.UPDATE_FIELD:
-        return this.updateFieldAction(deal, config.field);
+        return this.updateFieldAction(deal, config.field || config);
 
       case AutomationAction.ADD_TAG:
-        return this.addTagAction(deal, config.tag);
+        return this.addTagAction(deal, config.tag || config);
 
       case AutomationAction.REMOVE_TAG:
-        return this.removeTagAction(deal, config.tag);
+        return this.removeTagAction(deal, config.tag || config);
 
       case AutomationAction.ASSIGN_OWNER:
-        return this.assignOwnerAction(deal, config.owner);
+        return this.assignOwnerAction(deal, config.owner || config);
 
       case AutomationAction.CREATE_ACTIVITY:
-        return this.createActivityAction(deal, config.activity);
+        return this.createActivityAction(deal, config.activity || config);
 
       case AutomationAction.UPDATE_PROBABILITY:
-        return this.updateProbabilityAction(deal, config.probability);
+        return this.updateProbabilityAction(deal, config.probability || config);
 
       default:
         throw new Error(`Unknown action: ${action}`);

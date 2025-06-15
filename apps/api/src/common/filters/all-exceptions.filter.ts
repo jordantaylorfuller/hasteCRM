@@ -5,10 +5,10 @@ import {
   HttpException,
   HttpStatus,
   Logger,
-} from '@nestjs/common';
-import { Request, Response } from 'express';
-import { GqlArgumentsHost, GqlContextType } from '@nestjs/graphql';
-import { GraphQLError } from 'graphql';
+} from "@nestjs/common";
+import { Request, Response } from "express";
+import { GqlArgumentsHost, GqlContextType } from "@nestjs/graphql";
+import { GraphQLError } from "graphql";
 
 interface ErrorResponse {
   statusCode: number;
@@ -26,11 +26,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
   catch(exception: unknown, host: ArgumentsHost) {
     const contextType = host.getType<GqlContextType>();
-    
-    if (contextType === 'graphql') {
+
+    if (contextType === "graphql") {
       return this.handleGraphQLException(exception, host);
     }
-    
+
     return this.handleHttpException(exception, host);
   }
 
@@ -40,7 +40,12 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
 
     const { status, error } = this.getErrorInfo(exception);
-    const errorResponse = this.buildErrorResponse(exception, status, request.url, request.id);
+    const errorResponse = this.buildErrorResponse(
+      exception,
+      status,
+      request.url,
+      request.id,
+    );
 
     this.logError(exception, errorResponse, request);
 
@@ -54,10 +59,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     const { status, error } = this.getErrorInfo(exception);
     const errorResponse = this.buildErrorResponse(
-      exception, 
-      status, 
+      exception,
+      status,
       info.path?.key,
-      context.req?.id
+      context.req?.id,
     );
 
     this.logError(exception, errorResponse, context.req);
@@ -76,33 +81,36 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
   private getErrorInfo(exception: unknown): { status: number; error: string } {
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
-    let error = 'Internal Server Error';
+    let error = "Internal Server Error";
 
     if (exception instanceof HttpException) {
       status = exception.getStatus();
       const response = exception.getResponse();
-      error = typeof response === 'string' ? response : (response as any).error || exception.name;
+      error =
+        typeof response === "string"
+          ? response
+          : (response as any).error || exception.name;
     } else if (exception instanceof Error) {
       // Handle Prisma errors
-      if (exception.name === 'PrismaClientKnownRequestError') {
+      if (exception.name === "PrismaClientKnownRequestError") {
         const prismaError = exception as any;
         switch (prismaError.code) {
-          case 'P2002':
+          case "P2002":
             status = HttpStatus.CONFLICT;
-            error = 'Unique constraint violation';
+            error = "Unique constraint violation";
             break;
-          case 'P2025':
+          case "P2025":
             status = HttpStatus.NOT_FOUND;
-            error = 'Record not found';
+            error = "Record not found";
             break;
           default:
-            error = 'Database error';
+            error = "Database error";
         }
       }
       // Handle validation errors
-      else if (exception.name === 'ValidationError') {
+      else if (exception.name === "ValidationError") {
         status = HttpStatus.BAD_REQUEST;
-        error = 'Validation Error';
+        error = "Validation Error";
       }
     }
 
@@ -115,17 +123,18 @@ export class AllExceptionsFilter implements ExceptionFilter {
     path?: string,
     requestId?: string,
   ): ErrorResponse {
-    const isDevelopment = process.env.NODE_ENV === 'development';
+    const isDevelopment = process.env.NODE_ENV === "development";
     const timestamp = new Date().toISOString();
 
-    let message: string | string[] = 'An unexpected error occurred';
+    let message: string | string[] = "An unexpected error occurred";
     let stack: string | undefined;
 
     if (exception instanceof HttpException) {
       const response = exception.getResponse();
-      message = typeof response === 'string' 
-        ? response 
-        : (response as any).message || exception.message;
+      message =
+        typeof response === "string"
+          ? response
+          : (response as any).message || exception.message;
     } else if (exception instanceof Error) {
       message = exception.message;
       if (isDevelopment) {
@@ -149,7 +158,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
     return errorResponse;
   }
 
-  private logError(exception: unknown, errorResponse: ErrorResponse, request?: any) {
+  private logError(
+    exception: unknown,
+    errorResponse: ErrorResponse,
+    request?: any,
+  ) {
     const logContext = {
       statusCode: errorResponse.statusCode,
       path: errorResponse.path,
@@ -157,7 +170,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       userId: request?.user?.id,
       method: request?.method,
       ip: request?.ip,
-      userAgent: request?.get?.('user-agent'),
+      userAgent: request?.get?.("user-agent"),
     };
 
     if (errorResponse.statusCode >= 500) {
@@ -167,10 +180,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
         logContext,
       );
     } else {
-      this.logger.warn(
-        `Client error: ${errorResponse.message}`,
-        logContext,
-      );
+      this.logger.warn(`Client error: ${errorResponse.message}`, logContext);
     }
   }
 }

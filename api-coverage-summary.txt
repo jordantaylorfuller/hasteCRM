@@ -1,0 +1,315 @@
+
+> @hasteCRM/api@0.0.1 test
+> jest --coverage --coverageReporters=text-summary
+
+PASS src/modules/gmail/email-account.service.spec.ts
+[31m[Nest] 67005  - [39m06/14/2025, 8:31:45 PM [31m  ERROR[39m [38;5;3m[MessageFetchProcessor] [39m[31mFailed to fetch message msg-789:[39m
+[31m[Nest] 67005  - [39m06/14/2025, 8:31:45 PM [31m  ERROR[39m [38;5;3m[MessageFetchProcessor] [39m[31mError: Fetch failed[39m
+[31m[Nest] 67005  - [39m06/14/2025, 8:31:45 PM [31m  ERROR[39m [38;5;3m[MessageFetchProcessor] [39m[31mFailed to download attachment attach-789:[39m
+[31m[Nest] 67005  - [39m06/14/2025, 8:31:45 PM [31m  ERROR[39m [38;5;3m[MessageFetchProcessor] [39m[31mError: Download failed[39m
+[31m[Nest] 67005  - [39m06/14/2025, 8:31:45 PM [31m  ERROR[39m [38;5;3m[MessageFetchProcessor] [39m[31mFull sync failed for account account-456:[39m
+[31m[Nest] 67005  - [39m06/14/2025, 8:31:45 PM [31m  ERROR[39m [38;5;3m[MessageFetchProcessor] [39m[31mError: Full sync failed[39m
+PASS src/modules/gmail/processors/message-fetch.processor.spec.ts
+[31m[Nest] 67003  - [39m06/14/2025, 8:31:45 PM [31m  ERROR[39m [38;5;3m[WebhookRecoveryService] [39m[31mWebhook processing failed for account account-1:[39m
+[31m[Nest] 67003  - [39m06/14/2025, 8:31:45 PM [31m  ERROR[39m [38;5;3m[WebhookRecoveryService] [39m[31mError: Webhook processing failed[39m
+[31m[Nest] 67003  - [39m06/14/2025, 8:31:45 PM [31m  ERROR[39m [38;5;3m[WebhookRecoveryService] [39m[31mWebhook processing failed for account account-1:[39m
+[31m[Nest] 67003  - [39m06/14/2025, 8:31:45 PM [31m  ERROR[39m [38;5;3m[WebhookRecoveryService] [39m[31mError: Webhook processing failed[39m
+[31m[Nest] 67003  - [39m06/14/2025, 8:31:45 PM [31m  ERROR[39m [38;5;3m[WebhookRecoveryService] [39m[31mWebhook processing failed for account non-existent:[39m
+[31m[Nest] 67003  - [39m06/14/2025, 8:31:45 PM [31m  ERROR[39m [38;5;3m[WebhookRecoveryService] [39m[31mError: Webhook processing failed[39m
+[31m[Nest] 67003  - [39m06/14/2025, 8:31:45 PM [31m  ERROR[39m [38;5;3m[WebhookRecoveryService] [39m[31mWebhook processing failed for account account-1:[39m
+[31m[Nest] 67003  - [39m06/14/2025, 8:31:45 PM [31m  ERROR[39m [38;5;3m[WebhookRecoveryService] [39m[31mError: First webhook failure[39m
+PASS src/modules/webhooks/webhook-recovery.service.spec.ts
+[31m[Nest] 67004  - [39m06/14/2025, 8:31:45 PM [31m  ERROR[39m [38;5;3m[GmailWebhookService] [39m[31mNo account found for email: test@example.com[39m
+[31m[Nest] 67004  - [39m06/14/2025, 8:31:45 PM [31m  ERROR[39m [38;5;3m[GmailWebhookService] [39m[31mFailed to process Gmail notification:[39m
+[31m[Nest] 67004  - [39m06/14/2025, 8:31:45 PM [31m  ERROR[39m [38;5;3m[GmailWebhookService] [39m[31mError: Queue error[39m
+PASS src/modules/gmail/gmail-history.service.spec.ts
+[31m[Nest] 67008  - [39m06/14/2025, 8:31:45 PM [31m  ERROR[39m [38;5;3m[HistorySyncProcessor] [39m[31mHistory sync failed for account account-123:[39m
+[31m[Nest] 67008  - [39m06/14/2025, 8:31:45 PM [31m  ERROR[39m [38;5;3m[HistorySyncProcessor] [39m[31mError: Sync failed[39m
+PASS src/modules/webhooks/gmail-webhook.service.spec.ts
+[31m[Nest] 67008  - [39m06/14/2025, 8:31:45 PM [31m  ERROR[39m [38;5;3m[HistorySyncProcessor] [39m[31mHistory sync failed for account account-123:[39m
+[31m[Nest] 67008  - [39m06/14/2025, 8:31:45 PM [31m  ERROR[39m [38;5;3m[HistorySyncProcessor] [39m[31mObject:[39m
+{
+  "code": 500
+}
+
+PASS src/common/utils/notification.spec.ts
+PASS src/modules/gmail/processors/history-sync.processor.spec.ts
+[31m[Nest] 67006  - [39m06/14/2025, 8:31:45 PM [31m  ERROR[39m [38;5;3m[GmailSyncService] [39m[31mSync failed for user@example.com:[39m
+[31m[Nest] 67006  - [39m06/14/2025, 8:31:45 PM [31m  ERROR[39m [38;5;3m[GmailSyncService] [39m[31mError: API Error[39m
+PASS src/modules/gmail/gmail-sync.service.spec.ts
+PASS src/modules/gmail/gmail.service.spec.ts
+PASS src/modules/gmail/resolvers/email.resolver.spec.ts
+PASS src/modules/gmail/resolvers/email-account.resolver.spec.ts
+PASS src/modules/webhooks/gmail-webhook.controller.spec.ts
+[31m[Nest] 67001  - [39m06/14/2025, 8:31:46 PM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mUnhandled exception: Something went wrong[39m
+[31m[Nest] 67001  - [39m06/14/2025, 8:31:46 PM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mError: Something went wrong
+    at Object.<anonymous> (/Users/haste/Cursor/hasteCRM/apps/api/src/common/filters/all-exceptions.filter.spec.ts:124:25)
+    at Promise.then.completed (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/utils.js:298:28)
+    at new Promise (<anonymous>)
+    at callAsyncCircusFn (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/utils.js:231:10)
+    at _callCircusTest (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:316:40)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at _runTest (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:252:3)
+    at _runTestsForDescribeBlock (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:126:9)
+    at _runTestsForDescribeBlock (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:121:9)
+    at _runTestsForDescribeBlock (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:121:9)
+    at run (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:71:3)
+    at runAndTransformResultsToJestFormat (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+    at jestAdapter (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+    at runTestInternal (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-runner@29.7.0/node_modules/jest-runner/build/runTest.js:367:16)
+    at runTest (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-runner@29.7.0/node_modules/jest-runner/build/runTest.js:444:34)
+    at Object.worker (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-runner@29.7.0/node_modules/jest-runner/build/testWorker.js:106:12)[39m
+[31m[Nest] 67001  - [39m06/14/2025, 8:31:46 PM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mObject:[39m
+{
+  "statusCode": 500,
+  "path": "/api/test",
+  "requestId": "req-123",
+  "userId": "user-123",
+  "method": "GET",
+  "ip": "127.0.0.1",
+  "userAgent": "Mozilla/5.0"
+}
+
+[31m[Nest] 67001  - [39m06/14/2025, 8:31:46 PM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mUnhandled exception: Test error[39m
+[31m[Nest] 67001  - [39m06/14/2025, 8:31:46 PM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mError: Test error
+    at TestFile.js:123[39m
+[31m[Nest] 67001  - [39m06/14/2025, 8:31:46 PM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mObject:[39m
+{
+  "statusCode": 500,
+  "path": "/api/test",
+  "requestId": "req-123",
+  "userId": "user-123",
+  "method": "GET",
+  "ip": "127.0.0.1",
+  "userAgent": "Mozilla/5.0"
+}
+
+[31m[Nest] 67001  - [39m06/14/2025, 8:31:46 PM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mUnhandled exception: Test error[39m
+[31m[Nest] 67001  - [39m06/14/2025, 8:31:46 PM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mError: Test error
+    at TestFile.js:123[39m
+[31m[Nest] 67001  - [39m06/14/2025, 8:31:46 PM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mObject:[39m
+{
+  "statusCode": 500,
+  "path": "/api/test",
+  "requestId": "req-123",
+  "userId": "user-123",
+  "method": "GET",
+  "ip": "127.0.0.1",
+  "userAgent": "Mozilla/5.0"
+}
+
+[31m[Nest] 67001  - [39m06/14/2025, 8:31:46 PM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mUnhandled exception: An unexpected error occurred[39m
+[31m[Nest] 67001  - [39m06/14/2025, 8:31:46 PM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mundefined[39m
+[31m[Nest] 67001  - [39m06/14/2025, 8:31:46 PM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mObject:[39m
+{
+  "statusCode": 500,
+  "path": "/api/test",
+  "requestId": "req-123",
+  "userId": "user-123",
+  "method": "GET",
+  "ip": "127.0.0.1",
+  "userAgent": "Mozilla/5.0"
+}
+
+[31m[Nest] 67001  - [39m06/14/2025, 8:31:46 PM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mUnhandled exception: GraphQL generic error[39m
+[31m[Nest] 67001  - [39m06/14/2025, 8:31:46 PM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mError: GraphQL generic error
+    at Object.<anonymous> (/Users/haste/Cursor/hasteCRM/apps/api/src/common/filters/all-exceptions.filter.spec.ts:276:25)
+    at Promise.then.completed (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/utils.js:298:28)
+    at new Promise (<anonymous>)
+    at callAsyncCircusFn (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/utils.js:231:10)
+    at _callCircusTest (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:316:40)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at _runTest (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:252:3)
+    at _runTestsForDescribeBlock (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:126:9)
+    at _runTestsForDescribeBlock (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:121:9)
+    at _runTestsForDescribeBlock (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:121:9)
+    at run (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:71:3)
+    at runAndTransformResultsToJestFormat (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+    at jestAdapter (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+    at runTestInternal (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-runner@29.7.0/node_modules/jest-runner/build/runTest.js:367:16)
+    at runTest (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-runner@29.7.0/node_modules/jest-runner/build/runTest.js:444:34)
+    at Object.worker (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-runner@29.7.0/node_modules/jest-runner/build/testWorker.js:106:12)[39m
+[31m[Nest] 67001  - [39m06/14/2025, 8:31:46 PM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mObject:[39m
+{
+  "statusCode": 500,
+  "path": "testQuery",
+  "requestId": "req-123",
+  "userId": "user-123",
+  "method": "GET",
+  "ip": "127.0.0.1",
+  "userAgent": "Mozilla/5.0"
+}
+
+[31m[Nest] 67001  - [39m06/14/2025, 8:31:46 PM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mUnhandled exception: GraphQL generic error[39m
+[31m[Nest] 67001  - [39m06/14/2025, 8:31:46 PM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mError: GraphQL generic error
+    at Object.<anonymous> (/Users/haste/Cursor/hasteCRM/apps/api/src/common/filters/all-exceptions.filter.spec.ts:276:25)
+    at Promise.then.completed (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/utils.js:298:28)
+    at new Promise (<anonymous>)
+    at callAsyncCircusFn (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/utils.js:231:10)
+    at _callCircusTest (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:316:40)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at _runTest (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:252:3)
+    at _runTestsForDescribeBlock (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:126:9)
+    at _runTestsForDescribeBlock (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:121:9)
+    at _runTestsForDescribeBlock (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:121:9)
+    at run (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:71:3)
+    at runAndTransformResultsToJestFormat (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+    at jestAdapter (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+    at runTestInternal (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-runner@29.7.0/node_modules/jest-runner/build/runTest.js:367:16)
+    at runTest (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-runner@29.7.0/node_modules/jest-runner/build/runTest.js:444:34)
+    at Object.worker (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-runner@29.7.0/node_modules/jest-runner/build/testWorker.js:106:12)[39m
+[31m[Nest] 67001  - [39m06/14/2025, 8:31:46 PM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mObject:[39m
+{
+  "statusCode": 500,
+  "path": "testQuery",
+  "requestId": "req-123",
+  "userId": "user-123",
+  "method": "GET",
+  "ip": "127.0.0.1",
+  "userAgent": "Mozilla/5.0"
+}
+
+PASS src/common/filters/all-exceptions.filter.spec.ts
+PASS src/modules/auth/auth.controller.spec.ts
+PASS src/modules/ai/ai.resolver.spec.ts
+PASS src/modules/health/health.resolver.spec.ts
+PASS src/common/interceptors/logging.interceptor.spec.ts
+PASS src/modules/health/health.controller.spec.ts
+PASS src/modules/companies/companies.resolver.spec.ts
+PASS src/common/filters/validation-exception.filter.spec.ts
+PASS src/modules/contacts/dto/contact-filters.input.spec.ts
+PASS src/modules/auth/auth.service.spec.ts
+PASS src/modules/redis/redis.service.spec.ts
+PASS src/modules/contacts/contacts.resolver.spec.ts
+PASS src/modules/contacts/entities/contact.entity.spec.ts
+PASS src/modules/import-export/dto/import-contacts.input.spec.ts
+PASS src/modules/gmail/gmail.module.spec.ts
+PASS src/modules/auth/strategies/local.strategy.spec.ts
+[31m[Nest] 67003  - [39m06/14/2025, 8:31:46 PM [31m  ERROR[39m [38;5;3m[PipelineAutomationService] [39m[31mFailed to execute action SEND_EMAIL for automation automation-123[39m
+[31m[Nest] 67003  - [39m06/14/2025, 8:31:46 PM [31m  ERROR[39m [38;5;3m[PipelineAutomationService] [39m[31mError: No contacts found for deal[39m
+PASS src/modules/prisma/prisma.service.spec.ts
+PASS src/modules/health/indicators/prisma.health.spec.ts
+PASS src/common/filters/http-exception.filter.spec.ts
+PASS src/modules/pipelines/pipelines.resolver.spec.ts
+PASS src/modules/import-export/import-export.service.spec.ts
+[31m[Nest] 67003  - [39m06/14/2025, 8:31:46 PM [31m  ERROR[39m [38;5;3m[PipelineAutomationService] [39m[31mFailed to execute action CREATE_TASK for automation automation-123[39m
+[31m[Nest] 67003  - [39m06/14/2025, 8:31:46 PM [31m  ERROR[39m [38;5;3m[PipelineAutomationService] [39m[31mError: Task creation failed[39m
+PASS src/modules/auth/strategies/refresh-jwt.strategy.spec.ts
+PASS src/modules/pipelines/pipeline-automation.service.spec.ts
+[31m[Nest] 67000  - [39m06/14/2025, 8:31:46 PM [31m  ERROR[39m [38;5;3m[AiService] [39m[31mFailed to summarize email[39m
+[31m[Nest] 67000  - [39m06/14/2025, 8:31:46 PM [31m  ERROR[39m [38;5;3m[AiService] [39m[31mError: Email not found[39m
+[31m[Nest] 67000  - [39m06/14/2025, 8:31:46 PM [31m  ERROR[39m [38;5;3m[AiService] [39m[31mFailed to summarize email[39m
+[31m[Nest] 67000  - [39m06/14/2025, 8:31:46 PM [31m  ERROR[39m [38;5;3m[AiService] [39m[31mError: API Error[39m
+[31m[Nest] 67000  - [39m06/14/2025, 8:31:46 PM [31m  ERROR[39m [38;5;3m[AiService] [39m[31mFailed to generate smart compose[39m
+[31m[Nest] 67000  - [39m06/14/2025, 8:31:46 PM [31m  ERROR[39m [38;5;3m[AiService] [39m[31mError: Email not found[39m
+PASS src/modules/health/indicators/redis.health.spec.ts
+[31m[Nest] 67000  - [39m06/14/2025, 8:31:46 PM [31m  ERROR[39m [38;5;3m[AiService] [39m[31mFailed to enrich contact[39m
+[31m[Nest] 67000  - [39m06/14/2025, 8:31:46 PM [31m  ERROR[39m [38;5;3m[AiService] [39m[31mError: Contact not found[39m
+[31m[Nest] 67000  - [39m06/14/2025, 8:31:46 PM [31m  ERROR[39m [38;5;3m[AiService] [39m[31mFailed to enrich contact[39m
+[31m[Nest] 67000  - [39m06/14/2025, 8:31:46 PM [31m  ERROR[39m [38;5;3m[AiService] [39m[31mError: API Error[39m
+PASS src/modules/email/email.module.spec.ts
+PASS src/modules/ai/ai.service.spec.ts
+PASS src/modules/pipelines/processors/automation.processor.spec.ts
+PASS src/modules/pipelines/pipeline-analytics.service.spec.ts
+PASS src/modules/auth/two-factor.controller.spec.ts
+PASS src/common/guards/rate-limit.guard.spec.ts
+PASS src/modules/email/email.service.spec.ts
+  ● Console
+
+    console.error
+      Error sending email: Error: Failed to send
+          at Object.<anonymous> (/Users/haste/Cursor/hasteCRM/apps/api/src/modules/email/email.service.spec.ts:185:21)
+          at Promise.then.completed (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at _runTest (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:121:9)
+          at run (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-runner@29.7.0/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-runner@29.7.0/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-runner@29.7.0/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      45 |       // Email sent successfully
+      46 |     } catch (error) {
+    > 47 |       console.error("Error sending email:", error);
+         |               ^
+      48 |       throw error;
+      49 |     }
+      50 |   }
+
+      at EmailService.error [as sendEmail] (modules/email/email.service.ts:47:15)
+      at EmailService.sendVerificationEmail (modules/email/email.service.ts:114:5)
+      at Object.<anonymous> (modules/email/email.service.spec.ts:188:7)
+
+    console.error
+      Error sending email: Error: Failed to send
+          at Object.<anonymous> (/Users/haste/Cursor/hasteCRM/apps/api/src/modules/email/email.service.spec.ts:222:21)
+          at Promise.then.completed (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at _runTest (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:121:9)
+          at run (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-runner@29.7.0/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-runner@29.7.0/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-runner@29.7.0/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      45 |       // Email sent successfully
+      46 |     } catch (error) {
+    > 47 |       console.error("Error sending email:", error);
+         |               ^
+      48 |       throw error;
+      49 |     }
+      50 |   }
+
+      at EmailService.error [as sendEmail] (modules/email/email.service.ts:47:15)
+      at EmailService.sendPasswordResetEmail (modules/email/email.service.ts:181:5)
+      at Object.<anonymous> (modules/email/email.service.spec.ts:225:7)
+
+PASS src/modules/auth/strategies/jwt.strategy.spec.ts
+PASS src/modules/auth/two-factor.service.spec.ts
+PASS src/modules/companies/entities/company.entity.spec.ts
+PASS src/modules/pipelines/pipelines.service.spec.ts
+PASS src/modules/webhooks/guards/pubsub-auth.guard.spec.ts
+PASS src/common/guards/local-auth.guard.spec.ts
+PASS src/common/guards/custom-gql-auth.guard.spec.ts
+PASS src/modules/pipelines/deals.service.spec.ts
+PASS src/common/config/rate-limits.spec.ts
+PASS src/modules/companies/companies.service.spec.ts
+PASS src/modules/gmail/email.service.spec.ts
+PASS src/common/utils/utils.spec.ts
+PASS src/modules/prisma/prisma.module.spec.ts
+PASS src/common/exceptions/business.exception.spec.ts
+PASS src/modules/contacts/contacts.service.spec.ts
+PASS src/modules/gmail/email-parser.service.spec.ts
+PASS src/modules/auth/session.service.spec.ts
+PASS src/modules/auth/session.controller.spec.ts
+PASS src/modules/health/metrics.controller.spec.ts
+PASS src/common/interceptors/error-logging.interceptor.spec.ts
+PASS src/main.spec.ts
+PASS src/app.module.spec.ts
+
+=============================== Coverage summary ===============================
+Statements   : 89.1% ( 2960/3322 )
+Branches     : 77.14% ( 1333/1728 )
+Functions    : 76.03% ( 498/655 )
+Lines        : 88.61% ( 2762/3117 )
+================================================================================
+
+Test Suites: 65 passed, 65 total
+Tests:       967 passed, 967 total
+Snapshots:   0 total
+Time:        4.814 s, estimated 5 s
+Ran all test suites.

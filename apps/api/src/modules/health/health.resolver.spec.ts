@@ -1,7 +1,7 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { HealthResolver } from './health.resolver';
+import { Test, TestingModule } from "@nestjs/testing";
+import { HealthResolver } from "./health.resolver";
 
-describe('HealthResolver', () => {
+describe("HealthResolver", () => {
   let resolver: HealthResolver;
 
   beforeEach(async () => {
@@ -12,14 +12,14 @@ describe('HealthResolver', () => {
     resolver = module.get<HealthResolver>(HealthResolver);
   });
 
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(resolver).toBeDefined();
   });
 
-  describe('health', () => {
-    it('should return OK', () => {
+  describe("health", () => {
+    it("should return OK", () => {
       const result = resolver.health();
-      expect(result).toBe('OK');
+      expect(result).toBe("OK");
     });
   });
 });

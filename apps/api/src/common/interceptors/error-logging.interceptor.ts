@@ -4,14 +4,14 @@ import {
   ExecutionContext,
   CallHandler,
   Logger,
-} from '@nestjs/common';
-import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-import { GqlExecutionContext } from '@nestjs/graphql';
+} from "@nestjs/common";
+import { Observable, throwError } from "rxjs";
+import { catchError } from "rxjs/operators";
+import { GqlExecutionContext } from "@nestjs/graphql";
 
 @Injectable()
 export class ErrorLoggingInterceptor implements NestInterceptor {
-  private readonly logger = new Logger('ErrorInterceptor');
+  private readonly logger = new Logger("ErrorInterceptor");
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const start = Date.now();
@@ -21,16 +21,13 @@ export class ErrorLoggingInterceptor implements NestInterceptor {
       catchError((error) => {
         const duration = Date.now() - start;
         const errorContext = this.getErrorContext(context, contextType);
-        
-        this.logger.error(
-          `Error occurred after ${duration}ms`,
-          {
-            ...errorContext,
-            error: error.message,
-            stack: error.stack,
-            duration,
-          },
-        );
+
+        this.logger.error(`Error occurred after ${duration}ms`, {
+          ...errorContext,
+          error: error.message,
+          stack: error.stack,
+          duration,
+        });
 
         return throwError(() => error);
       }),
@@ -38,25 +35,25 @@ export class ErrorLoggingInterceptor implements NestInterceptor {
   }
 
   private getErrorContext(context: ExecutionContext, contextType: string) {
-    if (contextType === 'graphql') {
+    if (contextType === "graphql") {
       const gqlContext = GqlExecutionContext.create(context);
       const info = gqlContext.getInfo();
       const args = gqlContext.getArgs();
       const ctx = gqlContext.getContext();
 
       return {
-        type: 'graphql',
+        type: "graphql",
         fieldName: info.fieldName,
         parentType: info.parentType.name,
         args: this.sanitizeArgs(args),
         userId: ctx.req?.user?.id,
         requestId: ctx.req?.id,
       };
-    } else if (contextType === 'http') {
+    } else if (contextType === "http") {
       const request = context.switchToHttp().getRequest();
-      
+
       return {
-        type: 'http',
+        type: "http",
         method: request.method,
         url: request.url,
         params: request.params,
@@ -64,7 +61,7 @@ export class ErrorLoggingInterceptor implements NestInterceptor {
         body: this.sanitizeBody(request.body),
         userId: request.user?.id,
         ip: request.ip,
-        userAgent: request.get('user-agent'),
+        userAgent: request.get("user-agent"),
         requestId: request.id,
       };
     }
@@ -73,16 +70,22 @@ export class ErrorLoggingInterceptor implements NestInterceptor {
   }
 
   private sanitizeArgs(args: any): any {
-    if (!args || typeof args !== 'object') return args;
-    
-    const sensitiveFields = ['password', 'refreshToken', 'accessToken', 'totpSecret', 'creditCard'];
-    
+    if (!args || typeof args !== "object") return args;
+
+    const sensitiveFields = [
+      "password",
+      "refreshToken",
+      "accessToken",
+      "totpSecret",
+      "creditCard",
+    ];
+
     const sanitize = (obj: any): any => {
       if (Array.isArray(obj)) {
-        return obj.map(item => sanitize(item));
+        return obj.map((item) => sanitize(item));
       }
-      
-      if (obj && typeof obj === 'object') {
+
+      if (obj && typeof obj === "object") {
         const sanitized: any = {};
         for (const [key, value] of Object.entries(obj)) {
           if (!sensitiveFields.includes(key)) {
@@ -91,10 +94,10 @@ export class ErrorLoggingInterceptor implements NestInterceptor {
         }
         return sanitized;
       }
-      
+
       return obj;
     };
-    
+
     return sanitize(args);
   }
 

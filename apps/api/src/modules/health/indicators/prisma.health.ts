@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
 import {
   HealthIndicator,
   HealthIndicatorResult,
   HealthCheckError,
-} from '@nestjs/terminus';
-import { PrismaService } from '../../prisma/prisma.service';
+} from "@nestjs/terminus";
+import { PrismaService } from "../../prisma/prisma.service";
 
 @Injectable()
 export class PrismaHealthIndicator extends HealthIndicator {
@@ -15,24 +15,24 @@ export class PrismaHealthIndicator extends HealthIndicator {
   async isHealthy(key: string): Promise<HealthIndicatorResult> {
     try {
       const startTime = Date.now();
-      
+
       // Execute a simple query to check database connectivity
       await this.prisma.$queryRaw`SELECT 1`;
-      
+
       const responseTime = Date.now() - startTime;
-      
+
       // Get connection pool stats if available
       const metrics = await this.getMetrics();
-      
+
       return this.getStatus(key, true, {
         responseTime: `${responseTime}ms`,
         ...metrics,
       });
     } catch (error) {
       throw new HealthCheckError(
-        'Database health check failed',
+        "Database health check failed",
         this.getStatus(key, false, {
-          message: error instanceof Error ? error.message : 'Unknown error',
+          message: error instanceof Error ? error.message : "Unknown error",
         }),
       );
     }
@@ -44,7 +44,7 @@ export class PrismaHealthIndicator extends HealthIndicator {
       return this.getStatus(key, true);
     } catch (error) {
       throw new HealthCheckError(
-        'Database ping failed',
+        "Database ping failed",
         this.getStatus(key, false),
       );
     }
@@ -56,7 +56,7 @@ export class PrismaHealthIndicator extends HealthIndicator {
       const versionResult = await this.prisma.$queryRaw<[{ version: string }]>`
         SELECT version() as version
       `;
-      const version = versionResult[0]?.version?.split(' ')[1] || 'unknown';
+      const version = versionResult[0]?.version?.split(" ")[1] || "unknown";
 
       // Get connection count
       const connectionResult = await this.prisma.$queryRaw<[{ count: bigint }]>`
@@ -70,7 +70,7 @@ export class PrismaHealthIndicator extends HealthIndicator {
       const sizeResult = await this.prisma.$queryRaw<[{ size: string }]>`
         SELECT pg_size_pretty(pg_database_size(current_database())) as size
       `;
-      const size = sizeResult[0]?.size || 'unknown';
+      const size = sizeResult[0]?.size || "unknown";
 
       return {
         version,

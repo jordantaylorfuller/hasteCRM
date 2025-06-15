@@ -1,0 +1,438 @@
+
+> @hasteCRM/api@0.0.1 test:cov /Users/haste/Cursor/hasteCRM/apps/api
+> jest --coverage
+
+PASS src/modules/gmail/email-account.service.spec.ts
+[31m[Nest] 71033  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[GmailWebhookService] [39m[31mNo account found for email: test@example.com[39m
+[31m[Nest] 71033  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[GmailWebhookService] [39m[31mFailed to process Gmail notification:[39m
+[31m[Nest] 71033  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[GmailWebhookService] [39m[31mError: Queue error[39m
+[31m[Nest] 71030  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[MessageFetchProcessor] [39m[31mFailed to fetch message msg-789:[39m
+[31m[Nest] 71030  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[MessageFetchProcessor] [39m[31mError: Fetch failed[39m
+[31m[Nest] 71032  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[HistorySyncProcessor] [39m[31mHistory sync failed for account account-123:[39m
+[31m[Nest] 71032  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[HistorySyncProcessor] [39m[31mError: Sync failed[39m
+[31m[Nest] 71030  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[MessageFetchProcessor] [39m[31mFailed to download attachment attach-789:[39m
+[31m[Nest] 71030  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[MessageFetchProcessor] [39m[31mError: Download failed[39m
+PASS src/modules/webhooks/gmail-webhook.service.spec.ts
+[31m[Nest] 71030  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[MessageFetchProcessor] [39m[31mFull sync failed for account account-456:[39m
+[31m[Nest] 71030  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[MessageFetchProcessor] [39m[31mError: Full sync failed[39m
+[31m[Nest] 71032  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[HistorySyncProcessor] [39m[31mHistory sync failed for account account-123:[39m
+[31m[Nest] 71032  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[HistorySyncProcessor] [39m[31mObject:[39m
+{
+  "code": 500
+}
+
+PASS src/modules/gmail/processors/history-sync.processor.spec.ts
+[31m[Nest] 71031  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[WebhookRecoveryService] [39m[31mWebhook processing failed for account account-1:[39m
+[31m[Nest] 71031  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[WebhookRecoveryService] [39m[31mError: Webhook processing failed[39m
+PASS src/modules/gmail/processors/message-fetch.processor.spec.ts
+[31m[Nest] 71031  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[WebhookRecoveryService] [39m[31mWebhook processing failed for account account-1:[39m
+[31m[Nest] 71031  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[WebhookRecoveryService] [39m[31mError: Webhook processing failed[39m
+[31m[Nest] 71031  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[WebhookRecoveryService] [39m[31mWebhook processing failed for account non-existent:[39m
+[31m[Nest] 71031  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[WebhookRecoveryService] [39m[31mError: Webhook processing failed[39m
+[31m[Nest] 71031  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[WebhookRecoveryService] [39m[31mWebhook processing failed for account account-1:[39m
+[31m[Nest] 71031  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[WebhookRecoveryService] [39m[31mError: First webhook failure[39m
+[31m[Nest] 71028  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[GmailSyncService] [39m[31mSync failed for user@example.com:[39m
+[31m[Nest] 71028  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[GmailSyncService] [39m[31mError: API Error[39m
+PASS src/modules/webhooks/webhook-recovery.service.spec.ts
+PASS src/common/utils/notification.spec.ts
+PASS src/modules/gmail/gmail-history.service.spec.ts
+PASS src/modules/gmail/gmail-sync.service.spec.ts
+PASS src/modules/gmail/gmail.service.spec.ts
+PASS src/modules/webhooks/gmail-webhook.controller.spec.ts
+PASS src/modules/gmail/resolvers/email.resolver.spec.ts
+PASS src/modules/gmail/resolvers/email-account.resolver.spec.ts
+PASS src/modules/pipelines/pipelines.resolver.spec.ts
+[31m[Nest] 71024  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mUnhandled exception: Something went wrong[39m
+[31m[Nest] 71024  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mError: Something went wrong
+    at Object.<anonymous> (/Users/haste/Cursor/hasteCRM/apps/api/src/common/filters/all-exceptions.filter.spec.ts:124:25)
+    at Promise.then.completed (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/utils.js:298:28)
+    at new Promise (<anonymous>)
+    at callAsyncCircusFn (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/utils.js:231:10)
+    at _callCircusTest (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:316:40)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at _runTest (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:252:3)
+    at _runTestsForDescribeBlock (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:126:9)
+    at _runTestsForDescribeBlock (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:121:9)
+    at _runTestsForDescribeBlock (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:121:9)
+    at run (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:71:3)
+    at runAndTransformResultsToJestFormat (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+    at jestAdapter (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+    at runTestInternal (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-runner@29.7.0/node_modules/jest-runner/build/runTest.js:367:16)
+    at runTest (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-runner@29.7.0/node_modules/jest-runner/build/runTest.js:444:34)
+    at Object.worker (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-runner@29.7.0/node_modules/jest-runner/build/testWorker.js:106:12)[39m
+[31m[Nest] 71024  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mObject:[39m
+{
+  "statusCode": 500,
+  "path": "/api/test",
+  "requestId": "req-123",
+  "userId": "user-123",
+  "method": "GET",
+  "ip": "127.0.0.1",
+  "userAgent": "Mozilla/5.0"
+}
+
+[31m[Nest] 71024  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mUnhandled exception: Test error[39m
+[31m[Nest] 71024  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mError: Test error
+    at TestFile.js:123[39m
+[31m[Nest] 71024  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mObject:[39m
+{
+  "statusCode": 500,
+  "path": "/api/test",
+  "requestId": "req-123",
+  "userId": "user-123",
+  "method": "GET",
+  "ip": "127.0.0.1",
+  "userAgent": "Mozilla/5.0"
+}
+
+[31m[Nest] 71024  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mUnhandled exception: Test error[39m
+[31m[Nest] 71024  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mError: Test error
+    at TestFile.js:123[39m
+[31m[Nest] 71024  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mObject:[39m
+{
+  "statusCode": 500,
+  "path": "/api/test",
+  "requestId": "req-123",
+  "userId": "user-123",
+  "method": "GET",
+  "ip": "127.0.0.1",
+  "userAgent": "Mozilla/5.0"
+}
+
+[31m[Nest] 71024  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mUnhandled exception: An unexpected error occurred[39m
+[31m[Nest] 71024  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mundefined[39m
+[31m[Nest] 71024  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mObject:[39m
+{
+  "statusCode": 500,
+  "path": "/api/test",
+  "requestId": "req-123",
+  "userId": "user-123",
+  "method": "GET",
+  "ip": "127.0.0.1",
+  "userAgent": "Mozilla/5.0"
+}
+
+[31m[Nest] 71024  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mUnhandled exception: GraphQL generic error[39m
+[31m[Nest] 71024  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mError: GraphQL generic error
+    at Object.<anonymous> (/Users/haste/Cursor/hasteCRM/apps/api/src/common/filters/all-exceptions.filter.spec.ts:276:25)
+    at Promise.then.completed (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/utils.js:298:28)
+    at new Promise (<anonymous>)
+    at callAsyncCircusFn (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/utils.js:231:10)
+    at _callCircusTest (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:316:40)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at _runTest (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:252:3)
+    at _runTestsForDescribeBlock (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:126:9)
+    at _runTestsForDescribeBlock (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:121:9)
+    at _runTestsForDescribeBlock (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:121:9)
+    at run (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:71:3)
+    at runAndTransformResultsToJestFormat (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+    at jestAdapter (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+    at runTestInternal (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-runner@29.7.0/node_modules/jest-runner/build/runTest.js:367:16)
+    at runTest (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-runner@29.7.0/node_modules/jest-runner/build/runTest.js:444:34)
+    at Object.worker (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-runner@29.7.0/node_modules/jest-runner/build/testWorker.js:106:12)[39m
+[31m[Nest] 71024  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mObject:[39m
+{
+  "statusCode": 500,
+  "path": "testQuery",
+  "requestId": "req-123",
+  "userId": "user-123",
+  "method": "GET",
+  "ip": "127.0.0.1",
+  "userAgent": "Mozilla/5.0"
+}
+
+[31m[Nest] 71024  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mUnhandled exception: GraphQL generic error[39m
+[31m[Nest] 71024  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mError: GraphQL generic error
+    at Object.<anonymous> (/Users/haste/Cursor/hasteCRM/apps/api/src/common/filters/all-exceptions.filter.spec.ts:276:25)
+    at Promise.then.completed (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/utils.js:298:28)
+    at new Promise (<anonymous>)
+    at callAsyncCircusFn (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/utils.js:231:10)
+    at _callCircusTest (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:316:40)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at _runTest (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:252:3)
+    at _runTestsForDescribeBlock (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:126:9)
+    at _runTestsForDescribeBlock (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:121:9)
+    at _runTestsForDescribeBlock (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:121:9)
+    at run (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:71:3)
+    at runAndTransformResultsToJestFormat (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+    at jestAdapter (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+    at runTestInternal (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-runner@29.7.0/node_modules/jest-runner/build/runTest.js:367:16)
+    at runTest (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-runner@29.7.0/node_modules/jest-runner/build/runTest.js:444:34)
+    at Object.worker (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-runner@29.7.0/node_modules/jest-runner/build/testWorker.js:106:12)[39m
+[31m[Nest] 71024  - [39m06/15/2025, 12:13:49 AM [31m  ERROR[39m [38;5;3m[AllExceptionsFilter] [39m[31mObject:[39m
+{
+  "statusCode": 500,
+  "path": "testQuery",
+  "requestId": "req-123",
+  "userId": "user-123",
+  "method": "GET",
+  "ip": "127.0.0.1",
+  "userAgent": "Mozilla/5.0"
+}
+
+PASS src/common/filters/all-exceptions.filter.spec.ts
+PASS src/common/interceptors/logging.interceptor.spec.ts
+PASS src/modules/ai/ai.resolver.spec.ts
+PASS src/modules/redis/redis.service.spec.ts
+PASS src/modules/contacts/dto/contact-filters.input.spec.ts
+PASS src/modules/import-export/dto/import-contacts.input.spec.ts
+PASS src/modules/contacts/contacts.resolver.spec.ts
+PASS src/modules/companies/companies.resolver.spec.ts
+PASS src/modules/auth/auth.controller.spec.ts
+PASS src/modules/pipelines/processors/automation.processor.spec.ts
+PASS src/common/filters/http-exception.filter.spec.ts
+[31m[Nest] 71031  - [39m06/15/2025, 12:13:50 AM [31m  ERROR[39m [38;5;3m[AiService] [39m[31mFailed to summarize email[39m
+[31m[Nest] 71031  - [39m06/15/2025, 12:13:50 AM [31m  ERROR[39m [38;5;3m[AiService] [39m[31mError: Email not found[39m
+[31m[Nest] 71031  - [39m06/15/2025, 12:13:50 AM [31m  ERROR[39m [38;5;3m[AiService] [39m[31mFailed to summarize email[39m
+[31m[Nest] 71031  - [39m06/15/2025, 12:13:50 AM [31m  ERROR[39m [38;5;3m[AiService] [39m[31mError: API Error[39m
+[31m[Nest] 71031  - [39m06/15/2025, 12:13:50 AM [31m  ERROR[39m [38;5;3m[AiService] [39m[31mFailed to generate smart compose[39m
+[31m[Nest] 71031  - [39m06/15/2025, 12:13:50 AM [31m  ERROR[39m [38;5;3m[AiService] [39m[31mError: Email not found[39m
+[31m[Nest] 71031  - [39m06/15/2025, 12:13:50 AM [31m  ERROR[39m [38;5;3m[AiService] [39m[31mFailed to enrich contact[39m
+[31m[Nest] 71031  - [39m06/15/2025, 12:13:50 AM [31m  ERROR[39m [38;5;3m[AiService] [39m[31mError: Contact not found[39m
+[31m[Nest] 71031  - [39m06/15/2025, 12:13:50 AM [31m  ERROR[39m [38;5;3m[AiService] [39m[31mFailed to enrich contact[39m
+[31m[Nest] 71031  - [39m06/15/2025, 12:13:50 AM [31m  ERROR[39m [38;5;3m[AiService] [39m[31mError: API Error[39m
+PASS src/modules/contacts/entities/contact.entity.spec.ts
+PASS src/modules/ai/ai.service.spec.ts
+PASS src/common/filters/validation-exception.filter.spec.ts
+PASS src/modules/auth/strategies/local.strategy.spec.ts
+PASS src/modules/auth/auth.service.spec.ts
+PASS src/modules/gmail/gmail.module.spec.ts
+PASS src/modules/health/indicators/prisma.health.spec.ts
+PASS src/modules/prisma/prisma.service.spec.ts
+PASS src/modules/health/indicators/redis.health.spec.ts
+[31m[Nest] 71027  - [39m06/15/2025, 12:13:50 AM [31m  ERROR[39m [38;5;3m[PipelineAutomationService] [39m[31mFailed to execute action SEND_EMAIL for automation automation-123[39m
+[31m[Nest] 71027  - [39m06/15/2025, 12:13:50 AM [31m  ERROR[39m [38;5;3m[PipelineAutomationService] [39m[31mError: No contacts found for deal[39m
+PASS src/modules/auth/two-factor.controller.spec.ts
+PASS src/modules/health/health.controller.spec.ts
+[31m[Nest] 71027  - [39m06/15/2025, 12:13:50 AM [31m  ERROR[39m [38;5;3m[PipelineAutomationService] [39m[31mFailed to execute action CREATE_TASK for automation automation-123[39m
+[31m[Nest] 71027  - [39m06/15/2025, 12:13:50 AM [31m  ERROR[39m [38;5;3m[PipelineAutomationService] [39m[31mError: Task creation failed[39m
+PASS src/modules/contacts/contacts.service.spec.ts
+PASS src/modules/import-export/import-export.service.spec.ts
+PASS src/modules/pipelines/pipeline-automation.service.spec.ts
+PASS src/modules/pipelines/deals.service.spec.ts
+PASS src/modules/health/health.resolver.spec.ts
+PASS src/modules/auth/two-factor.service.spec.ts
+PASS src/modules/companies/entities/company.entity.spec.ts
+PASS src/modules/pipelines/pipeline-analytics.service.spec.ts
+PASS src/common/interceptors/error-logging.interceptor.spec.ts
+PASS src/modules/auth/strategies/refresh-jwt.strategy.spec.ts
+PASS src/modules/gmail/email.service.spec.ts
+PASS src/modules/health/metrics.controller.spec.ts
+PASS src/modules/pipelines/pipelines.service.spec.ts
+PASS src/modules/email/email.module.spec.ts
+PASS src/modules/auth/strategies/jwt.strategy.spec.ts
+PASS src/modules/email/email.service.spec.ts
+  ● Console
+
+    console.error
+      Error sending email: Error: Failed to send
+          at Object.<anonymous> (/Users/haste/Cursor/hasteCRM/apps/api/src/modules/email/email.service.spec.ts:185:21)
+          at Promise.then.completed (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at _runTest (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:121:9)
+          at run (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-runner@29.7.0/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-runner@29.7.0/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-runner@29.7.0/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      45 |       // Email sent successfully
+      46 |     } catch (error) {
+    > 47 |       console.error("Error sending email:", error);
+         |               ^
+      48 |       throw error;
+      49 |     }
+      50 |   }
+
+      at EmailService.error [as sendEmail] (modules/email/email.service.ts:47:15)
+      at EmailService.sendVerificationEmail (modules/email/email.service.ts:114:5)
+      at Object.<anonymous> (modules/email/email.service.spec.ts:188:7)
+
+    console.error
+      Error sending email: Error: Failed to send
+          at Object.<anonymous> (/Users/haste/Cursor/hasteCRM/apps/api/src/modules/email/email.service.spec.ts:222:21)
+          at Promise.then.completed (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at _runTest (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:121:9)
+          at run (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-runner@29.7.0/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-runner@29.7.0/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/Users/haste/Cursor/hasteCRM/node_modules/.pnpm/jest-runner@29.7.0/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      45 |       // Email sent successfully
+      46 |     } catch (error) {
+    > 47 |       console.error("Error sending email:", error);
+         |               ^
+      48 |       throw error;
+      49 |     }
+      50 |   }
+
+      at EmailService.error [as sendEmail] (modules/email/email.service.ts:47:15)
+      at EmailService.sendPasswordResetEmail (modules/email/email.service.ts:181:5)
+      at Object.<anonymous> (modules/email/email.service.spec.ts:225:7)
+
+PASS src/common/guards/custom-gql-auth.guard.spec.ts
+PASS src/common/config/rate-limits.spec.ts
+PASS src/modules/webhooks/guards/pubsub-auth.guard.spec.ts
+PASS src/modules/prisma/prisma.module.spec.ts
+PASS src/common/utils/utils.spec.ts
+PASS src/modules/auth/session.service.spec.ts
+PASS src/common/guards/rate-limit.guard.spec.ts
+PASS src/common/guards/local-auth.guard.spec.ts
+PASS src/common/exceptions/business.exception.spec.ts
+PASS src/modules/companies/companies.service.spec.ts
+PASS src/modules/auth/session.controller.spec.ts
+PASS src/modules/gmail/email-parser.service.spec.ts
+PASS src/main.spec.ts
+PASS src/app.module.spec.ts
+------------------------------------|---------|----------|---------|---------|-------------------------------------------------------------------
+File                                | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                                 
+------------------------------------|---------|----------|---------|---------|-------------------------------------------------------------------
+All files                           |    89.1 |    77.14 |   76.03 |   88.61 |                                                                   
+ src                                |   85.13 |    53.84 |      60 |   85.91 |                                                                   
+  app.module.ts                     |   68.75 |    26.66 |       0 |   68.96 | 44-59                                                             
+  main.ts                           |   97.61 |     90.9 |     100 |   97.61 | 104                                                               
+ src/common/config                  |     100 |      100 |     100 |     100 |                                                                   
+  rate-limits.ts                    |     100 |      100 |     100 |     100 |                                                                   
+ src/common/decorators              |     100 |      100 |     100 |     100 |                                                                   
+  rate-limit.decorator.ts           |     100 |      100 |     100 |     100 |                                                                   
+ src/common/exceptions              |     100 |      100 |     100 |     100 |                                                                   
+  business.exception.ts             |     100 |      100 |     100 |     100 |                                                                   
+ src/common/filters                 |   99.25 |     92.3 |     100 |    99.2 |                                                                   
+  all-exceptions.filter.ts          |   98.59 |    90.62 |     100 |   98.48 | 107                                                               
+  http-exception.filter.ts          |     100 |     90.9 |     100 |     100 | 70                                                                
+  validation-exception.filter.ts    |     100 |      100 |     100 |     100 |                                                                   
+ src/common/guards                  |     100 |    85.71 |     100 |     100 |                                                                   
+  custom-gql-auth.guard.ts          |     100 |    82.35 |     100 |     100 | 14,39                                                             
+  jwt-auth.guard.ts                 |     100 |      100 |     100 |     100 |                                                                   
+  local-auth.guard.ts               |     100 |      100 |     100 |     100 |                                                                   
+  rate-limit.guard.ts               |     100 |       88 |     100 |     100 | 23,89                                                             
+  refresh-jwt-auth.guard.ts         |     100 |      100 |     100 |     100 |                                                                   
+ src/common/interceptors            |   97.43 |     90.9 |   94.11 |   98.59 |                                                                   
+  error-logging.interceptor.ts      |   95.23 |     90.9 |   88.88 |   97.29 | 85                                                                
+  logging.interceptor.ts            |     100 |     90.9 |     100 |     100 | 49                                                                
+ src/common/utils                   |   96.55 |      100 |     100 |   96.29 |                                                                   
+  crypto.ts                         |     100 |      100 |     100 |     100 |                                                                   
+  helpers.ts                        |     100 |      100 |     100 |     100 |                                                                   
+  index.ts                          |       0 |      100 |     100 |       0 | 1-3                                                               
+  notification.ts                   |     100 |      100 |     100 |     100 |                                                                   
+  pagination.ts                     |     100 |      100 |     100 |     100 |                                                                   
+ src/modules/ai                     |   93.75 |    68.62 |   94.73 |   93.44 |                                                                   
+  ai.module.ts                      |     100 |       50 |     100 |     100 | 17                                                                
+  ai.resolver.ts                    |     100 |       75 |     100 |     100 | 9-56                                                              
+  ai.service.ts                     |   91.75 |     67.5 |   92.85 |   91.57 | 153-174,257-258,291                                               
+ src/modules/auth                   |   79.64 |    63.84 |   78.94 |   79.02 |                                                                   
+  auth.controller.ts                |   96.29 |    72.41 |    92.3 |   96.15 | 40-41                                                             
+  auth.module.ts                    |     100 |       50 |     100 |     100 | 26                                                                
+  auth.service.ts                   |   73.17 |    57.33 |   72.72 |   72.83 | 111,151,162,210,215,220,226,231,354-446,490-529,623-647           
+  session.controller.ts             |     100 |       75 |     100 |     100 | 18                                                                
+  session.service.ts                |   83.33 |    71.42 |   72.22 |   82.25 | 116-145                                                           
+  two-factor.controller.ts          |     100 |    85.71 |     100 |     100 | 19                                                                
+  two-factor.service.ts             |   66.99 |    63.04 |   69.23 |   66.66 | 27,59,95,134,150,193-203,215-247,294-327                          
+ src/modules/auth/dto               |     100 |      100 |     100 |     100 |                                                                   
+  login.dto.ts                      |     100 |      100 |     100 |     100 |                                                                   
+  register.dto.ts                   |     100 |      100 |     100 |     100 |                                                                   
+  two-factor.dto.ts                 |     100 |      100 |     100 |     100 |                                                                   
+ src/modules/auth/strategies        |   89.06 |       80 |    87.5 |    87.5 |                                                                   
+  google.strategy.ts                |      60 |       75 |      50 |   53.84 | 23-37                                                             
+  jwt.strategy.ts                   |   94.44 |    76.92 |     100 |   93.75 | 30                                                                
+  local.strategy.ts                 |     100 |       80 |     100 |     100 | 8                                                                 
+  refresh-jwt.strategy.ts           |     100 |     87.5 |     100 |     100 | 15                                                                
+ src/modules/companies              |   83.78 |    77.27 |      52 |   82.08 |                                                                   
+  companies.module.ts               |     100 |       50 |     100 |     100 | 14                                                                
+  companies.resolver.ts             |   72.72 |       75 |   36.84 |   70.73 | 13,22,24-25,33,35,42,44,52,54,66,69                               
+  companies.service.ts              |     100 |     87.5 |     100 |     100 | 8                                                                 
+ src/modules/companies/dto          |      92 |      100 |       0 |    91.3 |                                                                   
+  create-company.input.ts           |      92 |      100 |       0 |    91.3 | 49,55                                                             
+ src/modules/companies/entities     |   90.32 |       75 |       0 |   89.65 |                                                                   
+  company.entity.ts                 |   90.32 |       75 |       0 |   89.65 | 5,32,35                                                           
+ src/modules/contacts               |   84.89 |    80.85 |   54.34 |   83.96 |                                                                   
+  contacts.module.ts                |     100 |       50 |     100 |     100 | 14                                                                
+  contacts.resolver.ts              |   69.11 |       75 |   34.37 |   67.69 | 15,24,27-28,35,37,44,48-49,56,66,68,75,77,84,86-87,94,96,108,111  
+  contacts.service.ts               |     100 |       88 |     100 |     100 | 10-31                                                             
+ src/modules/contacts/dto           |   91.48 |       75 |       0 |   90.24 |                                                                   
+  contact-filters.input.ts          |   82.35 |       75 |       0 |      80 | 12,17,27                                                          
+  create-contact.input.ts           |     100 |      100 |     100 |     100 |                                                                   
+  update-contact.input.ts           |    87.5 |      100 |       0 |   83.33 | 7                                                                 
+ src/modules/contacts/entities      |    90.9 |    77.41 |      20 |   90.47 |                                                                   
+  contact.entity.ts                 |    90.9 |    77.41 |      20 |   90.47 | 16,76,79,82                                                       
+ src/modules/email                  |     100 |      100 |     100 |     100 |                                                                   
+  email.module.ts                   |     100 |      100 |     100 |     100 |                                                                   
+  email.service.ts                  |     100 |      100 |     100 |     100 |                                                                   
+ src/modules/gmail                  |   79.45 |    70.46 |   78.16 |   78.82 |                                                                   
+  email-account.service.ts          |     100 |    83.33 |     100 |     100 | 11                                                                
+  email-parser.service.ts           |    81.3 |    71.42 |      70 |   81.18 | 82-83,120,167,257-259,289-344                                     
+  email.service.ts                  |     100 |    96.42 |     100 |     100 | 46                                                                
+  gmail-history.service.ts          |      72 |    60.86 |   83.33 |   71.23 | 167-173,180-187,193-200,240-270                                   
+  gmail-sync.service.ts             |   66.66 |    69.56 |      50 |   65.82 | 46,64,79-80,116,138,211-278                                       
+  gmail.module.ts                   |     100 |       50 |     100 |     100 | 26                                                                
+  gmail.service.ts                  |   63.49 |    57.57 |   55.55 |   62.29 | 32-34,158-217,245-269,324-326                                     
+ src/modules/gmail/processors       |     100 |    83.33 |     100 |     100 |                                                                   
+  history-sync.processor.ts         |     100 |    81.81 |     100 |     100 | 19                                                                
+  message-fetch.processor.ts        |     100 |    85.71 |     100 |     100 | 30                                                                
+ src/modules/gmail/resolvers        |   86.15 |    70.54 |   68.57 |   85.48 |                                                                   
+  email-account.resolver.ts         |   84.61 |    76.19 |      60 |   83.78 | 24,49,59,68,77-78                                                 
+  email.resolver.ts                 |   86.81 |    67.81 |      75 |    86.2 | 28-29,52,76-77,165,189,240,261,276,285,306                        
+ src/modules/health                 |    98.8 |    81.63 |   95.23 |   98.66 |                                                                   
+  health.controller.ts              |     100 |       75 |     100 |     100 | 14-17                                                             
+  health.module.ts                  |     100 |      100 |     100 |     100 |                                                                   
+  health.resolver.ts                |   85.71 |      100 |      50 |      80 | 5                                                                 
+  metrics.controller.ts             |     100 |     86.2 |     100 |     100 | 40-45,83                                                          
+ src/modules/health/indicators      |   96.55 |    77.14 |     100 |   96.29 |                                                                   
+  prisma.health.ts                  |   96.42 |    58.33 |     100 |   96.15 | 82                                                                
+  redis.health.ts                   |   96.66 |    86.95 |     100 |   96.42 | 25                                                                
+ src/modules/import-export          |   73.25 |    70.83 |       5 |   70.51 |                                                                   
+  import-export.module.ts           |     100 |       50 |     100 |     100 | 17                                                                
+  import-export.resolver.ts         |   68.91 |    71.73 |       5 |   66.17 | 20,26-36,41-51,56-60,65-66,77,80,83,86,98,116,119,122,125,128,149 
+ src/modules/import-export/dto      |   83.33 |       50 |       0 |   78.57 |                                                                   
+  import-contacts.input.ts          |   83.33 |       50 |       0 |   78.57 | 17,28,32                                                          
+ src/modules/import-export/services |   84.26 |    74.41 |      80 |   83.52 |                                                                   
+  contact-export.service.ts         |   82.05 |    76.19 |      75 |   81.08 | 87-88,97,120-131                                                  
+  contact-import.service.ts         |      86 |    72.72 |   83.33 |   85.41 | 42,72,87,164-175                                                  
+ src/modules/pipelines              |   93.77 |     86.4 |   78.51 |   94.09 |                                                                   
+  deals.service.ts                  |     100 |    97.01 |     100 |     100 | 20,519                                                            
+  pipeline-analytics.service.ts     |   92.59 |    78.78 |    87.5 |   92.23 | 216-220,258,445-450,456                                           
+  pipeline-automation.service.ts    |     100 |    88.98 |     100 |     100 | 33-35,106-123,172,231-243                                         
+  pipelines.module.ts               |     100 |       50 |     100 |     100 | 20                                                                
+  pipelines.resolver.ts             |   72.94 |    76.85 |   48.88 |   74.35 | 32,39,59,67,83-86,98-101,113,120,134-139,174,201-202,211-212      
+  pipelines.service.ts              |     100 |    98.03 |     100 |     100 | 11                                                                
+ src/modules/pipelines/processors   |     100 |    83.33 |     100 |     100 |                                                                   
+  automation.processor.ts           |     100 |    83.33 |     100 |     100 | 10                                                                
+ src/modules/prisma                 |     100 |      100 |     100 |     100 |                                                                   
+  prisma-client.ts                  |     100 |      100 |     100 |     100 |                                                                   
+  prisma.module.ts                  |     100 |      100 |     100 |     100 |                                                                   
+  prisma.service.ts                 |     100 |      100 |     100 |     100 |                                                                   
+ src/modules/redis                  |   94.28 |    76.19 |   85.18 |   93.93 |                                                                   
+  redis.module.ts                   |     100 |      100 |     100 |     100 |                                                                   
+  redis.service.ts                  |   93.84 |    76.19 |   85.18 |   93.65 | 28,32,36,40                                                       
+ src/modules/webhooks               |   96.25 |    73.03 |      88 |   96.05 |                                                                   
+  gmail-webhook.controller.ts       |     100 |    77.27 |     100 |     100 | 41-49,89                                                          
+  gmail-webhook.service.ts          |   89.65 |    65.78 |    62.5 |   89.28 | 166-179                                                           
+  webhook-recovery.service.ts       |     100 |    81.48 |     100 |     100 | 14-16,188                                                         
+  webhooks.module.ts                |     100 |       50 |     100 |     100 | 18                                                                
+ src/modules/webhooks/guards        |     100 |      100 |     100 |     100 |                                                                   
+  pubsub-auth.guard.ts              |     100 |      100 |     100 |     100 |                                                                   
+ src/types                          |       0 |        0 |       0 |       0 |                                                                   
+  express.d.ts                      |       0 |        0 |       0 |       0 |                                                                   
+------------------------------------|---------|----------|---------|---------|-------------------------------------------------------------------
+
+Test Suites: 65 passed, 65 total
+Tests:       967 passed, 967 total
+Snapshots:   0 total
+Time:        4.736 s, estimated 5 s
+Ran all test suites.

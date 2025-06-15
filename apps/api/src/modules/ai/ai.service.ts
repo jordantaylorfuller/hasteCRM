@@ -316,7 +316,8 @@ Extract or infer: company name, job title, LinkedIn URL (if mentioned), a brief 
         });
 
         const responseContent = message.content[0];
-        const text = responseContent.type === "text" ? responseContent.text : "";
+        const text =
+          responseContent.type === "text" ? responseContent.text : "";
         enrichmentData = JSON.parse(text);
       }
 

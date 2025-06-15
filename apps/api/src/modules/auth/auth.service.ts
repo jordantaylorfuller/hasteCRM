@@ -313,13 +313,13 @@ export class AuthService {
     };
 
     const accessToken = await this.jwtService.signAsync(
-      { ...basePayload, type: 'access' as const },
-      { expiresIn: "15m" }
+      { ...basePayload, type: "access" as const },
+      { expiresIn: "15m" },
     );
 
     const refreshToken = await this.jwtService.signAsync(
-      { ...basePayload, type: 'refresh' as const },
-      { expiresIn: "7d" }
+      { ...basePayload, type: "refresh" as const },
+      { expiresIn: "7d" },
     );
 
     return {

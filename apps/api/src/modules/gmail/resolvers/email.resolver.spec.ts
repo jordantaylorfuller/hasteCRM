@@ -1,11 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { EmailResolver } from './email.resolver';
-import { EmailService } from '../email.service';
-import { GmailService } from '../gmail.service';
-import { EmailAccountService } from '../email-account.service';
-import { CustomGqlAuthGuard } from '../../../common/guards/custom-gql-auth.guard';
+import { Test, TestingModule } from "@nestjs/testing";
+import { EmailResolver } from "./email.resolver";
+import { EmailService } from "../email.service";
+import { GmailService } from "../gmail.service";
+import { EmailAccountService } from "../email-account.service";
+import { CustomGqlAuthGuard } from "../../../common/guards/custom-gql-auth.guard";
 
-describe('EmailResolver', () => {
+describe("EmailResolver", () => {
   let resolver: EmailResolver;
   let emailService: EmailService;
   let gmailService: GmailService;
@@ -40,21 +40,21 @@ describe('EmailResolver', () => {
   const mockContext = {
     req: {
       user: {
-        workspaceId: 'workspace-123',
-        userId: 'user-123',
-        email: 'test@example.com',
+        workspaceId: "workspace-123",
+        userId: "user-123",
+        email: "test@example.com",
       },
     },
   };
 
   const mockEmail = {
-    id: 'email-123',
-    messageId: 'msg-123',
-    subject: 'Test Email',
-    fromEmail: 'sender@example.com',
-    toEmails: ['recipient@example.com'],
-    workspaceId: 'workspace-123',
-    accountId: 'account-123',
+    id: "email-123",
+    messageId: "msg-123",
+    subject: "Test Email",
+    fromEmail: "sender@example.com",
+    toEmails: ["recipient@example.com"],
+    workspaceId: "workspace-123",
+    accountId: "account-123",
   };
 
   beforeEach(async () => {
@@ -89,8 +89,8 @@ describe('EmailResolver', () => {
     jest.clearAllMocks();
   });
 
-  describe('emails', () => {
-    it('should return paginated emails', async () => {
+  describe("emails", () => {
+    it("should return paginated emails", async () => {
       const mockEmails = [mockEmail];
       mockEmailService.findByWorkspace.mockResolvedValue({
         emails: mockEmails,
@@ -99,11 +99,14 @@ describe('EmailResolver', () => {
 
       const result = await resolver.emails(0, 20, null, mockContext);
 
-      expect(emailService.findByWorkspace).toHaveBeenCalledWith('workspace-123', {
-        skip: 0,
-        take: 20,
-        where: null,
-      });
+      expect(emailService.findByWorkspace).toHaveBeenCalledWith(
+        "workspace-123",
+        {
+          skip: 0,
+          take: 20,
+          where: null,
+        },
+      );
       expect(result).toEqual({
         emails: mockEmails,
         total: 100,
@@ -111,8 +114,8 @@ describe('EmailResolver', () => {
       });
     });
 
-    it('should handle filters', async () => {
-      const filters = { isRead: false, labels: ['INBOX'] };
+    it("should handle filters", async () => {
+      const filters = { isRead: false, labels: ["INBOX"] };
       mockEmailService.findByWorkspace.mockResolvedValue({
         emails: [],
         total: 0,
@@ -120,62 +123,74 @@ describe('EmailResolver', () => {
 
       await resolver.emails(0, 20, filters, mockContext);
 
-      expect(emailService.findByWorkspace).toHaveBeenCalledWith('workspace-123', {
-        skip: 0,
-        take: 20,
-        where: filters,
-      });
+      expect(emailService.findByWorkspace).toHaveBeenCalledWith(
+        "workspace-123",
+        {
+          skip: 0,
+          take: 20,
+          where: filters,
+        },
+      );
     });
   });
 
-  describe('email', () => {
-    it('should return single email and mark as read', async () => {
+  describe("email", () => {
+    it("should return single email and mark as read", async () => {
       mockEmailService.findByMessageId.mockResolvedValue(mockEmail);
       mockEmailService.markAsRead.mockResolvedValue(mockEmail);
 
-      const result = await resolver.email('msg-123', mockContext);
+      const result = await resolver.email("msg-123", mockContext);
 
-      expect(emailService.findByMessageId).toHaveBeenCalledWith('msg-123');
-      expect(emailService.markAsRead).toHaveBeenCalledWith('msg-123');
+      expect(emailService.findByMessageId).toHaveBeenCalledWith("msg-123");
+      expect(emailService.markAsRead).toHaveBeenCalledWith("msg-123");
       expect(result).toEqual(mockEmail);
     });
 
-    it('should return null when email not found', async () => {
+    it("should return null when email not found", async () => {
       mockEmailService.findByMessageId.mockResolvedValue(null);
 
-      const result = await resolver.email('non-existent', mockContext);
+      const result = await resolver.email("non-existent", mockContext);
 
       expect(emailService.markAsRead).not.toHaveBeenCalled();
       expect(result).toBeNull();
     });
   });
 
-  describe('emailThread', () => {
-    it('should return emails in thread', async () => {
-      const threadEmails = [mockEmail, { ...mockEmail, id: 'email-456' }];
+  describe("emailThread", () => {
+    it("should return emails in thread", async () => {
+      const threadEmails = [mockEmail, { ...mockEmail, id: "email-456" }];
       mockEmailService.findByThread.mockResolvedValue(threadEmails);
 
-      const result = await resolver.emailThread('thread-123', mockContext);
+      const result = await resolver.emailThread("thread-123", mockContext);
 
-      expect(emailService.findByThread).toHaveBeenCalledWith('thread-123');
+      expect(emailService.findByThread).toHaveBeenCalledWith("thread-123");
       expect(result).toEqual(threadEmails);
     });
   });
 
-  describe('searchEmails', () => {
-    it('should search emails', async () => {
+  describe("searchEmails", () => {
+    it("should search emails", async () => {
       const searchResults = [mockEmail];
       mockEmailService.search.mockResolvedValue({
         emails: searchResults,
         total: 50,
       });
 
-      const result = await resolver.searchEmails('test query', 0, 20, mockContext);
+      const result = await resolver.searchEmails(
+        "test query",
+        0,
+        20,
+        mockContext,
+      );
 
-      expect(emailService.search).toHaveBeenCalledWith('workspace-123', 'test query', {
-        skip: 0,
-        take: 20,
-      });
+      expect(emailService.search).toHaveBeenCalledWith(
+        "workspace-123",
+        "test query",
+        {
+          skip: 0,
+          take: 20,
+        },
+      );
       expect(result).toEqual({
         emails: searchResults,
         total: 50,
@@ -184,8 +199,8 @@ describe('EmailResolver', () => {
     });
   });
 
-  describe('emailStats', () => {
-    it('should return email statistics', async () => {
+  describe("emailStats", () => {
+    it("should return email statistics", async () => {
       const mockStats = {
         total: 1000,
         unread: 50,
@@ -195,35 +210,39 @@ describe('EmailResolver', () => {
 
       const result = await resolver.emailStats(mockContext);
 
-      expect(emailService.getStats).toHaveBeenCalledWith('workspace-123');
+      expect(emailService.getStats).toHaveBeenCalledWith("workspace-123");
       expect(result).toEqual(mockStats);
     });
   });
 
-  describe('sendEmail', () => {
-    it('should send email successfully', async () => {
+  describe("sendEmail", () => {
+    it("should send email successfully", async () => {
       const input = {
-        from: 'test@example.com',
-        to: ['recipient@example.com'],
-        subject: 'Test Subject',
-        body: 'Test Body',
+        from: "test@example.com",
+        to: ["recipient@example.com"],
+        subject: "Test Subject",
+        body: "Test Body",
       };
 
       const mockAccount = {
-        id: 'account-123',
-        email: 'test@example.com',
+        id: "account-123",
+        email: "test@example.com",
       };
 
       mockEmailAccountService.findByUser.mockResolvedValue([mockAccount]);
-      mockEmailAccountService.getFreshAccessToken.mockResolvedValue('fresh-token');
-      mockGmailService.sendEmail.mockResolvedValue({ id: 'msg-sent-123' });
+      mockEmailAccountService.getFreshAccessToken.mockResolvedValue(
+        "fresh-token",
+      );
+      mockGmailService.sendEmail.mockResolvedValue({ id: "msg-sent-123" });
 
       const result = await resolver.sendEmail(input, mockContext);
 
-      expect(emailAccountService.findByUser).toHaveBeenCalledWith('user-123');
-      expect(emailAccountService.getFreshAccessToken).toHaveBeenCalledWith('account-123');
+      expect(emailAccountService.findByUser).toHaveBeenCalledWith("user-123");
+      expect(emailAccountService.getFreshAccessToken).toHaveBeenCalledWith(
+        "account-123",
+      );
       expect(gmailService.sendEmail).toHaveBeenCalledWith(
-        'fresh-token',
+        "fresh-token",
         input.to,
         input.subject,
         input.body,
@@ -235,16 +254,16 @@ describe('EmailResolver', () => {
       );
       expect(result).toEqual({
         success: true,
-        messageId: 'msg-sent-123',
+        messageId: "msg-sent-123",
       });
     });
 
-    it('should handle account not found', async () => {
+    it("should handle account not found", async () => {
       const input = {
-        from: 'unknown@example.com',
-        to: ['recipient@example.com'],
-        subject: 'Test',
-        body: 'Test',
+        from: "unknown@example.com",
+        to: ["recipient@example.com"],
+        subject: "Test",
+        body: "Test",
       };
 
       mockEmailAccountService.findByUser.mockResolvedValue([]);
@@ -253,146 +272,160 @@ describe('EmailResolver', () => {
 
       expect(result).toEqual({
         success: false,
-        error: 'Email account not found',
+        error: "Email account not found",
       });
     });
 
-    it('should handle send errors', async () => {
+    it("should handle send errors", async () => {
       const input = {
-        from: 'test@example.com',
-        to: ['recipient@example.com'],
-        subject: 'Test',
-        body: 'Test',
+        from: "test@example.com",
+        to: ["recipient@example.com"],
+        subject: "Test",
+        body: "Test",
       };
 
       mockEmailAccountService.findByUser.mockResolvedValue([
-        { id: 'account-123', email: 'test@example.com' },
+        { id: "account-123", email: "test@example.com" },
       ]);
-      mockEmailAccountService.getFreshAccessToken.mockResolvedValue('fresh-token');
-      mockGmailService.sendEmail.mockRejectedValue(new Error('Send failed'));
+      mockEmailAccountService.getFreshAccessToken.mockResolvedValue(
+        "fresh-token",
+      );
+      mockGmailService.sendEmail.mockRejectedValue(new Error("Send failed"));
 
       const result = await resolver.sendEmail(input, mockContext);
 
       expect(result).toEqual({
         success: false,
-        error: 'Send failed',
+        error: "Send failed",
       });
     });
   });
 
-  describe('createDraft', () => {
-    it('should create draft successfully', async () => {
+  describe("createDraft", () => {
+    it("should create draft successfully", async () => {
       const input = {
-        from: 'test@example.com',
-        to: ['recipient@example.com'],
-        subject: 'Draft Subject',
-        body: 'Draft Body',
+        from: "test@example.com",
+        to: ["recipient@example.com"],
+        subject: "Draft Subject",
+        body: "Draft Body",
       };
 
       mockEmailAccountService.findByUser.mockResolvedValue([
-        { id: 'account-123', email: 'test@example.com' },
+        { id: "account-123", email: "test@example.com" },
       ]);
-      mockEmailAccountService.getFreshAccessToken.mockResolvedValue('fresh-token');
-      mockGmailService.createDraft.mockResolvedValue({ id: 'draft-123' });
+      mockEmailAccountService.getFreshAccessToken.mockResolvedValue(
+        "fresh-token",
+      );
+      mockGmailService.createDraft.mockResolvedValue({ id: "draft-123" });
 
       const result = await resolver.createDraft(input, mockContext);
 
       expect(gmailService.createDraft).toHaveBeenCalledWith(
-        'fresh-token',
+        "fresh-token",
         input.to,
         input.subject,
         input.body,
       );
       expect(result).toEqual({
         success: true,
-        draftId: 'draft-123',
+        draftId: "draft-123",
       });
     });
   });
 
-  describe('markEmailAsRead', () => {
-    it('should mark email as read', async () => {
+  describe("markEmailAsRead", () => {
+    it("should mark email as read", async () => {
       mockEmailService.markAsRead.mockResolvedValue(mockEmail);
 
-      const result = await resolver.markEmailAsRead('msg-123', mockContext);
+      const result = await resolver.markEmailAsRead("msg-123", mockContext);
 
-      expect(emailService.markAsRead).toHaveBeenCalledWith('msg-123');
+      expect(emailService.markAsRead).toHaveBeenCalledWith("msg-123");
       expect(result).toEqual(mockEmail);
     });
   });
 
-  describe('markEmailAsUnread', () => {
-    it('should mark email as unread', async () => {
+  describe("markEmailAsUnread", () => {
+    it("should mark email as unread", async () => {
       mockEmailService.markAsUnread.mockResolvedValue(mockEmail);
 
-      const result = await resolver.markEmailAsUnread('msg-123', mockContext);
+      const result = await resolver.markEmailAsUnread("msg-123", mockContext);
 
-      expect(emailService.markAsUnread).toHaveBeenCalledWith('msg-123');
+      expect(emailService.markAsUnread).toHaveBeenCalledWith("msg-123");
       expect(result).toEqual(mockEmail);
     });
   });
 
-  describe('toggleEmailStar', () => {
-    it('should toggle email star', async () => {
+  describe("toggleEmailStar", () => {
+    it("should toggle email star", async () => {
       mockEmailService.toggleStar.mockResolvedValue(mockEmail);
 
-      const result = await resolver.toggleEmailStar('msg-123', mockContext);
+      const result = await resolver.toggleEmailStar("msg-123", mockContext);
 
-      expect(emailService.toggleStar).toHaveBeenCalledWith('msg-123');
+      expect(emailService.toggleStar).toHaveBeenCalledWith("msg-123");
       expect(result).toEqual(mockEmail);
     });
   });
 
-  describe('archiveEmail', () => {
-    it('should archive email successfully', async () => {
+  describe("archiveEmail", () => {
+    it("should archive email successfully", async () => {
       mockEmailService.findByMessageId.mockResolvedValue(mockEmail);
       mockEmailAccountService.findOne.mockResolvedValue({
-        id: 'account-123',
+        id: "account-123",
       });
-      mockEmailAccountService.getFreshAccessToken.mockResolvedValue('fresh-token');
+      mockEmailAccountService.getFreshAccessToken.mockResolvedValue(
+        "fresh-token",
+      );
       mockGmailService.archiveMessage.mockResolvedValue(undefined);
       mockEmailService.removeLabels.mockResolvedValue(undefined);
 
-      const result = await resolver.archiveEmail('msg-123', mockContext);
+      const result = await resolver.archiveEmail("msg-123", mockContext);
 
-      expect(gmailService.archiveMessage).toHaveBeenCalledWith('fresh-token', 'msg-123');
+      expect(gmailService.archiveMessage).toHaveBeenCalledWith(
+        "fresh-token",
+        "msg-123",
+      );
       expect(emailService.removeLabels).toHaveBeenCalledWith(
-        'workspace-123',
-        'msg-123',
-        ['INBOX'],
+        "workspace-123",
+        "msg-123",
+        ["INBOX"],
       );
       expect(result).toEqual({ success: true });
     });
 
-    it('should handle email not found', async () => {
+    it("should handle email not found", async () => {
       mockEmailService.findByMessageId.mockResolvedValue(null);
 
-      const result = await resolver.archiveEmail('non-existent', mockContext);
+      const result = await resolver.archiveEmail("non-existent", mockContext);
 
       expect(result).toEqual({
         success: false,
-        error: 'Email not found',
+        error: "Email not found",
       });
     });
   });
 
-  describe('trashEmail', () => {
-    it('should trash email successfully', async () => {
+  describe("trashEmail", () => {
+    it("should trash email successfully", async () => {
       mockEmailService.findByMessageId.mockResolvedValue(mockEmail);
       mockEmailAccountService.findOne.mockResolvedValue({
-        id: 'account-123',
+        id: "account-123",
       });
-      mockEmailAccountService.getFreshAccessToken.mockResolvedValue('fresh-token');
+      mockEmailAccountService.getFreshAccessToken.mockResolvedValue(
+        "fresh-token",
+      );
       mockGmailService.trashMessage.mockResolvedValue(undefined);
       mockEmailService.addLabels.mockResolvedValue(undefined);
 
-      const result = await resolver.trashEmail('msg-123', mockContext);
+      const result = await resolver.trashEmail("msg-123", mockContext);
 
-      expect(gmailService.trashMessage).toHaveBeenCalledWith('fresh-token', 'msg-123');
+      expect(gmailService.trashMessage).toHaveBeenCalledWith(
+        "fresh-token",
+        "msg-123",
+      );
       expect(emailService.addLabels).toHaveBeenCalledWith(
-        'workspace-123',
-        'msg-123',
-        ['TRASH'],
+        "workspace-123",
+        "msg-123",
+        ["TRASH"],
       );
       expect(result).toEqual({ success: true });
     });

@@ -60,7 +60,7 @@ api.interceptors.response.use(
         // Refresh failed, redirect to login
         Cookies.remove("accessToken");
         Cookies.remove("refreshToken");
-        window.location.href = "/login";
+        window.location.assign("/login");
         return Promise.reject(refreshError);
       }
     }

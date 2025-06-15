@@ -1,10 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { SessionController } from './session.controller';
-import { SessionService } from './session.service';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
-import { RateLimitGuard } from '../../common/guards/rate-limit.guard';
+import { Test, TestingModule } from "@nestjs/testing";
+import { SessionController } from "./session.controller";
+import { SessionService } from "./session.service";
+import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
+import { RateLimitGuard } from "../../common/guards/rate-limit.guard";
 
-describe('SessionController', () => {
+describe("SessionController", () => {
   let controller: SessionController;
   let sessionService: SessionService;
 
@@ -16,9 +16,9 @@ describe('SessionController', () => {
 
   const mockRequest = {
     user: {
-      sub: 'user-123',
-      userId: 'user-123',
-      email: 'test@example.com',
+      sub: "user-123",
+      userId: "user-123",
+      email: "test@example.com",
     },
   };
 
@@ -46,22 +46,22 @@ describe('SessionController', () => {
     jest.clearAllMocks();
   });
 
-  describe('getUserSessions', () => {
-    it('should return user active sessions', async () => {
+  describe("getUserSessions", () => {
+    it("should return user active sessions", async () => {
       const mockSessions = [
         {
-          id: 'session-1',
-          userId: 'user-123',
-          device: 'Chrome on Windows',
-          ipAddress: '192.168.1.1',
+          id: "session-1",
+          userId: "user-123",
+          device: "Chrome on Windows",
+          ipAddress: "192.168.1.1",
           lastActive: new Date(),
           createdAt: new Date(),
         },
         {
-          id: 'session-2',
-          userId: 'user-123',
-          device: 'Safari on macOS',
-          ipAddress: '192.168.1.2',
+          id: "session-2",
+          userId: "user-123",
+          device: "Safari on macOS",
+          ipAddress: "192.168.1.2",
           lastActive: new Date(),
           createdAt: new Date(),
         },
@@ -71,11 +71,13 @@ describe('SessionController', () => {
 
       const result = await controller.getUserSessions(mockRequest);
 
-      expect(sessionService.getUserActiveSessions).toHaveBeenCalledWith('user-123');
+      expect(sessionService.getUserActiveSessions).toHaveBeenCalledWith(
+        "user-123",
+      );
       expect(result).toEqual(mockSessions);
     });
 
-    it('should return empty array when no sessions', async () => {
+    it("should return empty array when no sessions", async () => {
       mockSessionService.getUserActiveSessions.mockResolvedValue([]);
 
       const result = await controller.getUserSessions(mockRequest);
@@ -84,43 +86,54 @@ describe('SessionController', () => {
     });
   });
 
-  describe('revokeSession', () => {
-    it('should revoke a specific session', async () => {
+  describe("revokeSession", () => {
+    it("should revoke a specific session", async () => {
       mockSessionService.invalidateSession.mockResolvedValue(undefined);
 
-      const result = await controller.revokeSession(mockRequest, 'session-123');
+      const result = await controller.revokeSession(mockRequest, "session-123");
 
-      expect(sessionService.invalidateSession).toHaveBeenCalledWith('session-123');
-      expect(result).toEqual({ message: 'Session revoked successfully' });
+      expect(sessionService.invalidateSession).toHaveBeenCalledWith(
+        "session-123",
+      );
+      expect(result).toEqual({ message: "Session revoked successfully" });
     });
 
-    it('should handle non-existent session', async () => {
+    it("should handle non-existent session", async () => {
       mockSessionService.invalidateSession.mockResolvedValue(undefined);
 
-      const result = await controller.revokeSession(mockRequest, 'non-existent');
+      const result = await controller.revokeSession(
+        mockRequest,
+        "non-existent",
+      );
 
-      expect(sessionService.invalidateSession).toHaveBeenCalledWith('non-existent');
-      expect(result).toEqual({ message: 'Session revoked successfully' });
+      expect(sessionService.invalidateSession).toHaveBeenCalledWith(
+        "non-existent",
+      );
+      expect(result).toEqual({ message: "Session revoked successfully" });
     });
   });
 
-  describe('revokeAllSessions', () => {
-    it('should revoke all user sessions', async () => {
+  describe("revokeAllSessions", () => {
+    it("should revoke all user sessions", async () => {
       mockSessionService.invalidateAllUserSessions.mockResolvedValue(undefined);
 
       const result = await controller.revokeAllSessions(mockRequest);
 
-      expect(sessionService.invalidateAllUserSessions).toHaveBeenCalledWith('user-123');
-      expect(result).toEqual({ message: 'All sessions revoked successfully' });
+      expect(sessionService.invalidateAllUserSessions).toHaveBeenCalledWith(
+        "user-123",
+      );
+      expect(result).toEqual({ message: "All sessions revoked successfully" });
     });
 
-    it('should handle user with no sessions', async () => {
+    it("should handle user with no sessions", async () => {
       mockSessionService.invalidateAllUserSessions.mockResolvedValue(undefined);
 
       const result = await controller.revokeAllSessions(mockRequest);
 
-      expect(sessionService.invalidateAllUserSessions).toHaveBeenCalledWith('user-123');
-      expect(result).toEqual({ message: 'All sessions revoked successfully' });
+      expect(sessionService.invalidateAllUserSessions).toHaveBeenCalledWith(
+        "user-123",
+      );
+      expect(result).toEqual({ message: "All sessions revoked successfully" });
     });
   });
 });

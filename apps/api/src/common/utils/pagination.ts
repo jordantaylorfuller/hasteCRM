@@ -18,7 +18,7 @@ export function paginateResults<T>(
   items: T[],
   page: number,
   limit: number,
-  total: number
+  total: number,
 ): PaginationResult<T> {
   const validPage = Math.max(1, page);
   const validLimit = Math.max(1, limit);

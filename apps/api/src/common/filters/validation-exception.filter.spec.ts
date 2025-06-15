@@ -1,17 +1,17 @@
-import { Test } from '@nestjs/testing';
-import { ArgumentsHost, BadRequestException } from '@nestjs/common';
-import { ValidationExceptionFilter } from './validation-exception.filter';
-import { ValidationError } from 'class-validator';
-import { GqlArgumentsHost } from '@nestjs/graphql';
+import { Test } from "@nestjs/testing";
+import { ArgumentsHost, BadRequestException } from "@nestjs/common";
+import { ValidationExceptionFilter } from "./validation-exception.filter";
+import { ValidationError } from "class-validator";
+import { GqlArgumentsHost } from "@nestjs/graphql";
 
-jest.mock('@nestjs/graphql', () => ({
-  ...jest.requireActual('@nestjs/graphql'),
+jest.mock("@nestjs/graphql", () => ({
+  ...jest.requireActual("@nestjs/graphql"),
   GqlArgumentsHost: {
     create: jest.fn(),
   },
 }));
 
-describe('ValidationExceptionFilter', () => {
+describe("ValidationExceptionFilter", () => {
   let filter: ValidationExceptionFilter;
   let mockArgumentsHost: ArgumentsHost;
   let mockHttpArgumentsHost: any;
@@ -35,9 +35,9 @@ describe('ValidationExceptionFilter', () => {
     };
 
     mockRequest = {
-      url: '/api/contacts',
-      method: 'POST',
-      id: 'req-validation-123',
+      url: "/api/contacts",
+      method: "POST",
+      id: "req-validation-123",
     };
 
     mockHttpArgumentsHost = {
@@ -48,38 +48,40 @@ describe('ValidationExceptionFilter', () => {
     // Mock GraphQL context
     mockContext = {
       req: {
-        id: 'gql-validation-456',
+        id: "gql-validation-456",
       },
     };
 
     mockGqlArgumentsHost = {
       getContext: jest.fn().mockReturnValue(mockContext),
       getInfo: jest.fn().mockReturnValue({
-        path: { key: 'createContact' },
+        path: { key: "createContact" },
       }),
     };
 
     // Mock ArgumentsHost
     mockArgumentsHost = {
       switchToHttp: jest.fn().mockReturnValue(mockHttpArgumentsHost),
-      getType: jest.fn().mockReturnValue('http'),
+      getType: jest.fn().mockReturnValue("http"),
     } as any;
 
     // Mock GqlArgumentsHost.create
-    (GqlArgumentsHost.create as jest.Mock).mockReturnValue(mockGqlArgumentsHost);
+    (GqlArgumentsHost.create as jest.Mock).mockReturnValue(
+      mockGqlArgumentsHost,
+    );
 
     // Spy on logger
-    loggerWarnSpy = jest.spyOn(filter['logger'], 'warn').mockImplementation();
+    loggerWarnSpy = jest.spyOn(filter["logger"], "warn").mockImplementation();
   });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  describe('HTTP Context', () => {
-    it('should handle validation errors with string messages', () => {
+  describe("HTTP Context", () => {
+    it("should handle validation errors with string messages", () => {
       const exception = new BadRequestException({
-        message: ['Email is required', 'Name must be at least 2 characters'],
+        message: ["Email is required", "Name must be at least 2 characters"],
       });
 
       filter.catch(exception, mockArgumentsHost);
@@ -87,30 +89,30 @@ describe('ValidationExceptionFilter', () => {
       expect(mockResponse.status).toHaveBeenCalledWith(400);
       expect(mockResponse.json).toHaveBeenCalledWith({
         statusCode: 400,
-        error: 'Validation Failed',
-        message: 'The request contains invalid data',
+        error: "Validation Failed",
+        message: "The request contains invalid data",
         timestamp: expect.any(String),
-        path: '/api/contacts',
-        method: 'POST',
-        requestId: 'req-validation-123',
+        path: "/api/contacts",
+        method: "POST",
+        requestId: "req-validation-123",
         errors: {
-          general: ['Email is required', 'Name must be at least 2 characters'],
+          general: ["Email is required", "Name must be at least 2 characters"],
         },
       });
     });
 
-    it('should handle ValidationError objects from class-validator', () => {
+    it("should handle ValidationError objects from class-validator", () => {
       const validationError1 = new ValidationError();
-      validationError1.property = 'email';
+      validationError1.property = "email";
       validationError1.constraints = {
-        isEmail: 'email must be an email',
-        isNotEmpty: 'email should not be empty',
+        isEmail: "email must be an email",
+        isNotEmpty: "email should not be empty",
       };
 
       const validationError2 = new ValidationError();
-      validationError2.property = 'password';
+      validationError2.property = "password";
       validationError2.constraints = {
-        minLength: 'password must be longer than or equal to 8 characters',
+        minLength: "password must be longer than or equal to 8 characters",
       };
 
       const exception = new BadRequestException({
@@ -121,28 +123,28 @@ describe('ValidationExceptionFilter', () => {
 
       expect(mockResponse.json).toHaveBeenCalledWith({
         statusCode: 400,
-        error: 'Validation Failed',
-        message: 'The request contains invalid data',
+        error: "Validation Failed",
+        message: "The request contains invalid data",
         timestamp: expect.any(String),
-        path: '/api/contacts',
-        method: 'POST',
-        requestId: 'req-validation-123',
+        path: "/api/contacts",
+        method: "POST",
+        requestId: "req-validation-123",
         errors: {
-          email: ['email must be an email', 'email should not be empty'],
-          password: ['password must be longer than or equal to 8 characters'],
+          email: ["email must be an email", "email should not be empty"],
+          password: ["password must be longer than or equal to 8 characters"],
         },
       });
     });
 
-    it('should handle mixed validation errors', () => {
+    it("should handle mixed validation errors", () => {
       const validationError = new ValidationError();
-      validationError.property = 'age';
+      validationError.property = "age";
       validationError.constraints = {
-        min: 'age must not be less than 0',
+        min: "age must not be less than 0",
       };
 
       const exception = new BadRequestException({
-        message: ['General validation error', validationError],
+        message: ["General validation error", validationError],
       });
 
       filter.catch(exception, mockArgumentsHost);
@@ -150,46 +152,50 @@ describe('ValidationExceptionFilter', () => {
       expect(mockResponse.json).toHaveBeenCalledWith(
         expect.objectContaining({
           errors: {
-            general: ['General validation error'],
-            age: ['age must not be less than 0'],
+            general: ["General validation error"],
+            age: ["age must not be less than 0"],
           },
         }),
       );
     });
 
-    it('should pass through non-validation BadRequestExceptions', () => {
-      const exception = new BadRequestException('Simple bad request');
+    it("should pass through non-validation BadRequestExceptions", () => {
+      const exception = new BadRequestException("Simple bad request");
 
-      expect(() => filter.catch(exception, mockArgumentsHost)).toThrow(exception);
+      expect(() => filter.catch(exception, mockArgumentsHost)).toThrow(
+        exception,
+      );
       expect(mockResponse.status).not.toHaveBeenCalled();
     });
 
-    it('should pass through BadRequestExceptions with non-array messages', () => {
+    it("should pass through BadRequestExceptions with non-array messages", () => {
       const exception = new BadRequestException({
-        message: 'Not an array message',
-        error: 'BadRequest',
+        message: "Not an array message",
+        error: "BadRequest",
       });
 
-      expect(() => filter.catch(exception, mockArgumentsHost)).toThrow(exception);
+      expect(() => filter.catch(exception, mockArgumentsHost)).toThrow(
+        exception,
+      );
       expect(mockResponse.status).not.toHaveBeenCalled();
     });
 
-    it('should log validation errors', () => {
+    it("should log validation errors", () => {
       const exception = new BadRequestException({
-        message: ['Test validation error'],
+        message: ["Test validation error"],
       });
 
       filter.catch(exception, mockArgumentsHost);
 
       expect(loggerWarnSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Validation Error:'),
+        expect.stringContaining("Validation Error:"),
       );
       expect(loggerWarnSpy).toHaveBeenCalledWith(
         expect.stringContaining('"error":"Validation Failed"'),
       );
     });
 
-    it('should handle empty validation errors array', () => {
+    it("should handle empty validation errors array", () => {
       const exception = new BadRequestException({
         message: [],
       });
@@ -204,36 +210,38 @@ describe('ValidationExceptionFilter', () => {
     });
   });
 
-  describe('GraphQL Context', () => {
+  describe("GraphQL Context", () => {
     beforeEach(() => {
-      mockArgumentsHost.getType = jest.fn().mockReturnValue('graphql');
+      mockArgumentsHost.getType = jest.fn().mockReturnValue("graphql");
     });
 
-    it('should handle GraphQL validation errors', () => {
+    it("should handle GraphQL validation errors", () => {
       const exception = new BadRequestException({
-        message: ['Email is invalid', 'Name is required'],
+        message: ["Email is invalid", "Name is required"],
       });
 
-      expect(() => filter.catch(exception, mockArgumentsHost)).toThrow(BadRequestException);
-      
+      expect(() => filter.catch(exception, mockArgumentsHost)).toThrow(
+        BadRequestException,
+      );
+
       try {
         filter.catch(exception, mockArgumentsHost);
       } catch (error) {
         expect(error).toBeInstanceOf(BadRequestException);
         const response = (error as BadRequestException).getResponse() as any;
-        expect(response.message).toBe('Validation failed');
+        expect(response.message).toBe("Validation failed");
         expect(response.errors).toEqual({
-          general: ['Email is invalid', 'Name is required'],
+          general: ["Email is invalid", "Name is required"],
         });
       }
     });
 
-    it('should handle GraphQL ValidationError objects', () => {
+    it("should handle GraphQL ValidationError objects", () => {
       const validationError = new ValidationError();
-      validationError.property = 'username';
+      validationError.property = "username";
       validationError.constraints = {
-        length: 'username must be between 3 and 20 characters',
-        isAlphanumeric: 'username must contain only letters and numbers',
+        length: "username must be between 3 and 20 characters",
+        isAlphanumeric: "username must contain only letters and numbers",
       };
 
       const exception = new BadRequestException({
@@ -246,16 +254,16 @@ describe('ValidationExceptionFilter', () => {
         const response = (error as BadRequestException).getResponse() as any;
         expect(response.errors).toEqual({
           username: [
-            'username must be between 3 and 20 characters',
-            'username must contain only letters and numbers',
+            "username must be between 3 and 20 characters",
+            "username must contain only letters and numbers",
           ],
         });
       }
     });
 
-    it('should log GraphQL validation errors', () => {
+    it("should log GraphQL validation errors", () => {
       const exception = new BadRequestException({
-        message: ['GraphQL validation test'],
+        message: ["GraphQL validation test"],
       });
 
       try {
@@ -265,7 +273,7 @@ describe('ValidationExceptionFilter', () => {
       }
 
       expect(loggerWarnSpy).toHaveBeenCalledWith(
-        expect.stringContaining('GraphQL Validation Error:'),
+        expect.stringContaining("GraphQL Validation Error:"),
       );
       expect(loggerWarnSpy).toHaveBeenCalledWith(
         expect.stringContaining('"path":"createContact"'),
@@ -275,10 +283,10 @@ describe('ValidationExceptionFilter', () => {
       );
     });
 
-    it('should handle GraphQL context without request', () => {
+    it("should handle GraphQL context without request", () => {
       mockContext.req = undefined;
       const exception = new BadRequestException({
-        message: ['No request context'],
+        message: ["No request context"],
       });
 
       try {
@@ -288,27 +296,27 @@ describe('ValidationExceptionFilter', () => {
       }
 
       expect(loggerWarnSpy).toHaveBeenCalledWith(
-        expect.stringContaining('GraphQL Validation Error:'),
+        expect.stringContaining("GraphQL Validation Error:"),
       );
       const logCall = loggerWarnSpy.mock.calls[0][0];
       expect(logCall).not.toContain('"requestId"');
     });
   });
 
-  describe('Error Formatting', () => {
-    it('should format nested ValidationError objects', () => {
+  describe("Error Formatting", () => {
+    it("should format nested ValidationError objects", () => {
       const parentError = new ValidationError();
-      parentError.property = 'address';
-      
+      parentError.property = "address";
+
       const childError = new ValidationError();
-      childError.property = 'zipCode';
+      childError.property = "zipCode";
       childError.constraints = {
-        matches: 'zipCode must match the pattern',
+        matches: "zipCode must match the pattern",
       };
-      
+
       parentError.children = [childError];
       parentError.constraints = {
-        isDefined: 'address should not be null or undefined',
+        isDefined: "address should not be null or undefined",
       };
 
       const exception = new BadRequestException({
@@ -320,19 +328,19 @@ describe('ValidationExceptionFilter', () => {
       expect(mockResponse.json).toHaveBeenCalledWith(
         expect.objectContaining({
           errors: {
-            address: ['address should not be null or undefined'],
+            address: ["address should not be null or undefined"],
           },
         }),
       );
     });
 
-    it('should handle ValidationError without constraints', () => {
+    it("should handle ValidationError without constraints", () => {
       const validationError = new ValidationError();
-      validationError.property = 'field';
+      validationError.property = "field";
       // No constraints set
 
       const exception = new BadRequestException({
-        message: [validationError, 'Other error'],
+        message: [validationError, "Other error"],
       });
 
       filter.catch(exception, mockArgumentsHost);
@@ -340,23 +348,23 @@ describe('ValidationExceptionFilter', () => {
       expect(mockResponse.json).toHaveBeenCalledWith(
         expect.objectContaining({
           errors: {
-            general: ['Other error'],
+            general: ["Other error"],
           },
         }),
       );
     });
 
-    it('should handle multiple errors for the same field', () => {
+    it("should handle multiple errors for the same field", () => {
       const error1 = new ValidationError();
-      error1.property = 'email';
+      error1.property = "email";
       error1.constraints = {
-        isEmail: 'Invalid email format',
+        isEmail: "Invalid email format",
       };
 
       const error2 = new ValidationError();
-      error2.property = 'email';
+      error2.property = "email";
       error2.constraints = {
-        isNotEmpty: 'Email is required',
+        isNotEmpty: "Email is required",
       };
 
       const exception = new BadRequestException({
@@ -368,36 +376,36 @@ describe('ValidationExceptionFilter', () => {
       expect(mockResponse.json).toHaveBeenCalledWith(
         expect.objectContaining({
           errors: {
-            email: ['Invalid email format', 'Email is required'],
+            email: ["Invalid email format", "Email is required"],
           },
         }),
       );
     });
   });
 
-  describe('Request Context', () => {
-    it('should include all request details in error response', () => {
-      mockRequest.url = '/api/users/123/update';
-      mockRequest.method = 'PATCH';
-      mockRequest.id = 'unique-request-id';
+  describe("Request Context", () => {
+    it("should include all request details in error response", () => {
+      mockRequest.url = "/api/users/123/update";
+      mockRequest.method = "PATCH";
+      mockRequest.id = "unique-request-id";
 
       const exception = new BadRequestException({
-        message: ['Validation error'],
+        message: ["Validation error"],
       });
 
       filter.catch(exception, mockArgumentsHost);
 
       const response = mockResponse.json.mock.calls[0][0];
-      expect(response.path).toBe('/api/users/123/update');
-      expect(response.method).toBe('PATCH');
-      expect(response.requestId).toBe('unique-request-id');
+      expect(response.path).toBe("/api/users/123/update");
+      expect(response.method).toBe("PATCH");
+      expect(response.requestId).toBe("unique-request-id");
     });
 
-    it('should handle missing request ID', () => {
+    it("should handle missing request ID", () => {
       mockRequest.id = undefined;
 
       const exception = new BadRequestException({
-        message: ['Error without request ID'],
+        message: ["Error without request ID"],
       });
 
       filter.catch(exception, mockArgumentsHost);

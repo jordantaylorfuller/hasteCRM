@@ -191,6 +191,12 @@ describe('ErrorBoundary', () => {
       </ErrorBoundary>
     );
     
+    // Still shows error until we click Try again
+    expect(screen.getByText('Something went wrong')).toBeInTheDocument();
+    
+    // Click Try again with fixed component
+    fireEvent.click(screen.getByText('Try again'));
+    
     // Should now show the working component
     expect(screen.getByText('Component rendered successfully')).toBeInTheDocument();
   });

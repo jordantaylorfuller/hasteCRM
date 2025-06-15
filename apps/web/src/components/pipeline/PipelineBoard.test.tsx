@@ -12,12 +12,22 @@ jest.mock('@/components/ui/use-toast');
 
 // Mock @dnd-kit/core
 jest.mock('@dnd-kit/core', () => ({
-  DndContext: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  DragOverlay: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  DndContext: ({ children, onDragStart, onDragEnd }: any) => {
+    // Store handlers to be called by tests
+    (global as any).__dndHandlers = { onDragStart, onDragEnd };
+    return <div data-testid="dnd-context">{children}</div>;
+  },
+  DragOverlay: ({ children }: { children: React.ReactNode }) => <div data-testid="drag-overlay">{children}</div>,
   closestCorners: jest.fn(),
   PointerSensor: class PointerSensor {},
   useSensor: jest.fn(),
-  useSensors: jest.fn(),
+  useSensors: jest.fn(() => []),
+  DragStartEvent: class DragStartEvent {
+    constructor(public active: { id: string }) {}
+  },
+  DragEndEvent: class DragEndEvent {
+    constructor(public active: { id: string }, public over: { id: string } | null) {}
+  },
 }));
 
 jest.mock('@dnd-kit/sortable', () => ({
@@ -310,5 +320,290 @@ describe('PipelineBoard', () => {
 
     // Should use the first deal's currency
     expect(screen.getByTestId('stage-stage-1')).toHaveTextContent('EUR');
+  });
+
+  it('handles drag start event', async () => {
+    render(
+      <PipelineBoard
+        pipeline={mockPipeline}
+        deals={mockDeals}
+      />
+    );
+
+    // Simulate drag start
+    const handlers = (global as any).__dndHandlers;
+    const dragStartEvent = {
+      active: { id: 'deal-1' }
+    };
+
+    handlers.onDragStart(dragStartEvent);
+
+    // Verify drag overlay is shown with the dragged deal
+    await waitFor(() => {
+      const overlay = screen.getByTestId('drag-overlay');
+      expect(overlay).toHaveTextContent('Deal 1 - $1000');
+    });
+  });
+
+  it('handles drag end with stage change', async () => {
+    const onDealsChange = jest.fn();
+
+    render(
+      <PipelineBoard
+        pipeline={mockPipeline}
+        deals={mockDeals}
+        onDealsChange={onDealsChange}
+      />
+    );
+
+    // Simulate drag end
+    const handlers = (global as any).__dndHandlers;
+    const dragEndEvent = {
+      active: { id: 'deal-1' },
+      over: { id: 'stage-2' }
+    };
+
+    await handlers.onDragEnd(dragEndEvent);
+
+    // Verify mutation was called
+    expect(mockMoveDeal).toHaveBeenCalledWith({
+      variables: {
+        input: {
+          dealId: 'deal-1',
+          stageId: 'stage-2'
+        }
+      }
+    });
+
+    // Verify onDealsChange was called with updated deals
+    expect(onDealsChange).toHaveBeenCalled();
+    const updatedDeals = onDealsChange.mock.calls[0][0];
+    const movedDeal = updatedDeals.find((d: any) => d.id === 'deal-1');
+    expect(movedDeal.stage.id).toBe('stage-2');
+
+    // Verify success toast
+    expect(mockToast).toHaveBeenCalledWith({
+      title: 'Deal moved',
+      description: 'Deal 1 moved to Qualified'
+    });
+  });
+
+  it('handles drag end with no drop target', async () => {
+    render(
+      <PipelineBoard
+        pipeline={mockPipeline}
+        deals={mockDeals}
+      />
+    );
+
+    // Simulate drag end with no over
+    const handlers = (global as any).__dndHandlers;
+    const dragEndEvent = {
+      active: { id: 'deal-1' },
+      over: null
+    };
+
+    await handlers.onDragEnd(dragEndEvent);
+
+    // Verify mutation was not called
+    expect(mockMoveDeal).not.toHaveBeenCalled();
+  });
+
+  it('handles drag end on same stage', async () => {
+    render(
+      <PipelineBoard
+        pipeline={mockPipeline}
+        deals={mockDeals}
+      />
+    );
+
+    // Simulate drag end on same stage
+    const handlers = (global as any).__dndHandlers;
+    const dragEndEvent = {
+      active: { id: 'deal-1' },
+      over: { id: 'stage-1' }
+    };
+
+    await handlers.onDragEnd(dragEndEvent);
+
+    // Verify mutation was not called (same stage)
+    expect(mockMoveDeal).not.toHaveBeenCalled();
+  });
+
+  it('handles drag end with invalid deal', async () => {
+    render(
+      <PipelineBoard
+        pipeline={mockPipeline}
+        deals={mockDeals}
+      />
+    );
+
+    // Simulate drag end with invalid deal
+    const handlers = (global as any).__dndHandlers;
+    const dragEndEvent = {
+      active: { id: 'invalid-deal' },
+      over: { id: 'stage-2' }
+    };
+
+    await handlers.onDragEnd(dragEndEvent);
+
+    // Verify mutation was not called
+    expect(mockMoveDeal).not.toHaveBeenCalled();
+  });
+
+  it('handles mutation error and reverts changes', async () => {
+    const onDealsChange = jest.fn();
+    const mutationError = new Error('Network error');
+    mockMoveDeal.mockRejectedValueOnce(mutationError);
+
+    render(
+      <PipelineBoard
+        pipeline={mockPipeline}
+        deals={mockDeals}
+        onDealsChange={onDealsChange}
+      />
+    );
+
+    // Simulate drag end
+    const handlers = (global as any).__dndHandlers;
+    const dragEndEvent = {
+      active: { id: 'deal-1' },
+      over: { id: 'stage-2' }
+    };
+
+    await handlers.onDragEnd(dragEndEvent);
+
+    // Wait for mutation to fail
+    await waitFor(() => {
+      expect(mockToast).toHaveBeenCalledWith({
+        title: 'Error',
+        description: 'Failed to move deal. Please try again.',
+        variant: 'destructive'
+      });
+    });
+
+    // Verify deals were reverted to original state
+    expect(onDealsChange).toHaveBeenCalledTimes(2);
+    const revertedDeals = onDealsChange.mock.calls[1][0];
+    expect(revertedDeals).toEqual(mockDeals);
+  });
+
+  it('handles drag start with invalid deal', () => {
+    render(
+      <PipelineBoard
+        pipeline={mockPipeline}
+        deals={mockDeals}
+      />
+    );
+
+    // Simulate drag start with invalid deal
+    const handlers = (global as any).__dndHandlers;
+    const dragStartEvent = {
+      active: { id: 'invalid-deal' }
+    };
+
+    handlers.onDragStart(dragStartEvent);
+
+    // Verify drag overlay is empty (no active deal)
+    const overlay = screen.getByTestId('drag-overlay');
+    expect(overlay).toBeEmptyDOMElement();
+  });
+
+  it('handles empty pipeline with no deals', () => {
+    render(
+      <PipelineBoard
+        pipeline={mockPipeline}
+        deals={[]}
+      />
+    );
+
+    // Verify default currency is USD
+    expect(screen.getByTestId('stage-stage-1')).toHaveTextContent('USD 0');
+    expect(screen.getByTestId('stage-stage-2')).toHaveTextContent('USD 0');
+    expect(screen.getByTestId('stage-stage-3')).toHaveTextContent('USD 0');
+  });
+
+  it('clears active deal on drag end', async () => {
+    render(
+      <PipelineBoard
+        pipeline={mockPipeline}
+        deals={mockDeals}
+      />
+    );
+
+    const handlers = (global as any).__dndHandlers;
+
+    // Start drag
+    handlers.onDragStart({ active: { id: 'deal-1' } });
+
+    // Verify drag overlay shows deal
+    await waitFor(() => {
+      expect(screen.getByTestId('drag-overlay')).toHaveTextContent('Deal 1');
+    });
+
+    // End drag
+    handlers.onDragEnd({
+      active: { id: 'deal-1' },
+      over: { id: 'stage-2' }
+    });
+
+    // Verify drag overlay is cleared
+    await waitFor(() => {
+      const overlay = screen.getByTestId('drag-overlay');
+      expect(overlay).toBeEmptyDOMElement();
+    });
+  });
+
+  it('handles stage with no deals in dealsByStage map', () => {
+    // Create a pipeline with an extra stage that won't have any deals
+    const pipelineWithExtraStage = {
+      ...mockPipeline,
+      stages: [
+        ...mockPipeline.stages,
+        {
+          id: 'stage-4',
+          name: 'New Stage',
+          order: 3,
+          color: '#FFA500',
+          probability: 80,
+        }
+      ]
+    };
+
+    // Mock the dealsByStage calculation to simulate a missing entry
+    const originalUseMemo = React.useMemo;
+    let callCount = 0;
+    jest.spyOn(React, 'useMemo').mockImplementation((fn, deps) => {
+      callCount++;
+      // First useMemo is dealsByStage, modify it to not include stage-4
+      if (callCount === 1) {
+        return originalUseMemo(() => {
+          const grouped = new Map();
+          // Only add first 3 stages, not stage-4
+          grouped.set('stage-1', []);
+          grouped.set('stage-2', mockDeals.filter(d => d.stage.id === 'stage-2'));
+          grouped.set('stage-3', mockDeals.filter(d => d.stage.id === 'stage-3'));
+          // stage-4 is intentionally missing from the map
+          return grouped;
+        }, deps);
+      }
+      return originalUseMemo(fn, deps);
+    });
+
+    render(
+      <PipelineBoard
+        pipeline={pipelineWithExtraStage}
+        deals={mockDeals}
+      />
+    );
+
+    // Verify stage-4 is rendered with empty deals array (fallback to [])
+    const stage4 = screen.getByTestId('stage-stage-4');
+    expect(stage4).toBeInTheDocument();
+    expect(stage4).toHaveTextContent('New Stage');
+    expect(stage4).toHaveTextContent('$0'); // No deals, so value is 0
+
+    // Restore original useMemo
+    React.useMemo = originalUseMemo;
   });
 });

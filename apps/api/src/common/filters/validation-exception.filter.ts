@@ -4,10 +4,10 @@ import {
   ArgumentsHost,
   BadRequestException,
   Logger,
-} from '@nestjs/common';
-import { Request, Response } from 'express';
-import { GqlArgumentsHost, GqlContextType } from '@nestjs/graphql';
-import { ValidationError } from 'class-validator';
+} from "@nestjs/common";
+import { Request, Response } from "express";
+import { GqlArgumentsHost, GqlContextType } from "@nestjs/graphql";
+import { ValidationError } from "class-validator";
 
 @Catch(BadRequestException)
 export class ValidationExceptionFilter implements ExceptionFilter {
@@ -25,7 +25,7 @@ export class ValidationExceptionFilter implements ExceptionFilter {
 
     const validationErrors = this.formatValidationErrors(response.message);
 
-    if (contextType === 'graphql') {
+    if (contextType === "graphql") {
       return this.handleGraphQLValidation(validationErrors, host);
     }
 
@@ -39,8 +39,8 @@ export class ValidationExceptionFilter implements ExceptionFilter {
 
     const errorResponse = {
       statusCode: 400,
-      error: 'Validation Failed',
-      message: 'The request contains invalid data',
+      error: "Validation Failed",
+      message: "The request contains invalid data",
       timestamp: new Date().toISOString(),
       path: request.url,
       method: request.method,
@@ -60,19 +60,21 @@ export class ValidationExceptionFilter implements ExceptionFilter {
 
     const errorDetails = {
       statusCode: 400,
-      error: 'Validation Failed',
-      message: 'The request contains invalid data',
+      error: "Validation Failed",
+      message: "The request contains invalid data",
       timestamp: new Date().toISOString(),
       path: info.path?.key,
       requestId: context.req?.id,
       errors,
     };
 
-    this.logger.warn(`GraphQL Validation Error: ${JSON.stringify(errorDetails)}`);
+    this.logger.warn(
+      `GraphQL Validation Error: ${JSON.stringify(errorDetails)}`,
+    );
 
     // Create a new BadRequestException with formatted errors
     throw new BadRequestException({
-      message: 'Validation failed',
+      message: "Validation failed",
       errors,
     });
   }
@@ -81,7 +83,7 @@ export class ValidationExceptionFilter implements ExceptionFilter {
     const formatted: Record<string, string[]> = {};
 
     errors.forEach((error) => {
-      if (typeof error === 'string') {
+      if (typeof error === "string") {
         // Simple string error
         if (!formatted.general) {
           formatted.general = [];

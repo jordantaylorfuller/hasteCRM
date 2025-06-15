@@ -55,7 +55,8 @@ export class EmailParserService {
     const to = this.parseAddresses(headers.to);
     const cc = this.parseAddresses(headers.cc);
     const bcc = this.parseAddresses(headers.bcc);
-    const from = this.parseAddresses(headers.from)[0] || {
+    const fromAddresses = this.parseAddresses(headers.from);
+    const from = fromAddresses[0] || {
       email: "unknown@example.com",
     };
 
@@ -63,7 +64,7 @@ export class EmailParserService {
     const internalDate = message.internalDate
       ? new Date(parseInt(message.internalDate))
       : new Date();
-    
+
     // Use Date header if available for sentAt
     const sentAt = headers.date ? new Date(headers.date) : internalDate;
 
@@ -195,21 +196,70 @@ export class EmailParserService {
     }
 
     const addresses: EmailAddress[] = [];
-    const regex = /(?:"?([^"]*)"?\s)?<?([\w\-._]+@[\w\-._]+\.\w+)>?/g;
-    let match;
-
-    while ((match = regex.exec(addressString)) !== null) {
-      addresses.push({
-        name: match[1]?.trim(),
-        email: match[2].toLowerCase(),
-      });
+    
+    // Split by comma to handle multiple addresses, but preserve quoted names
+    const addressParts: string[] = [];
+    let current = '';
+    let inQuotes = false;
+    
+    for (let i = 0; i < addressString.length; i++) {
+      const char = addressString[i];
+      
+      if (char === '"') {
+        inQuotes = !inQuotes;
+        current += char;
+      } else if (char === ',' && !inQuotes) {
+        addressParts.push(current.trim());
+        current = '';
+      } else {
+        current += char;
+      }
     }
-
-    // Fallback for simple email addresses
-    if (addresses.length === 0 && addressString.includes("@")) {
-      addresses.push({
-        email: addressString.trim().toLowerCase(),
-      });
+    
+    // Don't forget the last part
+    if (current.trim()) {
+      addressParts.push(current.trim());
+    }
+    
+    for (const part of addressParts) {
+      if (!part) continue;
+      
+      // Match pattern: "Name" <email> or Name <email> or just email
+      const quotedNameMatch = part.match(/^"([^"]+)"\s*<([^<>]+)>$/);
+      const unquotedNameMatch = part.match(/^([^<>]+?)\s*<([^<>]+)>$/);
+      const plainEmailMatch = part.match(/^([^<>@\s]+@[^<>@\s]+\.[^<>@\s]+)$/);
+      
+      if (quotedNameMatch) {
+        // Quoted name with email in brackets: "Name" <email>
+        const name = quotedNameMatch[1].trim();
+        const email = quotedNameMatch[2].toLowerCase();
+        
+        addresses.push({
+          name: name || undefined,
+          email: email,
+        });
+      } else if (unquotedNameMatch) {
+        // Unquoted name with email in brackets: Name <email>
+        const name = unquotedNameMatch[1].trim();
+        const email = unquotedNameMatch[2].toLowerCase();
+        
+        addresses.push({
+          name: name || undefined,
+          email: email,
+        });
+      } else if (plainEmailMatch) {
+        // Plain email address without brackets
+        const email = plainEmailMatch[1].toLowerCase();
+        
+        addresses.push({
+          email: email,
+        });
+      } else if (part.includes("@")) {
+        // Fallback for simple email addresses
+        addresses.push({
+          email: part.trim().toLowerCase(),
+        });
+      }
     }
 
     return addresses;

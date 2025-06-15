@@ -6,34 +6,34 @@ export function formatError(error: any): Record<string, any> {
       name: error.name,
     };
   }
-  
-  if (typeof error === 'string') {
+
+  if (typeof error === "string") {
     return { message: error };
   }
-  
-  return error || { message: 'Unknown error' };
+
+  return error || { message: "Unknown error" };
 }
 
 export function isValidEmail(email: string): boolean {
   if (!email) return false;
-  
+
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 }
 
 export function sanitizeHtml(html: string): string {
-  if (!html) return '';
-  
+  if (!html) return "";
+
   // Basic sanitization - in production, use a library like DOMPurify
   return html
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/on\w+\s*=\s*["'][^"']*["']/gi, '')
-    .replace(/javascript:/gi, '');
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+    .replace(/on\w+\s*=\s*["'][^"']*["']/gi, "")
+    .replace(/javascript:/gi, "");
 }
 
 export function truncateString(str: string, maxLength: number): string {
-  if (!str || str.length <= maxLength) return str || '';
-  if (maxLength <= 0) return '...';
-  
-  return str.substring(0, maxLength) + '...';
+  if (!str || str.length <= maxLength) return str || "";
+  if (maxLength <= 0) return "...";
+
+  return str.substring(0, maxLength) + "...";
 }

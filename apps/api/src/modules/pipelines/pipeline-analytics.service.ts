@@ -340,7 +340,7 @@ export class PipelineAnalyticsService {
         );
       }
     } catch (error) {
-      console.error('Error calculating daily metrics:', error);
+      console.error("Error calculating daily metrics:", error);
     }
   }
 

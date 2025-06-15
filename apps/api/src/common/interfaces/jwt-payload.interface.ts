@@ -3,7 +3,7 @@ export interface JwtPayload {
   email: string;
   workspaceId: string;
   role: string;
-  type?: 'access' | 'refresh';
+  type?: "access" | "refresh";
   firstName?: string;
   lastName?: string;
   status?: string;

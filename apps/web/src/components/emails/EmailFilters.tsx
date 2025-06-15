@@ -315,6 +315,7 @@ export function EmailFilters({
               <button
                 onClick={() => clearFilter("isUnread")}
                 className="ml-1 hover:text-destructive"
+                aria-label="Remove unread filter"
               >
                 <X className="h-3 w-3" />
               </button>
@@ -326,6 +327,7 @@ export function EmailFilters({
               <button
                 onClick={() => clearFilter("isStarred")}
                 className="ml-1 hover:text-destructive"
+                aria-label="Remove starred filter"
               >
                 <X className="h-3 w-3" />
               </button>
@@ -337,6 +339,7 @@ export function EmailFilters({
               <button
                 onClick={() => clearFilter("hasAttachment")}
                 className="ml-1 hover:text-destructive"
+                aria-label="Remove attachment filter"
               >
                 <X className="h-3 w-3" />
               </button>
@@ -348,6 +351,7 @@ export function EmailFilters({
               <button
                 onClick={() => clearFilter("from")}
                 className="ml-1 hover:text-destructive"
+                aria-label="Remove from filter"
               >
                 <X className="h-3 w-3" />
               </button>
@@ -359,6 +363,7 @@ export function EmailFilters({
               <button
                 onClick={() => clearFilter("to")}
                 className="ml-1 hover:text-destructive"
+                aria-label="Remove to filter"
               >
                 <X className="h-3 w-3" />
               </button>
@@ -372,6 +377,7 @@ export function EmailFilters({
               <button
                 onClick={() => clearFilter("dateRange")}
                 className="ml-1 hover:text-destructive"
+                aria-label="Remove date range filter"
               >
                 <X className="h-3 w-3" />
               </button>

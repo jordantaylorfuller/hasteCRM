@@ -104,23 +104,28 @@ describe("ContactCard", () => {
     const user = userEvent.setup();
     render(<ContactCard contact={mockContact} onUpdate={mockOnUpdate} />);
 
-    // Find button with MoreHorizontal icon
-    const menuButton = document.querySelector('button .lucide-more-horizontal')?.parentElement as HTMLElement;
+    // Find dropdown trigger button
+    const menuButton = screen.getByRole('button', { name: '' });
     await user.click(menuButton);
 
-    expect(screen.getByText("Edit")).toBeInTheDocument();
-    expect(screen.getByText("Delete")).toBeInTheDocument();
+    // Wait for dropdown to open
+    await waitFor(() => {
+      expect(screen.getByText("Edit")).toBeInTheDocument();
+      expect(screen.getByText("Delete")).toBeInTheDocument();
+    });
   });
 
   it("handles edit action", async () => {
     const user = userEvent.setup();
     render(<ContactCard contact={mockContact} onUpdate={mockOnUpdate} />);
 
-    const menuButton = document.querySelector('button .lucide-more-horizontal')?.parentElement as HTMLElement;
+    const menuButton = screen.getByRole('button', { name: '' });
     await user.click(menuButton);
 
-    const editButton = screen.getByText("Edit");
-    await user.click(editButton);
+    await waitFor(async () => {
+      const editButton = screen.getByText("Edit");
+      await user.click(editButton);
+    });
 
     // Since EditContactModal is not implemented, we just check the state
     // In a real implementation, you would check if the modal opened
@@ -133,11 +138,13 @@ describe("ContactCard", () => {
 
     render(<ContactCard contact={mockContact} onUpdate={mockOnUpdate} />);
 
-    const menuButton = document.querySelector('button .lucide-more-horizontal')?.parentElement as HTMLElement;
+    const menuButton = screen.getByRole('button', { name: '' });
     await user.click(menuButton);
 
-    const deleteButton = screen.getByText("Delete");
-    await user.click(deleteButton);
+    await waitFor(async () => {
+      const deleteButton = screen.getByText("Delete");
+      await user.click(deleteButton);
+    });
 
     expect(mockConfirm).toHaveBeenCalledWith(
       "Are you sure you want to delete this contact?",

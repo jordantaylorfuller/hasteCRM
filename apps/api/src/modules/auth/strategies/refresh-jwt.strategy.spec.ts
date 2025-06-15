@@ -1,9 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { RefreshJwtStrategy } from './refresh-jwt.strategy';
-import { ConfigService } from '@nestjs/config';
-import { UnauthorizedException } from '@nestjs/common';
+import { Test, TestingModule } from "@nestjs/testing";
+import { RefreshJwtStrategy } from "./refresh-jwt.strategy";
+import { ConfigService } from "@nestjs/config";
+import { UnauthorizedException } from "@nestjs/common";
 
-describe('RefreshJwtStrategy', () => {
+describe("RefreshJwtStrategy", () => {
   let strategy: RefreshJwtStrategy;
   let configService: ConfigService;
 
@@ -26,7 +26,7 @@ describe('RefreshJwtStrategy', () => {
     configService = module.get<ConfigService>(ConfigService);
 
     mockConfigService.get.mockImplementation((key: string) => {
-      if (key === 'JWT_REFRESH_SECRET') return 'test-refresh-secret';
+      if (key === "JWT_REFRESH_SECRET") return "test-refresh-secret";
       return null;
     });
   });
@@ -35,36 +35,36 @@ describe('RefreshJwtStrategy', () => {
     jest.clearAllMocks();
   });
 
-  describe('constructor', () => {
-    it('should be defined', () => {
+  describe("constructor", () => {
+    it("should be defined", () => {
       expect(strategy).toBeDefined();
     });
   });
 
-  describe('validate', () => {
-    it('should return user payload for valid refresh token', async () => {
+  describe("validate", () => {
+    it("should return user payload for valid refresh token", async () => {
       const payload = {
-        sub: 'user-123',
-        email: 'test@example.com',
-        workspaceId: 'workspace-123',
-        type: 'refresh',
+        sub: "user-123",
+        email: "test@example.com",
+        workspaceId: "workspace-123",
+        type: "refresh",
       };
 
       const result = await strategy.validate(payload);
 
       expect(result).toEqual({
-        userId: 'user-123',
-        email: 'test@example.com',
-        workspaceId: 'workspace-123',
+        userId: "user-123",
+        email: "test@example.com",
+        workspaceId: "workspace-123",
       });
     });
 
-    it('should throw UnauthorizedException for non-refresh token', async () => {
+    it("should throw UnauthorizedException for non-refresh token", async () => {
       const payload = {
-        sub: 'user-123',
-        email: 'test@example.com',
-        workspaceId: 'workspace-123',
-        type: 'access', // Wrong token type
+        sub: "user-123",
+        email: "test@example.com",
+        workspaceId: "workspace-123",
+        type: "access", // Wrong token type
       };
 
       await expect(strategy.validate(payload)).rejects.toThrow(
@@ -72,11 +72,11 @@ describe('RefreshJwtStrategy', () => {
       );
     });
 
-    it('should throw UnauthorizedException for missing type', async () => {
+    it("should throw UnauthorizedException for missing type", async () => {
       const payload = {
-        sub: 'user-123',
-        email: 'test@example.com',
-        workspaceId: 'workspace-123',
+        sub: "user-123",
+        email: "test@example.com",
+        workspaceId: "workspace-123",
         // Missing type field
       };
 
@@ -85,11 +85,11 @@ describe('RefreshJwtStrategy', () => {
       );
     });
 
-    it('should throw UnauthorizedException for invalid payload', async () => {
+    it("should throw UnauthorizedException for invalid payload", async () => {
       const invalidPayload = {
         // Missing required fields
-        email: 'test@example.com',
-        type: 'refresh',
+        email: "test@example.com",
+        type: "refresh",
       };
 
       await expect(strategy.validate(invalidPayload)).rejects.toThrow(
@@ -97,17 +97,17 @@ describe('RefreshJwtStrategy', () => {
       );
     });
 
-    it('should throw UnauthorizedException for null payload', async () => {
+    it("should throw UnauthorizedException for null payload", async () => {
       await expect(strategy.validate(null)).rejects.toThrow(
         UnauthorizedException,
       );
     });
 
-    it('should throw UnauthorizedException for payload without sub', async () => {
+    it("should throw UnauthorizedException for payload without sub", async () => {
       const payload = {
-        email: 'test@example.com',
-        workspaceId: 'workspace-123',
-        type: 'refresh',
+        email: "test@example.com",
+        workspaceId: "workspace-123",
+        type: "refresh",
       };
 
       await expect(strategy.validate(payload)).rejects.toThrow(
@@ -115,11 +115,11 @@ describe('RefreshJwtStrategy', () => {
       );
     });
 
-    it('should throw UnauthorizedException for payload without workspaceId', async () => {
+    it("should throw UnauthorizedException for payload without workspaceId", async () => {
       const payload = {
-        sub: 'user-123',
-        email: 'test@example.com',
-        type: 'refresh',
+        sub: "user-123",
+        email: "test@example.com",
+        type: "refresh",
       };
 
       await expect(strategy.validate(payload)).rejects.toThrow(
@@ -127,12 +127,12 @@ describe('RefreshJwtStrategy', () => {
       );
     });
 
-    it('should handle expired token scenario', async () => {
+    it("should handle expired token scenario", async () => {
       const payload = {
-        sub: 'user-123',
-        email: 'test@example.com',
-        workspaceId: 'workspace-123',
-        type: 'refresh',
+        sub: "user-123",
+        email: "test@example.com",
+        workspaceId: "workspace-123",
+        type: "refresh",
         exp: Math.floor(Date.now() / 1000) - 3600, // Expired 1 hour ago
       };
 
@@ -140,9 +140,9 @@ describe('RefreshJwtStrategy', () => {
       const result = await strategy.validate(payload);
 
       expect(result).toEqual({
-        userId: 'user-123',
-        email: 'test@example.com',
-        workspaceId: 'workspace-123',
+        userId: "user-123",
+        email: "test@example.com",
+        workspaceId: "workspace-123",
       });
     });
   });

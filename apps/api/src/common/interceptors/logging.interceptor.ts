@@ -4,20 +4,20 @@ import {
   ExecutionContext,
   CallHandler,
   Logger,
-} from '@nestjs/common';
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
-import { GqlExecutionContext, GqlContextType } from '@nestjs/graphql';
+} from "@nestjs/common";
+import { Observable } from "rxjs";
+import { tap } from "rxjs/operators";
+import { GqlExecutionContext, GqlContextType } from "@nestjs/graphql";
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
-  private readonly logger = new Logger('HTTP');
+  private readonly logger = new Logger("HTTP");
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const start = Date.now();
     const contextType = context.getType<GqlContextType>();
 
-    if (contextType === 'graphql') {
+    if (contextType === "graphql") {
       return this.handleGraphQL(context, next, start);
     }
 
@@ -32,14 +32,14 @@ export class LoggingInterceptor implements NestInterceptor {
     const request = context.switchToHttp().getRequest();
     const response = context.switchToHttp().getResponse();
     const { method, url, ip } = request;
-    const userAgent = request.get('user-agent') || '';
+    const userAgent = request.get("user-agent") || "";
 
     return next.handle().pipe(
       tap({
         next: () => {
           const { statusCode } = response;
           const duration = Date.now() - start;
-          
+
           this.logger.log(
             `${method} ${url} ${statusCode} ${duration}ms - ${userAgent} ${ip}`,
           );
@@ -47,7 +47,7 @@ export class LoggingInterceptor implements NestInterceptor {
         error: (error) => {
           const duration = Date.now() - start;
           const statusCode = error.status || 500;
-          
+
           this.logger.error(
             `${method} ${url} ${statusCode} ${duration}ms - ${userAgent} ${ip}`,
           );
@@ -67,14 +67,14 @@ export class LoggingInterceptor implements NestInterceptor {
     const request = ctx.req;
 
     const operation = `${info.parentType.name}.${info.fieldName}`;
-    const ip = request?.ip || 'unknown';
-    const userAgent = request?.get('user-agent') || '';
+    const ip = request?.ip || "unknown";
+    const userAgent = request?.get("user-agent") || "";
 
     return next.handle().pipe(
       tap({
         next: () => {
           const duration = Date.now() - start;
-          
+
           this.logger.log(
             `GraphQL ${operation} 200 ${duration}ms - ${userAgent} ${ip}`,
           );
@@ -82,7 +82,7 @@ export class LoggingInterceptor implements NestInterceptor {
         error: (error) => {
           const duration = Date.now() - start;
           const statusCode = error.status || 500;
-          
+
           this.logger.error(
             `GraphQL ${operation} ${statusCode} ${duration}ms - ${userAgent} ${ip}`,
           );

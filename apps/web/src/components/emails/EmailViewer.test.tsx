@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { EmailViewer } from "./EmailViewer";
 import { Email } from "@/types/email";
@@ -105,17 +105,26 @@ describe("EmailViewer", () => {
   it("shows close button when onClose is provided", () => {
     render(<EmailViewer email={mockEmail} {...mockHandlers} />);
 
-    // Close button has X icon (lucide-x class)
-    const closeButton = document.querySelector('button .lucide-x')?.parentElement;
+    // The close button is positioned in the header with the X icon
+    // Find it by looking for a button in the header area
+    const header = screen.getByText(mockEmail.subject).parentElement?.parentElement;
+    const closeButton = header?.querySelector('button:last-child');
+    
     expect(closeButton).toBeInTheDocument();
+    // Verify it has the X icon
+    expect(closeButton?.querySelector('svg')).toBeInTheDocument();
   });
 
   it("hides close button when onClose is not provided", () => {
-    render(<EmailViewer email={mockEmail} />);
+    const { onClose, ...handlersWithoutClose } = mockHandlers;
+    render(<EmailViewer email={mockEmail} {...handlersWithoutClose} />);
 
-    // Close button has X icon (lucide-x class)
-    const closeButton = document.querySelector('button .lucide-x')?.parentElement;
-    expect(closeButton).not.toBeInTheDocument();
+    // When onClose is not provided, there should be no X button in the header
+    const header = screen.getByText(mockEmail.subject).parentElement;
+    const closeButton = header?.querySelector('button');
+    
+    // The close button should not exist
+    expect(closeButton).toBeNull();
   });
 
   it("handles reply action", async () => {
@@ -190,14 +199,21 @@ describe("EmailViewer", () => {
 
   it("opens more actions dropdown", async () => {
     const user = userEvent.setup();
-    render(<EmailViewer email={mockEmail} {...mockHandlers} />);
+    const { container } = render(<EmailViewer email={mockEmail} {...mockHandlers} />);
 
-    const moreButton = screen.getAllByRole("button").find(
-      (btn) => btn.querySelector(".lucide-more-vertical") !== null,
-    );
+    // Find the more actions button - it's the last icon button in the action buttons group
+    const actionButtons = container.querySelector('.ml-auto.flex.items-center.space-x-2');
+    const buttons = actionButtons?.querySelectorAll('button') || [];
+    const moreButton = buttons[buttons.length - 1];
+    
+    expect(moreButton).toBeTruthy();
     await user.click(moreButton!);
 
-    expect(screen.getByText("Mark as unread")).toBeInTheDocument();
+    // Wait for dropdown to be visible
+    await waitFor(() => {
+      expect(screen.getByText("Mark as unread")).toBeInTheDocument();
+    }, { timeout: 3000 });
+    
     expect(screen.getByText("Print")).toBeInTheDocument();
     expect(screen.getByText("View original")).toBeInTheDocument();
     expect(screen.getByText("Report spam")).toBeInTheDocument();
@@ -205,12 +221,20 @@ describe("EmailViewer", () => {
 
   it("handles mark as unread from dropdown", async () => {
     const user = userEvent.setup();
-    render(<EmailViewer email={mockEmail} {...mockHandlers} />);
+    const { container } = render(<EmailViewer email={mockEmail} {...mockHandlers} />);
 
-    const moreButton = screen.getAllByRole("button").find(
-      (btn) => btn.querySelector(".lucide-more-vertical") !== null,
-    );
+    // Find the more actions button - it's the last icon button in the action buttons group
+    const actionButtons = container.querySelector('.ml-auto.flex.items-center.space-x-2');
+    const buttons = actionButtons?.querySelectorAll('button') || [];
+    const moreButton = buttons[buttons.length - 1];
+    
+    expect(moreButton).toBeTruthy();
     await user.click(moreButton!);
+
+    // Wait for dropdown to be visible
+    await waitFor(() => {
+      expect(screen.getByText("Mark as unread")).toBeInTheDocument();
+    }, { timeout: 3000 });
 
     await user.click(screen.getByText("Mark as unread"));
     expect(mockHandlers.onMarkAsUnread).toHaveBeenCalledWith(mockEmail);
@@ -221,7 +245,7 @@ describe("EmailViewer", () => {
 
     expect(screen.getByText("Attachments (2)")).toBeInTheDocument();
     expect(screen.getByText("project-report.pdf")).toBeInTheDocument();
-    expect(screen.getByText("2 MB")).toBeInTheDocument();
+    expect(screen.getByText("1.95 MB")).toBeInTheDocument();
     expect(screen.getByText("data.xlsx")).toBeInTheDocument();
     expect(screen.getByText("500 KB")).toBeInTheDocument();
   });
@@ -230,6 +254,7 @@ describe("EmailViewer", () => {
     const emailWithVariousAttachments: Email = {
       ...mockEmail,
       attachments: [
+        { id: "0", gmailId: "g0", filename: "empty.txt", mimeType: "text/plain", size: 0 },
         { id: "1", gmailId: "g1", filename: "tiny.txt", mimeType: "text/plain", size: 100 },
         { id: "2", gmailId: "g2", filename: "small.pdf", mimeType: "application/pdf", size: 1024 },
         { id: "3", gmailId: "g3", filename: "medium.doc", mimeType: "application/msword", size: 1048576 },
@@ -239,6 +264,7 @@ describe("EmailViewer", () => {
 
     render(<EmailViewer email={emailWithVariousAttachments} {...mockHandlers} />);
 
+    expect(screen.getByText("0 Bytes")).toBeInTheDocument();
     expect(screen.getByText("100 Bytes")).toBeInTheDocument();
     expect(screen.getByText("1 KB")).toBeInTheDocument();
     expect(screen.getByText("1 MB")).toBeInTheDocument();

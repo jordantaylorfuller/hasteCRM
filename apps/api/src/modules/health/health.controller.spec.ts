@@ -1,14 +1,14 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { HealthController } from './health.controller';
+import { Test, TestingModule } from "@nestjs/testing";
+import { HealthController } from "./health.controller";
 import {
   HealthCheckService,
   MemoryHealthIndicator,
   DiskHealthIndicator,
-} from '@nestjs/terminus';
-import { PrismaHealthIndicator } from './indicators/prisma.health';
-import { RedisHealthIndicator } from './indicators/redis.health';
+} from "@nestjs/terminus";
+import { PrismaHealthIndicator } from "./indicators/prisma.health";
+import { RedisHealthIndicator } from "./indicators/redis.health";
 
-describe('HealthController', () => {
+describe("HealthController", () => {
   let controller: HealthController;
   let healthCheckService: HealthCheckService;
   let memoryHealthIndicator: MemoryHealthIndicator;
@@ -67,26 +67,31 @@ describe('HealthController', () => {
 
     controller = module.get<HealthController>(HealthController);
     healthCheckService = module.get<HealthCheckService>(HealthCheckService);
-    memoryHealthIndicator = module.get<MemoryHealthIndicator>(MemoryHealthIndicator);
+    memoryHealthIndicator = module.get<MemoryHealthIndicator>(
+      MemoryHealthIndicator,
+    );
     diskHealthIndicator = module.get<DiskHealthIndicator>(DiskHealthIndicator);
-    prismaHealthIndicator = module.get<PrismaHealthIndicator>(PrismaHealthIndicator);
-    redisHealthIndicator = module.get<RedisHealthIndicator>(RedisHealthIndicator);
+    prismaHealthIndicator = module.get<PrismaHealthIndicator>(
+      PrismaHealthIndicator,
+    );
+    redisHealthIndicator =
+      module.get<RedisHealthIndicator>(RedisHealthIndicator);
   });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  describe('check', () => {
-    it('should perform comprehensive health check', async () => {
+  describe("check", () => {
+    it("should perform comprehensive health check", async () => {
       const mockHealthResult = {
-        status: 'ok',
+        status: "ok",
         info: {
-          database: { status: 'up' },
-          redis: { status: 'up' },
-          memory_heap: { status: 'up' },
-          memory_rss: { status: 'up' },
-          storage: { status: 'up' },
+          database: { status: "up" },
+          redis: { status: "up" },
+          memory_heap: { status: "up" },
+          memory_rss: { status: "up" },
+          storage: { status: "up" },
         },
         details: {},
       };
@@ -106,38 +111,43 @@ describe('HealthController', () => {
       expect(result).toEqual(mockHealthResult);
     });
 
-    it('should execute all health indicators', async () => {
+    it("should execute all health indicators", async () => {
       const checks = [];
       mockHealthCheckService.check.mockImplementation((checkFns) => {
         checks.push(...checkFns);
         // Execute each check function to verify they call the correct indicators
-        checkFns.forEach(fn => fn());
-        return Promise.resolve({ status: 'ok' });
+        checkFns.forEach((fn) => fn());
+        return Promise.resolve({ status: "ok" });
       });
 
       await controller.check();
 
-      expect(mockPrismaHealthIndicator.isHealthy).toHaveBeenCalledWith('database');
-      expect(mockRedisHealthIndicator.isHealthy).toHaveBeenCalledWith('redis');
+      expect(mockPrismaHealthIndicator.isHealthy).toHaveBeenCalledWith(
+        "database",
+      );
+      expect(mockRedisHealthIndicator.isHealthy).toHaveBeenCalledWith("redis");
       expect(mockMemoryHealthIndicator.checkHeap).toHaveBeenCalledWith(
-        'memory_heap',
-        150 * 1024 * 1024
+        "memory_heap",
+        150 * 1024 * 1024,
       );
       expect(mockMemoryHealthIndicator.checkRSS).toHaveBeenCalledWith(
-        'memory_rss',
-        300 * 1024 * 1024
+        "memory_rss",
+        300 * 1024 * 1024,
       );
-      expect(mockDiskHealthIndicator.checkStorage).toHaveBeenCalledWith('storage', {
-        path: '/',
-        thresholdPercent: 0.9,
-      });
+      expect(mockDiskHealthIndicator.checkStorage).toHaveBeenCalledWith(
+        "storage",
+        {
+          path: "/",
+          thresholdPercent: 0.9,
+        },
+      );
     });
   });
 
-  describe('liveness', () => {
-    it('should perform simple liveness check', async () => {
+  describe("liveness", () => {
+    it("should perform simple liveness check", async () => {
       const mockLivenessResult = {
-        status: 'ok',
+        status: "ok",
         info: {},
         details: {},
       };
@@ -151,13 +161,13 @@ describe('HealthController', () => {
     });
   });
 
-  describe('readiness', () => {
-    it('should check critical services for readiness', async () => {
+  describe("readiness", () => {
+    it("should check critical services for readiness", async () => {
       const mockReadinessResult = {
-        status: 'ok',
+        status: "ok",
         info: {
-          database: { status: 'up' },
-          redis: { status: 'up' },
+          database: { status: "up" },
+          redis: { status: "up" },
         },
         details: {},
       };
@@ -174,25 +184,27 @@ describe('HealthController', () => {
       expect(result).toEqual(mockReadinessResult);
     });
 
-    it('should execute readiness health indicators', async () => {
+    it("should execute readiness health indicators", async () => {
       mockHealthCheckService.check.mockImplementation((checkFns) => {
-        checkFns.forEach(fn => fn());
-        return Promise.resolve({ status: 'ok' });
+        checkFns.forEach((fn) => fn());
+        return Promise.resolve({ status: "ok" });
       });
 
       await controller.readiness();
 
-      expect(mockPrismaHealthIndicator.isHealthy).toHaveBeenCalledWith('database');
-      expect(mockRedisHealthIndicator.isHealthy).toHaveBeenCalledWith('redis');
+      expect(mockPrismaHealthIndicator.isHealthy).toHaveBeenCalledWith(
+        "database",
+      );
+      expect(mockRedisHealthIndicator.isHealthy).toHaveBeenCalledWith("redis");
     });
   });
 
-  describe('startup', () => {
-    it('should perform lightweight startup check', async () => {
+  describe("startup", () => {
+    it("should perform lightweight startup check", async () => {
       const mockStartupResult = {
-        status: 'ok',
+        status: "ok",
         info: {
-          database: { status: 'up' },
+          database: { status: "up" },
         },
         details: {},
       };
@@ -208,47 +220,49 @@ describe('HealthController', () => {
       expect(result).toEqual(mockStartupResult);
     });
 
-    it('should execute startup health indicator', async () => {
+    it("should execute startup health indicator", async () => {
       mockHealthCheckService.check.mockImplementation((checkFns) => {
-        checkFns.forEach(fn => fn());
-        return Promise.resolve({ status: 'ok' });
+        checkFns.forEach((fn) => fn());
+        return Promise.resolve({ status: "ok" });
       });
 
       await controller.startup();
 
-      expect(mockPrismaHealthIndicator.pingCheck).toHaveBeenCalledWith('database');
+      expect(mockPrismaHealthIndicator.pingCheck).toHaveBeenCalledWith(
+        "database",
+      );
     });
   });
 
-  describe('error handling', () => {
-    it('should propagate errors from health check service', async () => {
-      const error = new Error('Health check failed');
+  describe("error handling", () => {
+    it("should propagate errors from health check service", async () => {
+      const error = new Error("Health check failed");
       mockHealthCheckService.check.mockRejectedValue(error);
 
       await expect(controller.check()).rejects.toThrow(error);
     });
 
-    it('should handle indicator failures', async () => {
-      const indicatorError = new Error('Database connection failed');
-      
+    it("should handle indicator failures", async () => {
+      const indicatorError = new Error("Database connection failed");
+
       // Set up the mock to throw error before the test
       mockPrismaHealthIndicator.isHealthy.mockRejectedValue(indicatorError);
-      
+
       mockHealthCheckService.check.mockImplementation(async (checkFns) => {
         // Try to execute the checks and catch errors
         try {
           for (const checkFn of checkFns) {
             await checkFn();
           }
-          return { status: 'ok' };
+          return { status: "ok" };
         } catch (error) {
-          return { status: 'error', error: error.message };
+          return { status: "error", error: error.message };
         }
       });
 
       const result = await controller.check();
-      expect(result.status).toBe('error');
-      expect(result.error).toBe('Database connection failed');
+      expect(result.status).toBe("error");
+      expect(result.error).toBe("Database connection failed");
     });
   });
 });

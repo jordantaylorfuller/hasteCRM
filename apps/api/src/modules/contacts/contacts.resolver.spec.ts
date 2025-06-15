@@ -238,13 +238,7 @@ describe("ContactsResolver", () => {
         },
       };
 
-      const result = await resolver.search(
-        "john",
-        filters,
-        0,
-        10,
-        mockContext,
-      );
+      const result = await resolver.search("john", filters, 0, 10, mockContext);
 
       expect(contactsService.search).toHaveBeenCalledWith(
         mockUser.workspaceId,
