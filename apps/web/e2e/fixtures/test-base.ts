@@ -1,4 +1,4 @@
-import { test as base } from '@playwright/test';
+import { test as base } from "@playwright/test";
 
 export interface TestUser {
   email: string;
@@ -18,9 +18,9 @@ export const test = base.extend<TestFixtures>({
     const timestamp = Date.now();
     const user: TestUser = {
       email: `test-${timestamp}@example.com`,
-      password: 'Test123!@#',
-      firstName: 'Test',
-      lastName: 'User',
+      password: "Test123!@#",
+      firstName: "Test",
+      lastName: "User",
     };
     await use(user);
   },
@@ -31,9 +31,9 @@ export const test = base.extend<TestFixtures>({
     // 1. Use API to create user and get auth token
     // 2. Use UI to register/login
     // For now, we'll use the UI approach
-    
+
     await use(page);
   },
 });
 
-export { expect } from '@playwright/test';
+export { expect } from "@playwright/test";

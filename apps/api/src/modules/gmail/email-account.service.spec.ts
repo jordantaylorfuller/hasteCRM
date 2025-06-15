@@ -85,14 +85,18 @@ describe("EmailAccountService", () => {
     };
 
     it("should create email account when email matches", async () => {
-      (gmailService.getProfile as jest.Mock).mockResolvedValue(mockGmailProfile);
+      (gmailService.getProfile as jest.Mock).mockResolvedValue(
+        mockGmailProfile,
+      );
       (prismaService.emailAccount.create as jest.Mock).mockResolvedValue(
         mockEmailAccount,
       );
 
       const result = await service.create(createData);
 
-      expect(gmailService.getProfile).toHaveBeenCalledWith(createData.accessToken);
+      expect(gmailService.getProfile).toHaveBeenCalledWith(
+        createData.accessToken,
+      );
       expect(prismaService.emailAccount.create).toHaveBeenCalledWith({
         data: {
           ...createData,
@@ -130,7 +134,9 @@ describe("EmailAccountService", () => {
     });
 
     it("should return null when account not found", async () => {
-      (prismaService.emailAccount.findUnique as jest.Mock).mockResolvedValue(null);
+      (prismaService.emailAccount.findUnique as jest.Mock).mockResolvedValue(
+        null,
+      );
 
       const result = await service.findOne("non-existent");
 
@@ -155,8 +161,13 @@ describe("EmailAccountService", () => {
 
   describe("findByWorkspace", () => {
     it("should find all accounts for a workspace", async () => {
-      const accounts = [mockEmailAccount, { ...mockEmailAccount, id: "account-456" }];
-      (prismaService.emailAccount.findMany as jest.Mock).mockResolvedValue(accounts);
+      const accounts = [
+        mockEmailAccount,
+        { ...mockEmailAccount, id: "account-456" },
+      ];
+      (prismaService.emailAccount.findMany as jest.Mock).mockResolvedValue(
+        accounts,
+      );
 
       const result = await service.findByWorkspace("workspace-123");
 
@@ -171,7 +182,9 @@ describe("EmailAccountService", () => {
   describe("findByUser", () => {
     it("should find all accounts for a user", async () => {
       const accounts = [mockEmailAccount];
-      (prismaService.emailAccount.findMany as jest.Mock).mockResolvedValue(accounts);
+      (prismaService.emailAccount.findMany as jest.Mock).mockResolvedValue(
+        accounts,
+      );
 
       const result = await service.findByUser("user-123");
 
@@ -186,7 +199,9 @@ describe("EmailAccountService", () => {
   describe("findActive", () => {
     it("should find all active accounts", async () => {
       const accounts = [mockEmailAccount];
-      (prismaService.emailAccount.findMany as jest.Mock).mockResolvedValue(accounts);
+      (prismaService.emailAccount.findMany as jest.Mock).mockResolvedValue(
+        accounts,
+      );
 
       const result = await service.findActive();
 
@@ -203,7 +218,9 @@ describe("EmailAccountService", () => {
   describe("findExpiringWatches", () => {
     it("should find accounts with expiring watches", async () => {
       const accounts = [mockEmailAccount];
-      (prismaService.emailAccount.findMany as jest.Mock).mockResolvedValue(accounts);
+      (prismaService.emailAccount.findMany as jest.Mock).mockResolvedValue(
+        accounts,
+      );
 
       const result = await service.findExpiringWatches(24);
 
@@ -222,7 +239,8 @@ describe("EmailAccountService", () => {
         .calls[0][0];
       const expiryDate = callArgs.where.watchExpiration.lte;
       const now = new Date();
-      const hoursDiff = (expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60);
+      const hoursDiff =
+        (expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60);
       expect(hoursDiff).toBeCloseTo(24, 0);
 
       expect(result).toEqual(accounts);
@@ -232,7 +250,9 @@ describe("EmailAccountService", () => {
   describe("findExpiredWatches", () => {
     it("should find accounts with expired watches", async () => {
       const accounts = [mockEmailAccount];
-      (prismaService.emailAccount.findMany as jest.Mock).mockResolvedValue(accounts);
+      (prismaService.emailAccount.findMany as jest.Mock).mockResolvedValue(
+        accounts,
+      );
 
       const result = await service.findExpiredWatches();
 
@@ -351,7 +371,9 @@ describe("EmailAccountService", () => {
     });
 
     it("should throw NotFoundException if account not found", async () => {
-      (prismaService.emailAccount.findUnique as jest.Mock).mockResolvedValue(null);
+      (prismaService.emailAccount.findUnique as jest.Mock).mockResolvedValue(
+        null,
+      );
 
       await expect(service.getFreshAccessToken("non-existent")).rejects.toThrow(
         new NotFoundException("Email account not found"),
@@ -470,7 +492,10 @@ describe("EmailAccountService", () => {
         updatedAccount,
       );
 
-      const result = await service.recordSuccessfulSync("account-123", newHistoryId);
+      const result = await service.recordSuccessfulSync(
+        "account-123",
+        newHistoryId,
+      );
 
       expect(prismaService.emailAccount.update).toHaveBeenCalledWith({
         where: { id: "account-123" },

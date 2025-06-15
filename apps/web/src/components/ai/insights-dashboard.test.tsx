@@ -16,16 +16,21 @@ beforeAll(() => {
       }
       return new originalDate(...args);
     }
-    
+
     static now() {
       return mockDate.getTime();
     }
   } as any;
-  
+
   // Copy all static methods
   Object.setPrototypeOf(global.Date, originalDate);
-  Object.getOwnPropertyNames(originalDate).forEach(prop => {
-    if (prop !== 'now' && prop !== 'prototype' && prop !== 'length' && prop !== 'name') {
+  Object.getOwnPropertyNames(originalDate).forEach((prop) => {
+    if (
+      prop !== "now" &&
+      prop !== "prototype" &&
+      prop !== "length" &&
+      prop !== "name"
+    ) {
       global.Date[prop] = originalDate[prop];
     }
   });
@@ -40,7 +45,9 @@ const mockGetAiInsightsSuccess = {
     query: GET_AI_INSIGHTS,
     variables: {
       timeRange: {
-        start: new Date(mockDate.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+        start: new Date(
+          mockDate.getTime() - 30 * 24 * 60 * 60 * 1000,
+        ).toISOString(),
         end: mockDate.toISOString(),
       },
     },
@@ -94,7 +101,9 @@ const mockGetAiInsightsError = {
     query: GET_AI_INSIGHTS,
     variables: {
       timeRange: {
-        start: new Date(mockDate.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+        start: new Date(
+          mockDate.getTime() - 30 * 24 * 60 * 60 * 1000,
+        ).toISOString(),
         end: mockDate.toISOString(),
       },
     },
@@ -107,7 +116,9 @@ const mockGetAiInsightsEmpty = {
     query: GET_AI_INSIGHTS,
     variables: {
       timeRange: {
-        start: new Date(mockDate.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+        start: new Date(
+          mockDate.getTime() - 30 * 24 * 60 * 60 * 1000,
+        ).toISOString(),
         end: mockDate.toISOString(),
       },
     },
@@ -138,11 +149,11 @@ describe("AiInsightsDashboard", () => {
     render(
       <MockedProvider mocks={[mockGetAiInsightsSuccess]} addTypename={false}>
         <AiInsightsDashboard />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     // Check for skeleton loaders - using class names instead of data-testid
-    const skeletons = document.querySelectorAll('.animate-pulse');
+    const skeletons = document.querySelectorAll(".animate-pulse");
     expect(skeletons.length).toBeGreaterThan(0);
   });
 
@@ -150,7 +161,7 @@ describe("AiInsightsDashboard", () => {
     render(
       <MockedProvider mocks={[mockGetAiInsightsSuccess]} addTypename={false}>
         <AiInsightsDashboard />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     await waitFor(() => {
@@ -158,7 +169,9 @@ describe("AiInsightsDashboard", () => {
     });
 
     // Check header
-    expect(screen.getByText("Powered by Claude AI - Last 30 days")).toBeInTheDocument();
+    expect(
+      screen.getByText("Powered by Claude AI - Last 30 days"),
+    ).toBeInTheDocument();
 
     // Check communication patterns section
     expect(screen.getByText("Communication Patterns")).toBeInTheDocument();
@@ -179,7 +192,9 @@ describe("AiInsightsDashboard", () => {
 
     // Check top contacts section
     expect(screen.getByText("Top Contacts")).toBeInTheDocument();
-    expect(screen.getByText("Your most frequent email correspondents")).toBeInTheDocument();
+    expect(
+      screen.getByText("Your most frequent email correspondents"),
+    ).toBeInTheDocument();
     expect(screen.getByText("John Doe")).toBeInTheDocument();
     expect(screen.getByText("john@example.com")).toBeInTheDocument();
     expect(screen.getByText("45")).toBeInTheDocument();
@@ -192,22 +207,34 @@ describe("AiInsightsDashboard", () => {
 
     // Check AI recommendations section
     expect(screen.getByText("AI Recommendations")).toBeInTheDocument();
-    expect(screen.getByText("Personalized suggestions to improve your communication")).toBeInTheDocument();
-    expect(screen.getByText(/Consider following up with contacts/)).toBeInTheDocument();
-    expect(screen.getByText(/Your response rate is highest between 9-10 AM/)).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Personalized suggestions to improve your communication",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Consider following up with contacts/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Your response rate is highest between 9-10 AM/),
+    ).toBeInTheDocument();
     expect(screen.getByText(/You have 5 starred emails/)).toBeInTheDocument();
-    expect(screen.getByText(/Consider organizing your contacts into groups/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Consider organizing your contacts into groups/),
+    ).toBeInTheDocument();
   });
 
   it("renders error state", async () => {
     render(
       <MockedProvider mocks={[mockGetAiInsightsError]} addTypename={false}>
         <AiInsightsDashboard />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Unable to load AI insights at this time.")).toBeInTheDocument();
+      expect(
+        screen.getByText("Unable to load AI insights at this time."),
+      ).toBeInTheDocument();
     });
   });
 
@@ -215,7 +242,7 @@ describe("AiInsightsDashboard", () => {
     render(
       <MockedProvider mocks={[mockGetAiInsightsEmpty]} addTypename={false}>
         <AiInsightsDashboard />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     await waitFor(() => {
@@ -230,7 +257,7 @@ describe("AiInsightsDashboard", () => {
 
     // No peak hours badges should be shown
     expect(screen.queryByText("Peak Communication Hours")).toBeInTheDocument();
-    
+
     // No contacts should be shown
     expect(screen.queryByText("John Doe")).not.toBeInTheDocument();
 
@@ -242,7 +269,7 @@ describe("AiInsightsDashboard", () => {
     render(
       <MockedProvider mocks={[mockGetAiInsightsSuccess]} addTypename={false}>
         <AiInsightsDashboard />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     await waitFor(() => {
@@ -262,7 +289,7 @@ describe("AiInsightsDashboard", () => {
     render(
       <MockedProvider mocks={[mockGetAiInsightsSuccess]} addTypename={false}>
         <AiInsightsDashboard />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     await waitFor(() => {
@@ -279,14 +306,16 @@ describe("AiInsightsDashboard", () => {
     render(
       <MockedProvider mocks={[mockGetAiInsightsSuccess]} addTypename={false}>
         <AiInsightsDashboard />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     await waitFor(() => {
       expect(screen.getByText("John Doe")).toBeInTheDocument();
     });
 
-    const contactItem = screen.getByText("John Doe").closest(".flex.items-center.justify-between");
+    const contactItem = screen
+      .getByText("John Doe")
+      .closest(".flex.items-center.justify-between");
     expect(contactItem).toHaveClass("hover:bg-muted/50", "transition-colors");
   });
 
@@ -294,7 +323,7 @@ describe("AiInsightsDashboard", () => {
     render(
       <MockedProvider mocks={[mockGetAiInsightsSuccess]} addTypename={false}>
         <AiInsightsDashboard />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     await waitFor(() => {
@@ -302,7 +331,9 @@ describe("AiInsightsDashboard", () => {
     });
 
     // Check for bullet points (rendered as divs with bg-primary)
-    const bullets = document.querySelectorAll(".h-2.w-2.rounded-full.bg-primary");
+    const bullets = document.querySelectorAll(
+      ".h-2.w-2.rounded-full.bg-primary",
+    );
     expect(bullets).toHaveLength(4); // 4 suggestions
   });
 
@@ -310,7 +341,7 @@ describe("AiInsightsDashboard", () => {
     render(
       <MockedProvider mocks={[mockGetAiInsightsSuccess]} addTypename={false}>
         <AiInsightsDashboard />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     await waitFor(() => {
@@ -328,7 +359,9 @@ describe("AiInsightsDashboard", () => {
         query: GET_AI_INSIGHTS,
         variables: {
           timeRange: {
-            start: new Date(mockDate.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+            start: new Date(
+              mockDate.getTime() - 30 * 24 * 60 * 60 * 1000,
+            ).toISOString(),
             end: mockDate.toISOString(),
           },
         },
@@ -343,11 +376,13 @@ describe("AiInsightsDashboard", () => {
     render(
       <MockedProvider mocks={[mockNullInsights]} addTypename={false}>
         <AiInsightsDashboard />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Unable to load AI insights at this time.")).toBeInTheDocument();
+      expect(
+        screen.getByText("Unable to load AI insights at this time."),
+      ).toBeInTheDocument();
     });
   });
 
@@ -355,7 +390,7 @@ describe("AiInsightsDashboard", () => {
     render(
       <MockedProvider mocks={[mockGetAiInsightsSuccess]} addTypename={false}>
         <AiInsightsDashboard />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     await waitFor(() => {
@@ -382,7 +417,9 @@ describe("AiInsightsDashboard", () => {
         query: GET_AI_INSIGHTS,
         variables: {
           timeRange: {
-            start: new Date(mockDate.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+            start: new Date(
+              mockDate.getTime() - 30 * 24 * 60 * 60 * 1000,
+            ).toISOString(),
             end: mockDate.toISOString(),
           },
         },
@@ -415,12 +452,15 @@ describe("AiInsightsDashboard", () => {
     render(
       <MockedProvider mocks={[mockWithComplexNames]} addTypename={false}>
         <AiInsightsDashboard />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
-    await waitFor(() => {
-      expect(screen.getByText("Mary Jane Watson Parker")).toBeInTheDocument();
-    }, { timeout: 5000 });
+    await waitFor(
+      () => {
+        expect(screen.getByText("Mary Jane Watson Parker")).toBeInTheDocument();
+      },
+      { timeout: 5000 },
+    );
 
     // Should show all initials
     expect(screen.getByText("MJWP")).toBeInTheDocument();
@@ -431,12 +471,15 @@ describe("AiInsightsDashboard", () => {
     render(
       <MockedProvider mocks={[mockGetAiInsightsSuccess]} addTypename={false}>
         <AiInsightsDashboard />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
-    await waitFor(() => {
-      expect(screen.getByText("Top Contacts")).toBeInTheDocument();
-    }, { timeout: 5000 });
+    await waitFor(
+      () => {
+        expect(screen.getByText("Top Contacts")).toBeInTheDocument();
+      },
+      { timeout: 5000 },
+    );
 
     // Check for "interactions" label
     const interactionLabels = screen.getAllByText("interactions");
@@ -449,7 +492,7 @@ describe("AiInsightsDashboard", () => {
     render(
       <MockedProvider mocks={[mockGetAiInsightsSuccess]} addTypename={false}>
         <AiInsightsDashboard />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     // Wait for component to load
@@ -458,14 +501,14 @@ describe("AiInsightsDashboard", () => {
     });
 
     // Component should render without errors
-    expect(document.querySelector('.space-y-6')).toBeInTheDocument();
+    expect(document.querySelector(".space-y-6")).toBeInTheDocument();
   });
 
   it("renders communication pattern icons with correct colors", async () => {
     render(
       <MockedProvider mocks={[mockGetAiInsightsSuccess]} addTypename={false}>
         <AiInsightsDashboard />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     await waitFor(() => {
@@ -473,8 +516,14 @@ describe("AiInsightsDashboard", () => {
     });
 
     // Check for colored icons
-    expect(document.querySelector(".lucide-trending-up.text-green-500")).toBeInTheDocument();
-    expect(document.querySelector(".lucide-star.text-yellow-500")).toBeInTheDocument();
-    expect(document.querySelector(".lucide-clock.text-blue-500")).toBeInTheDocument();
+    expect(
+      document.querySelector(".lucide-trending-up.text-green-500"),
+    ).toBeInTheDocument();
+    expect(
+      document.querySelector(".lucide-star.text-yellow-500"),
+    ).toBeInTheDocument();
+    expect(
+      document.querySelector(".lucide-clock.text-blue-500"),
+    ).toBeInTheDocument();
   });
 });

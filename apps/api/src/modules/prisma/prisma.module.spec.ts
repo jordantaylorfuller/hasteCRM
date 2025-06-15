@@ -20,7 +20,7 @@ describe("PrismaModule", () => {
   it("should provide PrismaService", () => {
     const prismaService = module.get<PrismaService>(PrismaService);
     expect(prismaService).toBeDefined();
-    expect(prismaService.constructor.name).toBe('PrismaService');
+    expect(prismaService.constructor.name).toBe("PrismaService");
   });
 
   it("should export PrismaService", () => {
@@ -35,11 +35,11 @@ describe("PrismaModule", () => {
     // We can verify this by checking if PrismaService is available globally
     const prismaService = module.get<PrismaService>(PrismaService);
     expect(prismaService).toBeDefined();
-    
+
     // Alternatively, check module metadata
     const providers = Reflect.getMetadata("providers", PrismaModule);
     const exports = Reflect.getMetadata("exports", PrismaModule);
-    
+
     expect(providers).toContain(PrismaService);
     expect(exports).toContain(PrismaService);
   });

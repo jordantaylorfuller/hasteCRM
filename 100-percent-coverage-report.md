@@ -3,12 +3,14 @@
 ## 📊 Current Coverage Status
 
 ### API Coverage (apps/api)
+
 - **Statements**: 80.74% (2680/3319)
-- **Branches**: 71.31% (1213/1701)  
+- **Branches**: 71.31% (1213/1701)
 - **Functions**: 65.03% (426/655)
 - **Lines**: 79.92% (2489/3114)
 
 ### Web Coverage (apps/web)
+
 - Multiple tests still failing due to component issues
 - Significant improvements made but further work needed
 
@@ -17,6 +19,7 @@
 ### ✅ Completed Tasks
 
 1. **Fixed Critical Test Failures**
+
    - Fixed truncateString test expectation
    - Added missing EmailService methods (sendBulkEmails, sendTemplatedEmail)
    - Fixed email parser multi-recipient handling
@@ -24,6 +27,7 @@
    - Added getWebhookStats method to GmailWebhookService
 
 2. **Achieved 100% Coverage in Key Areas**
+
    - PubSub Auth Guard: 100% coverage
    - Pipeline processors: 100% coverage
    - Gmail processors: 100% coverage
@@ -40,7 +44,9 @@
 ## 🔧 Remaining Work
 
 ### API (To reach 100%)
+
 1. **Low Coverage Areas**:
+
    - src/common/utils: 45.97% (needs utility function tests)
    - src/modules/email: 31.42% (needs email module tests)
    - src/modules/contacts: 64.02% (needs more resolver tests)
@@ -52,7 +58,9 @@
    - Companies resolver (optional parameter handling)
 
 ### Web (Significant work needed)
+
 1. **Failing Tests**: 96 tests failing
+
    - Dropdown menu component issues
    - Portal rendering problems
    - Async state update handling
@@ -65,12 +73,14 @@
 ## 📈 Recommendations
 
 ### Immediate Actions
+
 1. Fix remaining 6 API test failures
 2. Add tests for low-coverage utilities and services
 3. Mock Radix UI components properly for Web tests
 4. Handle async operations in React components
 
 ### Long-term Strategy
+
 1. Set up coverage thresholds (minimum 90%)
 2. Add pre-commit hooks to prevent coverage regression
 3. Implement E2E tests for critical user flows
@@ -79,6 +89,7 @@
 ## 🏆 Achievements
 
 Despite not reaching 100% coverage yet, significant progress was made:
+
 - API coverage improved from ~61.9% to ~80%
 - Web tests infrastructure established
 - Critical services now have comprehensive test coverage
@@ -96,16 +107,19 @@ Despite not reaching 100% coverage yet, significant progress was made:
 ## 🚀 Next Steps
 
 1. **Fix Remaining API Tests** (Est. 1-2 hours)
+
    - Update date expectations to use matchers
    - Fix service method calls
    - Handle optional parameters correctly
 
 2. **Improve Utility Coverage** (Est. 2-3 hours)
+
    - Add tests for all utility functions
    - Test error handling paths
    - Cover edge cases
 
 3. **Fix Web Component Tests** (Est. 4-6 hours)
+
    - Mock Radix UI properly
    - Handle portal rendering
    - Fix async state updates
@@ -126,18 +140,21 @@ Despite not reaching 100% coverage yet, significant progress was made:
 ## 📊 Coverage Breakdown by Module
 
 ### High Coverage (>90%)
+
 - Health Module: 98.8%
 - Webhooks: 96.25%
 - Redis Module: 94.28%
 - AI Module: 93.75%
 
 ### Medium Coverage (70-90%)
+
 - Pipelines: 87.5%
 - Companies: 83.78%
 - Import/Export: 70.93%
 - Auth: 79.64%
 
 ### Low Coverage (<70%)
+
 - Email: 31.42%
 - Contacts: 64.02%
 - Common Utils: 45.97%

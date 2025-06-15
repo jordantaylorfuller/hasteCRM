@@ -51,14 +51,16 @@ describe("Pipeline Queries", () => {
 
           // Check stages nested fields
           const stagesField = selection.selectionSet.selections.find(
-            (field) => field.kind === "Field" && field.name.value === "stages"
+            (field) => field.kind === "Field" && field.name.value === "stages",
           );
           if (stagesField?.kind === "Field" && stagesField.selectionSet) {
-            const stageFields = stagesField.selectionSet.selections.map((field) => {
-              if (field.kind === "Field") {
-                return field.name.value;
-              }
-            });
+            const stageFields = stagesField.selectionSet.selections.map(
+              (field) => {
+                if (field.kind === "Field") {
+                  return field.name.value;
+                }
+              },
+            );
             expect(stageFields).toEqual([
               "id",
               "name",
@@ -70,14 +72,16 @@ describe("Pipeline Queries", () => {
 
           // Check _count nested fields
           const countField = selection.selectionSet.selections.find(
-            (field) => field.kind === "Field" && field.name.value === "_count"
+            (field) => field.kind === "Field" && field.name.value === "_count",
           );
           if (countField?.kind === "Field" && countField.selectionSet) {
-            const countFields = countField.selectionSet.selections.map((field) => {
-              if (field.kind === "Field") {
-                return field.name.value;
-              }
-            });
+            const countFields = countField.selectionSet.selections.map(
+              (field) => {
+                if (field.kind === "Field") {
+                  return field.name.value;
+                }
+              },
+            );
             expect(countFields).toEqual(["deals"]);
           }
         }
@@ -108,7 +112,10 @@ describe("Pipeline Queries", () => {
         const variable = operation.variableDefinitions?.[0];
         if (variable?.kind === "VariableDefinition") {
           expect(variable.variable.name.value).toBe("id");
-          if (variable.type.kind === "NonNullType" && variable.type.type.kind === "NamedType") {
+          if (
+            variable.type.kind === "NonNullType" &&
+            variable.type.type.kind === "NamedType"
+          ) {
             expect(variable.type.type.name.value).toBe("ID");
           }
         }
@@ -159,7 +166,7 @@ describe("Pipeline Queries", () => {
       const operation = GET_DEALS.definitions[0];
       if (operation.kind === "OperationDefinition") {
         expect(operation.variableDefinitions).toHaveLength(6);
-        
+
         const variables = operation.variableDefinitions?.map((v) => {
           if (v.kind === "VariableDefinition") {
             return {
@@ -194,14 +201,16 @@ describe("Pipeline Queries", () => {
 
           // Check deals nested fields
           const dealsField = selection.selectionSet.selections.find(
-            (field) => field.kind === "Field" && field.name.value === "deals"
+            (field) => field.kind === "Field" && field.name.value === "deals",
           );
           if (dealsField?.kind === "Field" && dealsField.selectionSet) {
-            const dealFields = dealsField.selectionSet.selections.map((field) => {
-              if (field.kind === "Field") {
-                return field.name.value;
-              }
-            });
+            const dealFields = dealsField.selectionSet.selections.map(
+              (field) => {
+                if (field.kind === "Field") {
+                  return field.name.value;
+                }
+              },
+            );
             expect(dealFields).toContain("id");
             expect(dealFields).toContain("title");
             expect(dealFields).toContain("value");
@@ -212,41 +221,59 @@ describe("Pipeline Queries", () => {
 
             // Check nested owner fields
             const ownerField = dealsField.selectionSet.selections.find(
-              (field) => field.kind === "Field" && field.name.value === "owner"
+              (field) => field.kind === "Field" && field.name.value === "owner",
             );
             if (ownerField?.kind === "Field" && ownerField.selectionSet) {
-              const ownerFields = ownerField.selectionSet.selections.map((field) => {
-                if (field.kind === "Field") {
-                  return field.name.value;
-                }
-              });
-              expect(ownerFields).toEqual(["id", "firstName", "lastName", "avatarUrl"]);
+              const ownerFields = ownerField.selectionSet.selections.map(
+                (field) => {
+                  if (field.kind === "Field") {
+                    return field.name.value;
+                  }
+                },
+              );
+              expect(ownerFields).toEqual([
+                "id",
+                "firstName",
+                "lastName",
+                "avatarUrl",
+              ]);
             }
 
             // Check nested company fields
             const companyField = dealsField.selectionSet.selections.find(
-              (field) => field.kind === "Field" && field.name.value === "company"
+              (field) =>
+                field.kind === "Field" && field.name.value === "company",
             );
             if (companyField?.kind === "Field" && companyField.selectionSet) {
-              const companyFields = companyField.selectionSet.selections.map((field) => {
-                if (field.kind === "Field") {
-                  return field.name.value;
-                }
-              });
+              const companyFields = companyField.selectionSet.selections.map(
+                (field) => {
+                  if (field.kind === "Field") {
+                    return field.name.value;
+                  }
+                },
+              );
               expect(companyFields).toEqual(["id", "name", "logoUrl"]);
             }
 
             // Check nested _count fields
             const countField = dealsField.selectionSet.selections.find(
-              (field) => field.kind === "Field" && field.name.value === "_count"
+              (field) =>
+                field.kind === "Field" && field.name.value === "_count",
             );
             if (countField?.kind === "Field" && countField.selectionSet) {
-              const countFields = countField.selectionSet.selections.map((field) => {
-                if (field.kind === "Field") {
-                  return field.name.value;
-                }
-              });
-              expect(countFields).toEqual(["activities", "tasks", "notes", "emails"]);
+              const countFields = countField.selectionSet.selections.map(
+                (field) => {
+                  if (field.kind === "Field") {
+                    return field.name.value;
+                  }
+                },
+              );
+              expect(countFields).toEqual([
+                "activities",
+                "tasks",
+                "notes",
+                "emails",
+              ]);
             }
           }
         }
@@ -260,7 +287,7 @@ describe("Pipeline Queries", () => {
         if (field.kind === "Field") {
           expect(field.name.value).toBe("deals");
           expect(field.arguments).toHaveLength(6);
-          
+
           const argNames = field.arguments?.map((arg) => {
             if (arg.kind === "Argument") {
               return arg.name.value;
@@ -299,13 +326,17 @@ describe("Pipeline Queries", () => {
       const operation = GET_PIPELINE_METRICS.definitions[0];
       if (operation.kind === "OperationDefinition") {
         expect(operation.variableDefinitions).toHaveLength(3);
-        
+
         const variables = operation.variableDefinitions?.map((v) => {
           if (v.kind === "VariableDefinition") {
             const isRequired = v.type.kind === "NonNullType";
-            const typeName = isRequired 
-              ? v.type.type.kind === "NamedType" ? v.type.type.name.value : null
-              : v.type.kind === "NamedType" ? v.type.name.value : null;
+            const typeName = isRequired
+              ? v.type.type.kind === "NamedType"
+                ? v.type.type.name.value
+                : null
+              : v.type.kind === "NamedType"
+                ? v.type.name.value
+                : null;
             return {
               name: v.variable.name.value,
               type: typeName,
@@ -336,27 +367,32 @@ describe("Pipeline Queries", () => {
 
           // Check pipeline nested fields
           const pipelineField = selection.selectionSet.selections.find(
-            (field) => field.kind === "Field" && field.name.value === "pipeline"
+            (field) =>
+              field.kind === "Field" && field.name.value === "pipeline",
           );
           if (pipelineField?.kind === "Field" && pipelineField.selectionSet) {
-            const pipelineFields = pipelineField.selectionSet.selections.map((field) => {
-              if (field.kind === "Field") {
-                return field.name.value;
-              }
-            });
+            const pipelineFields = pipelineField.selectionSet.selections.map(
+              (field) => {
+                if (field.kind === "Field") {
+                  return field.name.value;
+                }
+              },
+            );
             expect(pipelineFields).toEqual(["id", "name"]);
           }
 
           // Check metrics nested fields
           const metricsField = selection.selectionSet.selections.find(
-            (field) => field.kind === "Field" && field.name.value === "metrics"
+            (field) => field.kind === "Field" && field.name.value === "metrics",
           );
           if (metricsField?.kind === "Field" && metricsField.selectionSet) {
-            const metricFields = metricsField.selectionSet.selections.map((field) => {
-              if (field.kind === "Field") {
-                return field.name.value;
-              }
-            });
+            const metricFields = metricsField.selectionSet.selections.map(
+              (field) => {
+                if (field.kind === "Field") {
+                  return field.name.value;
+                }
+              },
+            );
             expect(metricFields).toEqual([
               "total",
               "won",
@@ -369,14 +405,16 @@ describe("Pipeline Queries", () => {
 
           // Check stages nested fields
           const stagesField = selection.selectionSet.selections.find(
-            (field) => field.kind === "Field" && field.name.value === "stages"
+            (field) => field.kind === "Field" && field.name.value === "stages",
           );
           if (stagesField?.kind === "Field" && stagesField.selectionSet) {
-            const stageFields = stagesField.selectionSet.selections.map((field) => {
-              if (field.kind === "Field") {
-                return field.name.value;
-              }
-            });
+            const stageFields = stagesField.selectionSet.selections.map(
+              (field) => {
+                if (field.kind === "Field") {
+                  return field.name.value;
+                }
+              },
+            );
             expect(stageFields).toEqual([
               "id",
               "name",
@@ -401,7 +439,8 @@ describe("Pipeline Queries", () => {
 
       queries.forEach((query) => {
         expect(() => {
-          const hasValidDefinition = query.definitions[0].kind === "OperationDefinition";
+          const hasValidDefinition =
+            query.definitions[0].kind === "OperationDefinition";
           expect(hasValidDefinition).toBe(true);
         }).not.toThrow();
       });
@@ -433,7 +472,10 @@ describe("Pipeline Queries", () => {
 
       queryFieldMap.forEach(({ query, fieldName }) => {
         const operation = query.definitions[0];
-        if (operation.kind === "OperationDefinition" && operation.selectionSet) {
+        if (
+          operation.kind === "OperationDefinition" &&
+          operation.selectionSet
+        ) {
           const field = operation.selectionSet.selections[0];
           if (field.kind === "Field") {
             expect(field.name.value).toBe(fieldName);

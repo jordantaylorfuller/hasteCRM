@@ -42,7 +42,9 @@ const mockDeals = [
     currency: "USD",
     probability: 20,
     closeDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-    stageEnteredAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+    stageEnteredAt: new Date(
+      Date.now() - 5 * 24 * 60 * 60 * 1000,
+    ).toISOString(),
     daysInStage: 5,
     owner: {
       id: "owner-1",
@@ -76,7 +78,9 @@ const mockDeals = [
     value: 15000,
     currency: "USD",
     probability: 20,
-    stageEnteredAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+    stageEnteredAt: new Date(
+      Date.now() - 10 * 24 * 60 * 60 * 1000,
+    ).toISOString(),
     daysInStage: 10,
     owner: {
       id: "owner-2",
@@ -130,7 +134,9 @@ describe("StageColumn", () => {
   it("renders stage color indicator", () => {
     const { container } = renderStageColumn();
 
-    const colorIndicator = container.querySelector('[style*="background-color: rgb(59, 130, 246)"]');
+    const colorIndicator = container.querySelector(
+      '[style*="background-color: rgb(59, 130, 246)"]',
+    );
     expect(colorIndicator).toBeInTheDocument();
   });
 
@@ -164,7 +170,9 @@ describe("StageColumn", () => {
 
     const { container } = renderStageColumn();
 
-    const droppableArea = container.querySelector('[class*="ring-2"][class*="ring-primary"]');
+    const droppableArea = container.querySelector(
+      '[class*="ring-2"][class*="ring-primary"]',
+    );
     expect(droppableArea).toBeInTheDocument();
 
     // Reset
@@ -174,7 +182,9 @@ describe("StageColumn", () => {
   it("has correct minimum height for droppable area", () => {
     const { container } = renderStageColumn();
 
-    const droppableArea = container.querySelector('[class*="min-h-\\[calc\\(100vh-280px\\)\\]"]');
+    const droppableArea = container.querySelector(
+      '[class*="min-h-\\[calc\\(100vh-280px\\)\\]"]',
+    );
     expect(droppableArea).toBeInTheDocument();
   });
 
@@ -216,7 +226,9 @@ describe("StageColumn", () => {
 
     const { container } = renderStageColumn({ stage: greenStage });
 
-    const colorIndicator = container.querySelector('[style*="background-color: rgb(16, 185, 129)"]');
+    const colorIndicator = container.querySelector(
+      '[style*="background-color: rgb(16, 185, 129)"]',
+    );
     expect(colorIndicator).toBeInTheDocument();
   });
 

@@ -156,9 +156,8 @@ export class GmailWebhookService {
 
     return {
       totalReceived: parseInt(count || "0"),
-      averageProcessingTime: count && totalTime 
-        ? parseInt(totalTime) / parseInt(count)
-        : 0,
+      averageProcessingTime:
+        count && totalTime ? parseInt(totalTime) / parseInt(count) : 0,
     };
   }
 

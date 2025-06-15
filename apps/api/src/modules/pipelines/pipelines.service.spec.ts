@@ -537,9 +537,9 @@ describe("PipelinesService", () => {
         id: "existing-stage",
       });
 
-      await expect(
-        service.createStage(pipelineId, stageData),
-      ).rejects.toThrow(ConflictException);
+      await expect(service.createStage(pipelineId, stageData)).rejects.toThrow(
+        ConflictException,
+      );
     });
   });
 
@@ -700,9 +700,9 @@ describe("PipelinesService", () => {
         { id: "stage-1", pipelineId },
       ]);
 
-      await expect(
-        service.reorderStages(pipelineId, stageIds),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.reorderStages(pipelineId, stageIds)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 

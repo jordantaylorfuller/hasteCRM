@@ -13,25 +13,31 @@ let mockSelectState: Record<string, any> = {};
 // Mock the Select components to work with the test expectations
 jest.mock("@/components/ui/select", () => {
   const React = require("react");
-  
+
   // Create a stateful select component that properly manages open/close state
   const Select = ({ children, value, onValueChange }: any) => {
     const [isOpen, setIsOpen] = React.useState(false);
-    
+
     // Pass down all props to children
     return (
       <div data-testid="select-wrapper">
         {React.Children.map(children, (child: any) => {
           if (React.isValidElement(child)) {
             // Pass the onValueChange to SelectContent/SelectItem through context
-            if (child.type && (child.type as any).displayName === 'SelectTrigger') {
-              return React.cloneElement(child, { 
+            if (
+              child.type &&
+              (child.type as any).displayName === "SelectTrigger"
+            ) {
+              return React.cloneElement(child, {
                 value,
                 isOpen,
                 setIsOpen,
               } as any);
-            } else if (child.type && (child.type as any).displayName === 'SelectContent') {
-              return React.cloneElement(child, { 
+            } else if (
+              child.type &&
+              (child.type as any).displayName === "SelectContent"
+            ) {
+              return React.cloneElement(child, {
                 isOpen,
                 onValueChange,
                 setIsOpen,
@@ -43,56 +49,62 @@ jest.mock("@/components/ui/select", () => {
       </div>
     );
   };
-  
-  Select.displayName = 'Select';
-  
+
+  Select.displayName = "Select";
+
   return {
     Select,
-    SelectTrigger: Object.assign(({ children, id, value, isOpen, setIsOpen }: any) => {
-      // Map values to display text
-      const displayMap: Record<string, string> = {
-        ACTIVE: "Active",
-        INACTIVE: "Inactive", 
-        ARCHIVED: "Archived",
-        MANUAL: "Manual",
-        IMPORT: "Import",
-        API: "API",
-        GMAIL: "Gmail",
-        WEBHOOK: "Webhook",
-        ENRICHMENT: "Enrichment",
-        all: "All"
-      };
-      
-      return (
-        <button
-          id={id}
-          aria-label={id === "status" ? "Status" : "Source"}
-          onClick={() => setIsOpen && setIsOpen(!isOpen)}
-          data-value={value}
-        >
-          {displayMap[value] || value || "All"}
-        </button>
-      );
-    }, { displayName: 'SelectTrigger' }),
-    
-    SelectContent: Object.assign(({ children, isOpen, onValueChange, setIsOpen }: any) => {
-      if (!isOpen) return null;
-      
-      return (
-        <div role="listbox">
-          {React.Children.map(children, (child: any) => {
-            if (React.isValidElement(child)) {
-              return React.cloneElement(child, { 
-                onValueChange,
-                setIsOpen 
-              } as any);
-            }
-            return child;
-          })}
-        </div>
-      );
-    }, { displayName: 'SelectContent' }),
-    
+    SelectTrigger: Object.assign(
+      ({ children, id, value, isOpen, setIsOpen }: any) => {
+        // Map values to display text
+        const displayMap: Record<string, string> = {
+          ACTIVE: "Active",
+          INACTIVE: "Inactive",
+          ARCHIVED: "Archived",
+          MANUAL: "Manual",
+          IMPORT: "Import",
+          API: "API",
+          GMAIL: "Gmail",
+          WEBHOOK: "Webhook",
+          ENRICHMENT: "Enrichment",
+          all: "All",
+        };
+
+        return (
+          <button
+            id={id}
+            aria-label={id === "status" ? "Status" : "Source"}
+            onClick={() => setIsOpen && setIsOpen(!isOpen)}
+            data-value={value}
+          >
+            {displayMap[value] || value || "All"}
+          </button>
+        );
+      },
+      { displayName: "SelectTrigger" },
+    ),
+
+    SelectContent: Object.assign(
+      ({ children, isOpen, onValueChange, setIsOpen }: any) => {
+        if (!isOpen) return null;
+
+        return (
+          <div role="listbox">
+            {React.Children.map(children, (child: any) => {
+              if (React.isValidElement(child)) {
+                return React.cloneElement(child, {
+                  onValueChange,
+                  setIsOpen,
+                } as any);
+              }
+              return child;
+            })}
+          </div>
+        );
+      },
+      { displayName: "SelectContent" },
+    ),
+
     SelectItem: ({ value, children, onValueChange, setIsOpen }: any) => (
       <div
         role="option"
@@ -108,7 +120,7 @@ jest.mock("@/components/ui/select", () => {
         {children}
       </div>
     ),
-    
+
     SelectValue: ({ placeholder }: any) => <span>{placeholder}</span>,
   };
 });
@@ -123,11 +135,11 @@ describe("ContactFilters", () => {
   });
 
   it("renders filters button", () => {
-    render(
-      <ContactFilters filters={defaultFilters} onChange={mockOnChange} />,
-    );
+    render(<ContactFilters filters={defaultFilters} onChange={mockOnChange} />);
 
-    expect(screen.getByRole("button", { name: /filters/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /filters/i }),
+    ).toBeInTheDocument();
   });
 
   it("shows active filters count when filters are applied", () => {
@@ -142,32 +154,28 @@ describe("ContactFilters", () => {
   });
 
   it("does not show count badge when no filters are active", () => {
-    render(
-      <ContactFilters filters={defaultFilters} onChange={mockOnChange} />,
-    );
+    render(<ContactFilters filters={defaultFilters} onChange={mockOnChange} />);
 
     expect(screen.queryByText("0")).not.toBeInTheDocument();
   });
 
   it("opens popover when button is clicked", async () => {
     const user = userEvent.setup();
-    render(
-      <ContactFilters filters={defaultFilters} onChange={mockOnChange} />,
-    );
+    render(<ContactFilters filters={defaultFilters} onChange={mockOnChange} />);
 
     const filterButton = screen.getByRole("button", { name: /filters/i });
     await user.click(filterButton);
 
-    expect(screen.getByText("Filter contacts by various criteria")).toBeInTheDocument();
+    expect(
+      screen.getByText("Filter contacts by various criteria"),
+    ).toBeInTheDocument();
     expect(screen.getByLabelText("Status")).toBeInTheDocument();
     expect(screen.getByLabelText("Source")).toBeInTheDocument();
   });
 
   it("handles status filter selection", async () => {
     const user = userEvent.setup();
-    render(
-      <ContactFilters filters={defaultFilters} onChange={mockOnChange} />,
-    );
+    render(<ContactFilters filters={defaultFilters} onChange={mockOnChange} />);
 
     // Open popover
     await user.click(screen.getByRole("button", { name: /filters/i }));
@@ -190,9 +198,7 @@ describe("ContactFilters", () => {
 
   it("handles source filter selection", async () => {
     const user = userEvent.setup();
-    render(
-      <ContactFilters filters={defaultFilters} onChange={mockOnChange} />,
-    );
+    render(<ContactFilters filters={defaultFilters} onChange={mockOnChange} />);
 
     // Open popover
     await user.click(screen.getByRole("button", { name: /filters/i }));
@@ -215,9 +221,7 @@ describe("ContactFilters", () => {
 
   it("handles multiple filter selections", async () => {
     const user = userEvent.setup();
-    render(
-      <ContactFilters filters={defaultFilters} onChange={mockOnChange} />,
-    );
+    render(<ContactFilters filters={defaultFilters} onChange={mockOnChange} />);
 
     // Open popover
     await user.click(screen.getByRole("button", { name: /filters/i }));
@@ -265,9 +269,7 @@ describe("ContactFilters", () => {
     };
 
     const user = userEvent.setup();
-    render(
-      <ContactFilters filters={activeFilters} onChange={mockOnChange} />,
-    );
+    render(<ContactFilters filters={activeFilters} onChange={mockOnChange} />);
 
     await user.click(screen.getByRole("button", { name: /filters/i }));
     await user.click(screen.getByRole("button", { name: "Reset" }));
@@ -277,12 +279,12 @@ describe("ContactFilters", () => {
 
   it("closes popover after applying filters", async () => {
     const user = userEvent.setup();
-    render(
-      <ContactFilters filters={defaultFilters} onChange={mockOnChange} />,
-    );
+    render(<ContactFilters filters={defaultFilters} onChange={mockOnChange} />);
 
     await user.click(screen.getByRole("button", { name: /filters/i }));
-    expect(screen.getByText("Filter contacts by various criteria")).toBeInTheDocument();
+    expect(
+      screen.getByText("Filter contacts by various criteria"),
+    ).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Apply" }));
 
@@ -296,9 +298,7 @@ describe("ContactFilters", () => {
 
   it("closes popover after reset", async () => {
     const user = userEvent.setup();
-    render(
-      <ContactFilters filters={defaultFilters} onChange={mockOnChange} />,
-    );
+    render(<ContactFilters filters={defaultFilters} onChange={mockOnChange} />);
 
     await user.click(screen.getByRole("button", { name: /filters/i }));
     await user.click(screen.getByRole("button", { name: "Reset" }));
@@ -313,24 +313,24 @@ describe("ContactFilters", () => {
 
   it("shows all status options in dropdown", async () => {
     const user = userEvent.setup();
-    render(
-      <ContactFilters filters={defaultFilters} onChange={mockOnChange} />,
-    );
+    render(<ContactFilters filters={defaultFilters} onChange={mockOnChange} />);
 
     await user.click(screen.getByRole("button", { name: /filters/i }));
     await user.click(screen.getByLabelText("Status"));
 
     expect(screen.getByRole("option", { name: "All" })).toBeInTheDocument();
     expect(screen.getByRole("option", { name: "Active" })).toBeInTheDocument();
-    expect(screen.getByRole("option", { name: "Inactive" })).toBeInTheDocument();
-    expect(screen.getByRole("option", { name: "Archived" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("option", { name: "Inactive" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("option", { name: "Archived" }),
+    ).toBeInTheDocument();
   });
 
   it("shows all source options in dropdown", async () => {
     const user = userEvent.setup();
-    render(
-      <ContactFilters filters={defaultFilters} onChange={mockOnChange} />,
-    );
+    render(<ContactFilters filters={defaultFilters} onChange={mockOnChange} />);
 
     await user.click(screen.getByRole("button", { name: /filters/i }));
     await user.click(screen.getByLabelText("Source"));
@@ -341,7 +341,9 @@ describe("ContactFilters", () => {
     expect(screen.getByRole("option", { name: "API" })).toBeInTheDocument();
     expect(screen.getByRole("option", { name: "Gmail" })).toBeInTheDocument();
     expect(screen.getByRole("option", { name: "Webhook" })).toBeInTheDocument();
-    expect(screen.getByRole("option", { name: "Enrichment" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("option", { name: "Enrichment" }),
+    ).toBeInTheDocument();
   });
 
   it("allows clearing individual filter by selecting 'All'", async () => {
@@ -350,9 +352,7 @@ describe("ContactFilters", () => {
     };
 
     const user = userEvent.setup();
-    render(
-      <ContactFilters filters={activeFilters} onChange={mockOnChange} />,
-    );
+    render(<ContactFilters filters={activeFilters} onChange={mockOnChange} />);
 
     await user.click(screen.getByRole("button", { name: /filters/i }));
     await user.click(screen.getByLabelText("Status"));

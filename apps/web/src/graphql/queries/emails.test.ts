@@ -27,7 +27,7 @@ describe("Email Queries and Mutations", () => {
       const operation = GET_EMAILS.definitions[0];
       if (operation.kind === "OperationDefinition") {
         expect(operation.variableDefinitions).toHaveLength(3);
-        
+
         const variables = operation.variableDefinitions?.map((v) => {
           if (v.kind === "VariableDefinition") {
             return {
@@ -59,14 +59,16 @@ describe("Email Queries and Mutations", () => {
 
           // Check items nested fields
           const itemsField = selection.selectionSet.selections.find(
-            (field) => field.kind === "Field" && field.name.value === "items"
+            (field) => field.kind === "Field" && field.name.value === "items",
           );
           if (itemsField?.kind === "Field" && itemsField.selectionSet) {
-            const emailFields = itemsField.selectionSet.selections.map((field) => {
-              if (field.kind === "Field") {
-                return field.name.value;
-              }
-            });
+            const emailFields = itemsField.selectionSet.selections.map(
+              (field) => {
+                if (field.kind === "Field") {
+                  return field.name.value;
+                }
+              },
+            );
             expect(emailFields).toContain("id");
             expect(emailFields).toContain("gmailId");
             expect(emailFields).toContain("subject");
@@ -74,14 +76,19 @@ describe("Email Queries and Mutations", () => {
 
             // Check attachments nested fields
             const attachmentsField = itemsField.selectionSet.selections.find(
-              (field) => field.kind === "Field" && field.name.value === "attachments"
+              (field) =>
+                field.kind === "Field" && field.name.value === "attachments",
             );
-            if (attachmentsField?.kind === "Field" && attachmentsField.selectionSet) {
-              const attachmentFields = attachmentsField.selectionSet.selections.map((field) => {
-                if (field.kind === "Field") {
-                  return field.name.value;
-                }
-              });
+            if (
+              attachmentsField?.kind === "Field" &&
+              attachmentsField.selectionSet
+            ) {
+              const attachmentFields =
+                attachmentsField.selectionSet.selections.map((field) => {
+                  if (field.kind === "Field") {
+                    return field.name.value;
+                  }
+                });
               expect(attachmentFields).toEqual([
                 "id",
                 "gmailId",
@@ -164,7 +171,10 @@ describe("Email Queries and Mutations", () => {
         const variable = operation.variableDefinitions?.[0];
         if (variable?.kind === "VariableDefinition") {
           expect(variable.variable.name.value).toBe("accountId");
-          if (variable.type.kind === "NonNullType" && variable.type.type.kind === "NamedType") {
+          if (
+            variable.type.kind === "NonNullType" &&
+            variable.type.type.kind === "NamedType"
+          ) {
             expect(variable.type.type.name.value).toBe("String");
           }
         }
@@ -220,7 +230,10 @@ describe("Email Queries and Mutations", () => {
         const variable = operation.variableDefinitions?.[0];
         if (variable?.kind === "VariableDefinition") {
           expect(variable.variable.name.value).toBe("input");
-          if (variable.type.kind === "NonNullType" && variable.type.type.kind === "NamedType") {
+          if (
+            variable.type.kind === "NonNullType" &&
+            variable.type.type.kind === "NamedType"
+          ) {
             expect(variable.type.type.name.value).toBe("SendEmailInput");
           }
         }
@@ -263,11 +276,14 @@ describe("Email Queries and Mutations", () => {
       const operation = UPDATE_EMAIL.definitions[0];
       if (operation.kind === "OperationDefinition") {
         expect(operation.variableDefinitions).toHaveLength(2);
-        
+
         const idVariable = operation.variableDefinitions?.[0];
         if (idVariable?.kind === "VariableDefinition") {
           expect(idVariable.variable.name.value).toBe("id");
-          if (idVariable.type.kind === "NonNullType" && idVariable.type.type.kind === "NamedType") {
+          if (
+            idVariable.type.kind === "NonNullType" &&
+            idVariable.type.type.kind === "NamedType"
+          ) {
             expect(idVariable.type.type.name.value).toBe("String");
           }
         }
@@ -275,7 +291,10 @@ describe("Email Queries and Mutations", () => {
         const inputVariable = operation.variableDefinitions?.[1];
         if (inputVariable?.kind === "VariableDefinition") {
           expect(inputVariable.variable.name.value).toBe("input");
-          if (inputVariable.type.kind === "NonNullType" && inputVariable.type.type.kind === "NamedType") {
+          if (
+            inputVariable.type.kind === "NonNullType" &&
+            inputVariable.type.type.kind === "NamedType"
+          ) {
             expect(inputVariable.type.type.name.value).toBe("UpdateEmailInput");
           }
         }
@@ -310,7 +329,8 @@ describe("Email Queries and Mutations", () => {
 
       operations.forEach((operation) => {
         expect(() => {
-          const hasValidDefinition = operation.definitions[0].kind === "OperationDefinition";
+          const hasValidDefinition =
+            operation.definitions[0].kind === "OperationDefinition";
           expect(hasValidDefinition).toBe(true);
         }).not.toThrow();
       });

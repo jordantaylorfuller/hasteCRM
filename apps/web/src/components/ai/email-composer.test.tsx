@@ -71,13 +71,21 @@ describe("SmartEmailComposer", () => {
     render(
       <MockedProvider mocks={[]}>
         <SmartEmailComposer onCompose={mockOnCompose} />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     expect(screen.getByText("AI Email Composer")).toBeInTheDocument();
-    expect(screen.getByLabelText("What would you like to say?")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("E.g., Accept their proposal and suggest next steps...")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /generate email/i })).toBeInTheDocument();
+    expect(
+      screen.getByLabelText("What would you like to say?"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText(
+        "E.g., Accept their proposal and suggest next steps...",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /generate email/i }),
+    ).toBeInTheDocument();
     expect(screen.getByLabelText("Tone")).toBeInTheDocument();
     expect(screen.getByLabelText("Length")).toBeInTheDocument();
   });
@@ -86,7 +94,7 @@ describe("SmartEmailComposer", () => {
     render(
       <MockedProvider mocks={[]}>
         <SmartEmailComposer onCompose={mockOnCompose} />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     const quickPrompts = [
@@ -107,13 +115,17 @@ describe("SmartEmailComposer", () => {
     render(
       <MockedProvider mocks={[]}>
         <SmartEmailComposer onCompose={mockOnCompose} />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
-    const quickPromptButton = screen.getByRole("button", { name: "Request more information" });
+    const quickPromptButton = screen.getByRole("button", {
+      name: "Request more information",
+    });
     await user.click(quickPromptButton);
 
-    const promptTextarea = screen.getByPlaceholderText("E.g., Accept their proposal and suggest next steps...");
+    const promptTextarea = screen.getByPlaceholderText(
+      "E.g., Accept their proposal and suggest next steps...",
+    );
     expect(promptTextarea).toHaveValue("Request more information");
   });
 
@@ -122,10 +134,12 @@ describe("SmartEmailComposer", () => {
     render(
       <MockedProvider mocks={[]}>
         <SmartEmailComposer onCompose={mockOnCompose} />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
-    const promptTextarea = screen.getByPlaceholderText("E.g., Accept their proposal and suggest next steps...");
+    const promptTextarea = screen.getByPlaceholderText(
+      "E.g., Accept their proposal and suggest next steps...",
+    );
     await user.type(promptTextarea, "Custom prompt text");
 
     expect(promptTextarea).toHaveValue("Custom prompt text");
@@ -135,12 +149,12 @@ describe("SmartEmailComposer", () => {
     render(
       <MockedProvider mocks={[]}>
         <SmartEmailComposer onCompose={mockOnCompose} />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
-    const toneSelect = screen.getByRole('combobox', { name: /tone/i });
-    const lengthSelect = screen.getByRole('combobox', { name: /length/i });
-    
+    const toneSelect = screen.getByRole("combobox", { name: /tone/i });
+    const lengthSelect = screen.getByRole("combobox", { name: /length/i });
+
     expect(toneSelect).toHaveTextContent("Professional");
     expect(lengthSelect).toHaveTextContent("Medium");
   });
@@ -151,10 +165,12 @@ describe("SmartEmailComposer", () => {
     render(
       <MockedProvider mocks={[]}>
         <SmartEmailComposer onCompose={mockOnCompose} />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
-    const generateButton = screen.getByRole("button", { name: /generate email/i });
+    const generateButton = screen.getByRole("button", {
+      name: /generate email/i,
+    });
     expect(generateButton).toBeDisabled();
   });
 
@@ -163,13 +179,17 @@ describe("SmartEmailComposer", () => {
     render(
       <MockedProvider mocks={[]}>
         <SmartEmailComposer onCompose={mockOnCompose} />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
-    const promptTextarea = screen.getByPlaceholderText("E.g., Accept their proposal and suggest next steps...");
+    const promptTextarea = screen.getByPlaceholderText(
+      "E.g., Accept their proposal and suggest next steps...",
+    );
     await user.type(promptTextarea, "Test prompt");
 
-    const generateButton = screen.getByRole("button", { name: /generate email/i });
+    const generateButton = screen.getByRole("button", {
+      name: /generate email/i,
+    });
     expect(generateButton).not.toBeDisabled();
   });
 
@@ -178,18 +198,19 @@ describe("SmartEmailComposer", () => {
     const user = userEvent.setup();
     render(
       <MockedProvider mocks={[mockGenerateSmartComposeSuccess]}>
-        <SmartEmailComposer 
-          emailId="test-email-id"
-          onCompose={mockOnCompose} 
-        />
-      </MockedProvider>
+        <SmartEmailComposer emailId="test-email-id" onCompose={mockOnCompose} />
+      </MockedProvider>,
     );
 
     // Fill prompt and generate
-    const quickPromptButton = screen.getByRole("button", { name: "Accept the proposal with enthusiasm" });
+    const quickPromptButton = screen.getByRole("button", {
+      name: "Accept the proposal with enthusiasm",
+    });
     await user.click(quickPromptButton);
 
-    const generateButton = screen.getByRole("button", { name: /generate email/i });
+    const generateButton = screen.getByRole("button", {
+      name: /generate email/i,
+    });
     await user.click(generateButton);
 
     // No need to check for loading state as MockedProvider returns immediately
@@ -200,9 +221,15 @@ describe("SmartEmailComposer", () => {
     });
 
     // Check suggestions are displayed
-    expect(screen.getByText("I'm thrilled to accept your proposal!")).toBeInTheDocument();
-    expect(screen.getByText("We're excited to move forward with this opportunity.")).toBeInTheDocument();
-    expect(screen.getByText("This is fantastic news - we accept!")).toBeInTheDocument();
+    expect(
+      screen.getByText("I'm thrilled to accept your proposal!"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("We're excited to move forward with this opportunity."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("This is fantastic news - we accept!"),
+    ).toBeInTheDocument();
 
     // Check full draft is displayed
     expect(screen.getByText("Full Draft")).toBeInTheDocument();
@@ -213,15 +240,14 @@ describe("SmartEmailComposer", () => {
     const user = userEvent.setup();
     render(
       <MockedProvider mocks={[mockGenerateSmartComposeSuccess]}>
-        <SmartEmailComposer 
-          emailId="test-email-id"
-          onCompose={mockOnCompose} 
-        />
-      </MockedProvider>
+        <SmartEmailComposer emailId="test-email-id" onCompose={mockOnCompose} />
+      </MockedProvider>,
     );
 
     // Generate suggestions
-    const quickPromptButton = screen.getByRole("button", { name: "Accept the proposal with enthusiasm" });
+    const quickPromptButton = screen.getByRole("button", {
+      name: "Accept the proposal with enthusiasm",
+    });
     await user.click(quickPromptButton);
     await user.click(screen.getByRole("button", { name: /generate email/i }));
 
@@ -230,25 +256,28 @@ describe("SmartEmailComposer", () => {
     });
 
     // Click on a suggestion
-    const suggestionCard = screen.getByText("We're excited to move forward with this opportunity.");
+    const suggestionCard = screen.getByText(
+      "We're excited to move forward with this opportunity.",
+    );
     await user.click(suggestionCard.closest(".cursor-pointer")!);
 
-    expect(mockOnCompose).toHaveBeenCalledWith("We're excited to move forward with this opportunity.");
+    expect(mockOnCompose).toHaveBeenCalledWith(
+      "We're excited to move forward with this opportunity.",
+    );
   });
 
   it("handles use full draft button", async () => {
     const user = userEvent.setup();
     render(
       <MockedProvider mocks={[mockGenerateSmartComposeSuccess]}>
-        <SmartEmailComposer 
-          emailId="test-email-id"
-          onCompose={mockOnCompose} 
-        />
-      </MockedProvider>
+        <SmartEmailComposer emailId="test-email-id" onCompose={mockOnCompose} />
+      </MockedProvider>,
     );
 
     // Generate draft
-    const quickPromptButton = screen.getByRole("button", { name: "Accept the proposal with enthusiasm" });
+    const quickPromptButton = screen.getByRole("button", {
+      name: "Accept the proposal with enthusiasm",
+    });
     await user.click(quickPromptButton);
     await user.click(screen.getByRole("button", { name: /generate email/i }));
 
@@ -257,10 +286,14 @@ describe("SmartEmailComposer", () => {
     });
 
     // Click use draft button
-    const useDraftButton = screen.getByRole("button", { name: /use this draft/i });
+    const useDraftButton = screen.getByRole("button", {
+      name: /use this draft/i,
+    });
     await user.click(useDraftButton);
 
-    expect(mockOnCompose).toHaveBeenCalledWith(expect.stringContaining("Dear Team,"));
+    expect(mockOnCompose).toHaveBeenCalledWith(
+      expect.stringContaining("Dear Team,"),
+    );
   });
 
   it("handles regenerate button", async () => {
@@ -273,15 +306,14 @@ describe("SmartEmailComposer", () => {
 
     render(
       <MockedProvider mocks={mocks}>
-        <SmartEmailComposer 
-          emailId="test-email-id"
-          onCompose={mockOnCompose} 
-        />
-      </MockedProvider>
+        <SmartEmailComposer emailId="test-email-id" onCompose={mockOnCompose} />
+      </MockedProvider>,
     );
 
     // Generate initial draft
-    const quickPromptButton = screen.getByRole("button", { name: "Accept the proposal with enthusiasm" });
+    const quickPromptButton = screen.getByRole("button", {
+      name: "Accept the proposal with enthusiasm",
+    });
     await user.click(quickPromptButton);
     await user.click(screen.getByRole("button", { name: /generate email/i }));
 
@@ -290,7 +322,9 @@ describe("SmartEmailComposer", () => {
     });
 
     // Click regenerate
-    const regenerateButton = screen.getByRole("button", { name: /regenerate/i });
+    const regenerateButton = screen.getByRole("button", {
+      name: /regenerate/i,
+    });
     await user.click(regenerateButton);
 
     // The regenerate will trigger a new generation
@@ -305,21 +339,28 @@ describe("SmartEmailComposer", () => {
     render(
       <MockedProvider mocks={[mockGenerateSmartComposeError]}>
         <SmartEmailComposer onCompose={mockOnCompose} />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     // Try to generate with error mock
-    const promptTextarea = screen.getByPlaceholderText("E.g., Accept their proposal and suggest next steps...");
+    const promptTextarea = screen.getByPlaceholderText(
+      "E.g., Accept their proposal and suggest next steps...",
+    );
     await user.type(promptTextarea, "Request more information");
 
     // For this test, we'll use default tone/length values
     // The error mock needs to be updated to match default values
 
-    const generateButton = screen.getByRole("button", { name: /generate email/i });
+    const generateButton = screen.getByRole("button", {
+      name: /generate email/i,
+    });
     await user.click(generateButton);
 
     await waitFor(() => {
-      expect(console.error).toHaveBeenCalledWith("Failed to generate smart compose:", expect.any(Error));
+      expect(console.error).toHaveBeenCalledWith(
+        "Failed to generate smart compose:",
+        expect.any(Error),
+      );
     });
 
     // Should not show suggestions or draft
@@ -330,12 +371,12 @@ describe("SmartEmailComposer", () => {
   it("uses default values when provided", () => {
     render(
       <MockedProvider mocks={[]}>
-        <SmartEmailComposer 
+        <SmartEmailComposer
           onCompose={mockOnCompose}
           defaultTo="john@example.com"
           defaultSubject="Re: Project Update"
         />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     // The component doesn't seem to use these props, but we include them for completeness
@@ -346,15 +387,14 @@ describe("SmartEmailComposer", () => {
     const user = userEvent.setup();
     render(
       <MockedProvider mocks={[mockGenerateSmartComposeSuccess]}>
-        <SmartEmailComposer 
-          emailId="test-email-id"
-          onCompose={mockOnCompose} 
-        />
-      </MockedProvider>
+        <SmartEmailComposer emailId="test-email-id" onCompose={mockOnCompose} />
+      </MockedProvider>,
     );
 
     // Fill and generate
-    const quickPromptButton = screen.getByRole("button", { name: "Accept the proposal with enthusiasm" });
+    const quickPromptButton = screen.getByRole("button", {
+      name: "Accept the proposal with enthusiasm",
+    });
     await user.click(quickPromptButton);
     await user.click(screen.getByRole("button", { name: /generate email/i }));
 
@@ -363,7 +403,9 @@ describe("SmartEmailComposer", () => {
     });
 
     // The mutation was called with includeContext: true
-    expect(mockGenerateSmartComposeSuccess.request.variables.input.includeContext).toBe(true);
+    expect(
+      mockGenerateSmartComposeSuccess.request.variables.input.includeContext,
+    ).toBe(true);
   });
 
   it("handles empty emailId correctly", async () => {
@@ -394,10 +436,12 @@ describe("SmartEmailComposer", () => {
     render(
       <MockedProvider mocks={[mockWithoutEmailId]}>
         <SmartEmailComposer onCompose={mockOnCompose} />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
-    const promptTextarea = screen.getByPlaceholderText("E.g., Accept their proposal and suggest next steps...");
+    const promptTextarea = screen.getByPlaceholderText(
+      "E.g., Accept their proposal and suggest next steps...",
+    );
     await user.type(promptTextarea, "Test prompt");
     await user.click(screen.getByRole("button", { name: /generate email/i }));
 
@@ -410,15 +454,14 @@ describe("SmartEmailComposer", () => {
     const user = userEvent.setup();
     render(
       <MockedProvider mocks={[mockGenerateSmartComposeSuccess]}>
-        <SmartEmailComposer 
-          emailId="test-email-id"
-          onCompose={mockOnCompose} 
-        />
-      </MockedProvider>
+        <SmartEmailComposer emailId="test-email-id" onCompose={mockOnCompose} />
+      </MockedProvider>,
     );
 
     // Generate suggestions
-    const quickPromptButton = screen.getByRole("button", { name: "Accept the proposal with enthusiasm" });
+    const quickPromptButton = screen.getByRole("button", {
+      name: "Accept the proposal with enthusiasm",
+    });
     await user.click(quickPromptButton);
     await user.click(screen.getByRole("button", { name: /generate email/i }));
 
@@ -427,9 +470,11 @@ describe("SmartEmailComposer", () => {
     });
 
     // Click on a suggestion
-    const suggestionCard = screen.getByText("We're excited to move forward with this opportunity.");
+    const suggestionCard = screen.getByText(
+      "We're excited to move forward with this opportunity.",
+    );
     const cardElement = suggestionCard.closest(".cursor-pointer")!;
-    
+
     await user.click(cardElement);
 
     // Check if the card has the selected styling
@@ -468,10 +513,12 @@ describe("SmartEmailComposer", () => {
     render(
       <MockedProvider mocks={[mockEmptyResponse]}>
         <SmartEmailComposer onCompose={mockOnCompose} />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
-    const promptTextarea = screen.getByPlaceholderText("E.g., Accept their proposal and suggest next steps...");
+    const promptTextarea = screen.getByPlaceholderText(
+      "E.g., Accept their proposal and suggest next steps...",
+    );
     await user.type(promptTextarea, "Test empty response");
     await user.click(screen.getByRole("button", { name: /generate email/i }));
 

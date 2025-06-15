@@ -137,7 +137,7 @@ describe("Main Bootstrap", () => {
 
       // Get the middleware function
       const middlewareCall = mockApp.use.mock.calls.find(
-        (call) => typeof call[0] === "function" && call[0].length === 3
+        (call) => typeof call[0] === "function" && call[0].length === 3,
       );
       expect(middlewareCall).toBeDefined();
 
@@ -151,7 +151,10 @@ describe("Main Bootstrap", () => {
 
       expect(mockReq.id).toBeDefined();
       expect(mockReq.id).toMatch(/^req-\d+-[a-z0-9]+$/);
-      expect(mockRes.setHeader).toHaveBeenCalledWith("X-Request-ID", mockReq.id);
+      expect(mockRes.setHeader).toHaveBeenCalledWith(
+        "X-Request-ID",
+        mockReq.id,
+      );
       expect(mockNext).toHaveBeenCalled();
     });
 
@@ -159,7 +162,7 @@ describe("Main Bootstrap", () => {
       await bootstrap();
 
       const middleware = mockApp.use.mock.calls.find(
-        (call) => typeof call[0] === "function" && call[0].length === 3
+        (call) => typeof call[0] === "function" && call[0].length === 3,
       )[0];
 
       const mockReq: any = { headers: { "x-request-id": "existing-id" } };
@@ -169,7 +172,10 @@ describe("Main Bootstrap", () => {
       middleware(mockReq, mockRes, mockNext);
 
       expect(mockReq.id).toBe("existing-id");
-      expect(mockRes.setHeader).toHaveBeenCalledWith("X-Request-ID", "existing-id");
+      expect(mockRes.setHeader).toHaveBeenCalledWith(
+        "X-Request-ID",
+        "existing-id",
+      );
     });
 
     it("should set up global exception filters in correct order", async () => {
@@ -178,7 +184,7 @@ describe("Main Bootstrap", () => {
       expect(mockApp.useGlobalFilters).toHaveBeenCalledWith(
         expect.any(ValidationExceptionFilter),
         expect.any(HttpExceptionFilter),
-        expect.any(AllExceptionsFilter)
+        expect.any(AllExceptionsFilter),
       );
     });
 
@@ -186,7 +192,7 @@ describe("Main Bootstrap", () => {
       await bootstrap();
 
       expect(mockApp.useGlobalInterceptors).toHaveBeenCalledWith(
-        expect.any(ErrorLoggingInterceptor)
+        expect.any(ErrorLoggingInterceptor),
       );
     });
 
@@ -202,11 +208,13 @@ describe("Main Bootstrap", () => {
       await bootstrap();
 
       const pipeCall = mockApp.useGlobalPipes.mock.calls[0][0];
-      const errors = [{ property: "test", constraints: { required: "test is required" } }];
-      
+      const errors = [
+        { property: "test", constraints: { required: "test is required" } },
+      ];
+
       // Access the exceptionFactory from the pipe options
       const exception = pipeCall.exceptionFactory(errors);
-      
+
       expect(exception).toBeInstanceOf(BadRequestException);
     });
 
@@ -235,9 +243,11 @@ describe("Main Bootstrap", () => {
       process.env.NODE_ENV = "production";
       await bootstrap();
 
-      expect(mockLogger).toHaveBeenCalledWith("🚀 API running on http://localhost:4000");
       expect(mockLogger).toHaveBeenCalledWith(
-        "📝 GraphQL playground: http://localhost:4000/graphql"
+        "🚀 API running on http://localhost:4000",
+      );
+      expect(mockLogger).toHaveBeenCalledWith(
+        "📝 GraphQL playground: http://localhost:4000/graphql",
       );
       expect(mockLogger).toHaveBeenCalledWith("🌍 Environment: production");
     });
@@ -265,7 +275,7 @@ describe("Main Bootstrap", () => {
       // Store original handlers
       originalUncaughtException = process.listeners("uncaughtException");
       originalUnhandledRejection = process.listeners("unhandledRejection");
-      
+
       // Remove all listeners
       process.removeAllListeners("uncaughtException");
       process.removeAllListeners("unhandledRejection");
@@ -292,7 +302,10 @@ describe("Main Bootstrap", () => {
       const error = new Error("Test uncaught exception");
       process.emit("uncaughtException", error);
 
-      expect(consoleErrorSpy).toHaveBeenCalledWith("Uncaught Exception:", error);
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Uncaught Exception:",
+        error,
+      );
       expect(processExitSpy).toHaveBeenCalledWith(1);
     });
 
@@ -310,7 +323,7 @@ describe("Main Bootstrap", () => {
         "Unhandled Rejection at:",
         promise,
         "reason:",
-        reason
+        reason,
       );
       expect(processExitSpy).toHaveBeenCalledWith(1);
     });
@@ -323,10 +336,10 @@ describe("Main Bootstrap", () => {
       jest.doMock("dotenv", () => ({
         config: jest.fn(),
       }));
-      
+
       // Import the module fresh
       require("./main");
-      
+
       const dotenvMock = require("dotenv");
       expect(dotenvMock.config).toHaveBeenCalledWith({
         path: expect.stringContaining(".env"),
@@ -338,13 +351,13 @@ describe("Main Bootstrap", () => {
     it("should verify that bootstrap is called conditionally", () => {
       // Since we can't mock require.main, we verify the condition exists
       // The actual bootstrap call when run as main is tested by running the file directly
-      
+
       // Verify the bootstrap function is exported and callable
       const { bootstrap } = require("./main");
       expect(bootstrap).toBeDefined();
       expect(typeof bootstrap).toBe("function");
-      
-      // The conditional execution (line 104) is tested implicitly 
+
+      // The conditional execution (line 104) is tested implicitly
       // by the fact that bootstrap() is not called during test imports
       expect(NestFactory.create).not.toHaveBeenCalled();
     });

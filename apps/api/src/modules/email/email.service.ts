@@ -191,27 +191,31 @@ If you didn't request a password reset, you can safely ignore this email. Your p
     const batchSize = 10;
     for (let i = 0; i < emails.length; i += batchSize) {
       const batch = emails.slice(i, i + batchSize);
-      await Promise.all(batch.map(email => this.sendEmail(email)));
+      await Promise.all(batch.map((email) => this.sendEmail(email)));
     }
   }
 
-  async sendTemplatedEmail(template: string, data: any, to: string): Promise<void> {
+  async sendTemplatedEmail(
+    template: string,
+    data: any,
+    to: string,
+  ): Promise<void> {
     // Simple template replacement - in production, use a proper template engine
     let html = template;
     let text = template;
-    
+
     // Replace template variables
-    Object.keys(data).forEach(key => {
-      const regex = new RegExp(`{{${key}}}`, 'g');
+    Object.keys(data).forEach((key) => {
+      const regex = new RegExp(`{{${key}}}`, "g");
       html = html.replace(regex, data[key]);
       text = text.replace(regex, data[key]);
     });
 
     await this.sendEmail({
       to,
-      subject: data.subject || 'hasteCRM Notification',
+      subject: data.subject || "hasteCRM Notification",
       html,
-      text: text.replace(/<[^>]*>/g, ''), // Strip HTML tags for text version
+      text: text.replace(/<[^>]*>/g, ""), // Strip HTML tags for text version
     });
   }
 }

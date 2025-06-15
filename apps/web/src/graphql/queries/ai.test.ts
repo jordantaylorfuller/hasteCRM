@@ -24,8 +24,13 @@ describe("AI Queries", () => {
         const variable = operation.variableDefinitions?.[0];
         if (variable?.kind === "VariableDefinition") {
           expect(variable.variable.name.value).toBe("input");
-          if (variable.type.kind === "NonNullType" && variable.type.type.kind === "NamedType") {
-            expect(variable.type.type.name.value).toBe("EmailSummarizationInput");
+          if (
+            variable.type.kind === "NonNullType" &&
+            variable.type.type.kind === "NamedType"
+          ) {
+            expect(variable.type.type.name.value).toBe(
+              "EmailSummarizationInput",
+            );
           }
         }
       }
@@ -88,8 +93,13 @@ describe("AI Queries", () => {
         const variable = operation.variableDefinitions?.[0];
         if (variable?.kind === "VariableDefinition") {
           expect(variable.variable.name.value).toBe("timeRange");
-          if (variable.type.kind === "NonNullType" && variable.type.type.kind === "NamedType") {
-            expect(variable.type.type.name.value).toBe("InsightsTimeRangeInput");
+          if (
+            variable.type.kind === "NonNullType" &&
+            variable.type.type.kind === "NamedType"
+          ) {
+            expect(variable.type.type.name.value).toBe(
+              "InsightsTimeRangeInput",
+            );
           }
         }
       }
@@ -105,18 +115,31 @@ describe("AI Queries", () => {
               return field.name.value;
             }
           });
-          expect(fields).toEqual(["communicationPatterns", "topContacts", "suggestions"]);
+          expect(fields).toEqual([
+            "communicationPatterns",
+            "topContacts",
+            "suggestions",
+          ]);
 
           // Check communicationPatterns nested fields
-          const communicationPatternsField = selection.selectionSet.selections.find(
-            (field) => field.kind === "Field" && field.name.value === "communicationPatterns"
-          );
-          if (communicationPatternsField?.kind === "Field" && communicationPatternsField.selectionSet) {
-            const patternFields = communicationPatternsField.selectionSet.selections.map((field) => {
-              if (field.kind === "Field") {
-                return field.name.value;
-              }
-            });
+          const communicationPatternsField =
+            selection.selectionSet.selections.find(
+              (field) =>
+                field.kind === "Field" &&
+                field.name.value === "communicationPatterns",
+            );
+          if (
+            communicationPatternsField?.kind === "Field" &&
+            communicationPatternsField.selectionSet
+          ) {
+            const patternFields =
+              communicationPatternsField.selectionSet.selections.map(
+                (field) => {
+                  if (field.kind === "Field") {
+                    return field.name.value;
+                  }
+                },
+              );
             expect(patternFields).toEqual([
               "totalEmails",
               "readRate",
@@ -128,14 +151,20 @@ describe("AI Queries", () => {
 
           // Check topContacts nested fields
           const topContactsField = selection.selectionSet.selections.find(
-            (field) => field.kind === "Field" && field.name.value === "topContacts"
+            (field) =>
+              field.kind === "Field" && field.name.value === "topContacts",
           );
-          if (topContactsField?.kind === "Field" && topContactsField.selectionSet) {
-            const contactFields = topContactsField.selectionSet.selections.map((field) => {
-              if (field.kind === "Field") {
-                return field.name.value;
-              }
-            });
+          if (
+            topContactsField?.kind === "Field" &&
+            topContactsField.selectionSet
+          ) {
+            const contactFields = topContactsField.selectionSet.selections.map(
+              (field) => {
+                if (field.kind === "Field") {
+                  return field.name.value;
+                }
+              },
+            );
             expect(contactFields).toEqual([
               "id",
               "name",
@@ -171,8 +200,9 @@ describe("AI Queries", () => {
       // This test ensures the query can be used with Apollo Client
       expect(() => {
         const query = SUMMARIZE_EMAIL;
-        const hasVariables = query.definitions[0].kind === "OperationDefinition" && 
-                           query.definitions[0].variableDefinitions?.length > 0;
+        const hasVariables =
+          query.definitions[0].kind === "OperationDefinition" &&
+          query.definitions[0].variableDefinitions?.length > 0;
         expect(hasVariables).toBe(true);
       }).not.toThrow();
     });
@@ -188,8 +218,9 @@ describe("AI Queries", () => {
       // This test ensures the query can be used with Apollo Client
       expect(() => {
         const query = GET_AI_INSIGHTS;
-        const hasVariables = query.definitions[0].kind === "OperationDefinition" && 
-                           query.definitions[0].variableDefinitions?.length > 0;
+        const hasVariables =
+          query.definitions[0].kind === "OperationDefinition" &&
+          query.definitions[0].variableDefinitions?.length > 0;
         expect(hasVariables).toBe(true);
       }).not.toThrow();
     });

@@ -69,10 +69,10 @@ describe("AppModule", () => {
     expect(moduleNames).toContain("EmailModule");
     expect(moduleNames).toContain("ImportExportModule");
     expect(moduleNames).toContain("AiModule");
-    
+
     // Check dynamic modules exist in imports array
-    const hasDynamicModules = imports.some((m: any) => 
-      (m && m.module) || (m && typeof m === 'object' && !m.name)
+    const hasDynamicModules = imports.some(
+      (m: any) => (m && m.module) || (m && typeof m === "object" && !m.name),
     );
     expect(hasDynamicModules).toBe(true);
   });
@@ -80,16 +80,16 @@ describe("AppModule", () => {
   describe("ConfigModule configuration", () => {
     it("should have ConfigModule in imports", () => {
       const imports = Reflect.getMetadata("imports", AppModule) || [];
-      
+
       // The imports array should not be empty
       expect(imports.length).toBeGreaterThan(0);
-      
+
       // At least one import should be an object (dynamic module)
-      const hasDynamicModules = imports.some((imp: any) => 
-        imp && typeof imp === 'object' && !Array.isArray(imp)
+      const hasDynamicModules = imports.some(
+        (imp: any) => imp && typeof imp === "object" && !Array.isArray(imp),
       );
       expect(hasDynamicModules).toBe(true);
-      
+
       // We know ConfigModule.forRoot() is the first import in the source
       // Just verify the structure is correct
       expect(imports[0]).toBeTruthy();
@@ -100,7 +100,7 @@ describe("AppModule", () => {
     it("should configure ScheduleModule", () => {
       const imports = Reflect.getMetadata("imports", AppModule);
       const scheduleModule = imports.find(
-        (m: any) => m.module === ScheduleModule
+        (m: any) => m.module === ScheduleModule,
       );
 
       expect(scheduleModule).toBeDefined();
@@ -110,9 +110,7 @@ describe("AppModule", () => {
   describe("BullModule configuration", () => {
     it("should configure BullModule with default Redis settings", () => {
       const imports = Reflect.getMetadata("imports", AppModule);
-      const bullModule = imports.find(
-        (m: any) => m.module === BullModule
-      );
+      const bullModule = imports.find((m: any) => m.module === BullModule);
 
       expect(bullModule).toBeDefined();
       expect(bullModule.providers).toBeDefined();
@@ -159,7 +157,7 @@ describe("AppModule", () => {
         }).compile();
 
         expect(module).toBeDefined();
-        
+
         // Verify core modules are available
         const prismaModule = module.get(PrismaModule);
         const authModule = module.get(AuthModule);
@@ -185,7 +183,7 @@ describe("AppModule", () => {
       // Re-import module to get fresh configuration
       jest.resetModules();
       const { AppModule: FreshAppModule } = require("./app.module");
-      
+
       const imports = Reflect.getMetadata("imports", FreshAppModule);
       expect(imports).toBeDefined();
       expect(imports.length).toBeGreaterThan(0);
@@ -199,7 +197,7 @@ describe("AppModule", () => {
       // Re-import module to get fresh configuration
       jest.resetModules();
       const { AppModule: FreshAppModule } = require("./app.module");
-      
+
       const imports = Reflect.getMetadata("imports", FreshAppModule);
       expect(imports).toBeDefined();
       expect(imports.length).toBeGreaterThan(0);

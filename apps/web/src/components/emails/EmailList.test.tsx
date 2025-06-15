@@ -79,7 +79,7 @@ describe("EmailList", () => {
     render(<EmailList emails={[]} loading={true} {...mockHandlers} />);
 
     // Skeleton component uses animate-pulse class
-    const skeletons = document.querySelectorAll('.animate-pulse');
+    const skeletons = document.querySelectorAll(".animate-pulse");
     expect(skeletons.length).toBeGreaterThan(0);
   });
 
@@ -103,12 +103,18 @@ describe("EmailList", () => {
     render(<EmailList emails={mockEmails} {...mockHandlers} />);
 
     // Find all SVG elements that are star icons
-    const starIcons = screen.getAllByRole("button")
-      .map(button => button.querySelector('svg'))
-      .filter(svg => svg && svg.classList.contains('h-4') && svg.classList.contains('w-4'));
-    
+    const starIcons = screen
+      .getAllByRole("button")
+      .map((button) => button.querySelector("svg"))
+      .filter(
+        (svg) =>
+          svg && svg.classList.contains("h-4") && svg.classList.contains("w-4"),
+      );
+
     // The second email is starred, so one of the star icons should have the fill-yellow-400 class
-    const starredIcon = starIcons.find(icon => icon?.classList.contains('fill-yellow-400'));
+    const starredIcon = starIcons.find((icon) =>
+      icon?.classList.contains("fill-yellow-400"),
+    );
     expect(starredIcon).toBeInTheDocument();
   });
 
@@ -116,7 +122,9 @@ describe("EmailList", () => {
     const user = userEvent.setup();
     render(<EmailList emails={mockEmails} {...mockHandlers} />);
 
-    const emailCard = screen.getByText("Important Meeting Tomorrow").closest('[class*="card"]');
+    const emailCard = screen
+      .getByText("Important Meeting Tomorrow")
+      .closest('[class*="card"]');
     await user.click(emailCard!);
 
     expect(mockHandlers.onSelectEmail).toHaveBeenCalledWith(mockEmails[0]);
@@ -127,10 +135,13 @@ describe("EmailList", () => {
     render(<EmailList emails={mockEmails} {...mockHandlers} />);
 
     // Find star buttons by looking for buttons with star SVGs
-    const starButtons = screen.getAllByRole("button").filter((button) => 
-      button.querySelector('svg[class*="h-4 w-4"]') && 
-      button.parentElement?.className.includes('space-x-3')
-    );
+    const starButtons = screen
+      .getAllByRole("button")
+      .filter(
+        (button) =>
+          button.querySelector('svg[class*="h-4 w-4"]') &&
+          button.parentElement?.className.includes("space-x-3"),
+      );
     await user.click(starButtons[0]);
 
     expect(mockHandlers.onStarEmail).toHaveBeenCalledWith(mockEmails[0]);
@@ -163,11 +174,11 @@ describe("EmailList", () => {
     render(<EmailList emails={mockEmails} {...mockHandlers} />);
 
     const selectAllCheckbox = screen.getAllByRole("checkbox")[0];
-    
+
     // Select all emails
     await user.click(selectAllCheckbox);
     expect(screen.getByText("2 selected")).toBeInTheDocument();
-    
+
     // Deselect all emails
     await user.click(selectAllCheckbox);
     expect(screen.queryByText(/selected/)).not.toBeInTheDocument();
@@ -188,11 +199,11 @@ describe("EmailList", () => {
     render(<EmailList emails={mockEmails} {...mockHandlers} />);
 
     const checkboxes = screen.getAllByRole("checkbox");
-    
+
     // Select an email
     await user.click(checkboxes[1]);
     expect(screen.getByText("1 selected")).toBeInTheDocument();
-    
+
     // Deselect the same email
     await user.click(checkboxes[1]);
     expect(screen.queryByText(/selected/)).not.toBeInTheDocument();
@@ -207,11 +218,11 @@ describe("EmailList", () => {
 
     // Bulk action buttons appear in the header when emails are selected
     expect(screen.getByText("2 selected")).toBeInTheDocument();
-    
+
     // Find buttons that appear after selection - they have icon children
     const header = screen.getByText(/selected/).parentElement;
-    const bulkActionButtons = header?.querySelectorAll('button');
-    
+    const bulkActionButtons = header?.querySelectorAll("button");
+
     // Should have bulk action buttons visible
     expect(bulkActionButtons!.length).toBeGreaterThanOrEqual(2);
   });
@@ -327,9 +338,7 @@ describe("EmailList", () => {
       subject: "",
     };
 
-    render(
-      <EmailList emails={[emailWithoutSubject]} {...mockHandlers} />,
-    );
+    render(<EmailList emails={[emailWithoutSubject]} {...mockHandlers} />);
 
     expect(screen.getByText("(no subject)")).toBeInTheDocument();
   });
@@ -341,9 +350,7 @@ describe("EmailList", () => {
       fromName: undefined,
     };
 
-    render(
-      <EmailList emails={[emailWithoutName]} {...mockHandlers} />,
-    );
+    render(<EmailList emails={[emailWithoutName]} {...mockHandlers} />);
 
     expect(screen.getByText("john@example.com")).toBeInTheDocument();
   });

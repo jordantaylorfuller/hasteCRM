@@ -77,7 +77,8 @@ export function ContactFilters({ filters, onChange }: ContactFiltersProps) {
                 onValueChange={(value) =>
                   setLocalFilters({
                     ...localFilters,
-                    status: value === "all" ? undefined : (value as ContactStatus),
+                    status:
+                      value === "all" ? undefined : (value as ContactStatus),
                   })
                 }
               >
@@ -104,7 +105,8 @@ export function ContactFilters({ filters, onChange }: ContactFiltersProps) {
                 onValueChange={(value) =>
                   setLocalFilters({
                     ...localFilters,
-                    source: value === "all" ? undefined : (value as ContactSource),
+                    source:
+                      value === "all" ? undefined : (value as ContactSource),
                   })
                 }
               >

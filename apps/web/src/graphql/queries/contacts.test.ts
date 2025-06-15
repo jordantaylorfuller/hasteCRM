@@ -21,7 +21,7 @@ describe("Contact Queries", () => {
       const operation = GET_CONTACTS.definitions[0];
       if (operation.kind === "OperationDefinition") {
         expect(operation.variableDefinitions).toHaveLength(3);
-        
+
         const variables = operation.variableDefinitions?.map((v) => {
           if (v.kind === "VariableDefinition") {
             return {
@@ -53,14 +53,17 @@ describe("Contact Queries", () => {
 
           // Check contacts nested fields
           const contactsField = selection.selectionSet.selections.find(
-            (field) => field.kind === "Field" && field.name.value === "contacts"
+            (field) =>
+              field.kind === "Field" && field.name.value === "contacts",
           );
           if (contactsField?.kind === "Field" && contactsField.selectionSet) {
-            const contactFields = contactsField.selectionSet.selections.map((field) => {
-              if (field.kind === "Field") {
-                return field.name.value;
-              }
-            });
+            const contactFields = contactsField.selectionSet.selections.map(
+              (field) => {
+                if (field.kind === "Field") {
+                  return field.name.value;
+                }
+              },
+            );
             expect(contactFields).toEqual([
               "id",
               "firstName",
@@ -88,7 +91,7 @@ describe("Contact Queries", () => {
         if (field.kind === "Field") {
           expect(field.name.value).toBe("contacts");
           expect(field.arguments).toHaveLength(3);
-          
+
           const argNames = field.arguments?.map((arg) => {
             if (arg.kind === "Argument") {
               return arg.name.value;
@@ -123,7 +126,10 @@ describe("Contact Queries", () => {
         const variable = operation.variableDefinitions?.[0];
         if (variable?.kind === "VariableDefinition") {
           expect(variable.variable.name.value).toBe("id");
-          if (variable.type.kind === "NonNullType" && variable.type.type.kind === "NamedType") {
+          if (
+            variable.type.kind === "NonNullType" &&
+            variable.type.type.kind === "NamedType"
+          ) {
             expect(variable.type.type.name.value).toBe("String");
           }
         }
@@ -202,13 +208,17 @@ describe("Contact Queries", () => {
       const operation = SEARCH_CONTACTS.definitions[0];
       if (operation.kind === "OperationDefinition") {
         expect(operation.variableDefinitions).toHaveLength(4);
-        
+
         const variables = operation.variableDefinitions?.map((v) => {
           if (v.kind === "VariableDefinition") {
             const isRequired = v.type.kind === "NonNullType";
-            const typeName = isRequired 
-              ? v.type.type.kind === "NamedType" ? v.type.type.name.value : null
-              : v.type.kind === "NamedType" ? v.type.name.value : null;
+            const typeName = isRequired
+              ? v.type.type.kind === "NamedType"
+                ? v.type.type.name.value
+                : null
+              : v.type.kind === "NamedType"
+                ? v.type.name.value
+                : null;
             return {
               name: v.variable.name.value,
               type: typeName,
@@ -240,14 +250,17 @@ describe("Contact Queries", () => {
 
           // Check contacts nested fields
           const contactsField = selection.selectionSet.selections.find(
-            (field) => field.kind === "Field" && field.name.value === "contacts"
+            (field) =>
+              field.kind === "Field" && field.name.value === "contacts",
           );
           if (contactsField?.kind === "Field" && contactsField.selectionSet) {
-            const contactFields = contactsField.selectionSet.selections.map((field) => {
-              if (field.kind === "Field") {
-                return field.name.value;
-              }
-            });
+            const contactFields = contactsField.selectionSet.selections.map(
+              (field) => {
+                if (field.kind === "Field") {
+                  return field.name.value;
+                }
+              },
+            );
             expect(contactFields).toEqual([
               "id",
               "firstName",
@@ -270,7 +283,7 @@ describe("Contact Queries", () => {
         if (field.kind === "Field") {
           expect(field.name.value).toBe("searchContacts");
           expect(field.arguments).toHaveLength(4);
-          
+
           const argNames = field.arguments?.map((arg) => {
             if (arg.kind === "Argument") {
               return arg.name.value;
@@ -288,7 +301,8 @@ describe("Contact Queries", () => {
 
       queries.forEach((query) => {
         expect(() => {
-          const hasValidDefinition = query.definitions[0].kind === "OperationDefinition";
+          const hasValidDefinition =
+            query.definitions[0].kind === "OperationDefinition";
           expect(hasValidDefinition).toBe(true);
         }).not.toThrow();
       });

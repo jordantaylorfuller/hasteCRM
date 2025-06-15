@@ -25,7 +25,10 @@ describe("AI Mutations", () => {
         const variable = operation.variableDefinitions?.[0];
         if (variable?.kind === "VariableDefinition") {
           expect(variable.variable.name.value).toBe("input");
-          if (variable.type.kind === "NonNullType" && variable.type.type.kind === "NamedType") {
+          if (
+            variable.type.kind === "NonNullType" &&
+            variable.type.type.kind === "NamedType"
+          ) {
             expect(variable.type.type.name.value).toBe("SmartComposeInput");
           }
         }
@@ -89,7 +92,10 @@ describe("AI Mutations", () => {
         const variable = operation.variableDefinitions?.[0];
         if (variable?.kind === "VariableDefinition") {
           expect(variable.variable.name.value).toBe("contactId");
-          if (variable.type.kind === "NonNullType" && variable.type.type.kind === "NamedType") {
+          if (
+            variable.type.kind === "NonNullType" &&
+            variable.type.type.kind === "NamedType"
+          ) {
             expect(variable.type.type.name.value).toBe("ID");
           }
         }
@@ -151,8 +157,9 @@ describe("AI Mutations", () => {
       // This test ensures the mutation can be used with Apollo Client
       expect(() => {
         const query = GENERATE_SMART_COMPOSE;
-        const hasVariables = query.definitions[0].kind === "OperationDefinition" && 
-                           query.definitions[0].variableDefinitions?.length > 0;
+        const hasVariables =
+          query.definitions[0].kind === "OperationDefinition" &&
+          query.definitions[0].variableDefinitions?.length > 0;
         expect(hasVariables).toBe(true);
       }).not.toThrow();
     });
@@ -165,8 +172,9 @@ describe("AI Mutations", () => {
       // This test ensures the mutation can be used with Apollo Client
       expect(() => {
         const query = ENRICH_CONTACT;
-        const hasVariables = query.definitions[0].kind === "OperationDefinition" && 
-                           query.definitions[0].variableDefinitions?.length > 0;
+        const hasVariables =
+          query.definitions[0].kind === "OperationDefinition" &&
+          query.definitions[0].variableDefinitions?.length > 0;
         expect(hasVariables).toBe(true);
       }).not.toThrow();
     });

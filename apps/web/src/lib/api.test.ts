@@ -10,7 +10,6 @@ jest.mock("js-cookie", () => ({
   remove: jest.fn(),
 }));
 
-
 describe("API Client", () => {
   let mock: MockAdapter;
   const API_URL = "http://localhost:4000";
@@ -47,7 +46,9 @@ describe("API Client", () => {
 
       const response = await api.get("/test");
 
-      expect(mock.history.get[0].headers?.Authorization).toBe(`Bearer ${mockToken}`);
+      expect(mock.history.get[0].headers?.Authorization).toBe(
+        `Bearer ${mockToken}`,
+      );
       expect(response.data).toEqual({ data: "test" });
     });
 
@@ -67,9 +68,13 @@ describe("API Client", () => {
 
       mock.onPost("/test").reply(200, { success: true });
 
-      await api.post("/test", { data: "test" }, {
-        headers: { "X-Custom-Header": "custom-value" },
-      });
+      await api.post(
+        "/test",
+        { data: "test" },
+        {
+          headers: { "X-Custom-Header": "custom-value" },
+        },
+      );
 
       const request = mock.history.post[0];
       expect(request.headers?.Authorization).toBe("Bearer token");
@@ -126,7 +131,7 @@ describe("API Client", () => {
       // Setup: initial request fails with 401
       (Cookies.get as jest.Mock)
         .mockReturnValueOnce(oldAccessToken) // First request
-        .mockReturnValueOnce(refreshToken)   // Refresh attempt
+        .mockReturnValueOnce(refreshToken) // Refresh attempt
         .mockReturnValueOnce(newAccessToken); // Retry request
 
       // First request fails
@@ -145,15 +150,23 @@ describe("API Client", () => {
       const response = await api.get("/test");
 
       // Verify token refresh
-      expect(Cookies.set).toHaveBeenCalledWith("accessToken", newAccessToken, { expires: 1 });
-      expect(Cookies.set).toHaveBeenCalledWith("refreshToken", newRefreshToken, { expires: 7 });
+      expect(Cookies.set).toHaveBeenCalledWith("accessToken", newAccessToken, {
+        expires: 1,
+      });
+      expect(Cookies.set).toHaveBeenCalledWith(
+        "refreshToken",
+        newRefreshToken,
+        { expires: 7 },
+      );
 
       // Verify successful retry
       expect(response.status).toBe(200);
       expect(response.data).toEqual({ data: "success" });
 
       // Verify retry has new token
-      expect(mock.history.get[1].headers?.Authorization).toBe(`Bearer ${newAccessToken}`);
+      expect(mock.history.get[1].headers?.Authorization).toBe(
+        `Bearer ${newAccessToken}`,
+      );
 
       refreshMock.restore();
     });
@@ -163,14 +176,14 @@ describe("API Client", () => {
 
       // Both requests will fail with 401
       mock.onGet("/test").reply(401);
-      
+
       // Create a request with _retry flag already set
       const config = { _retry: true };
 
       await expect(api.get("/test", config)).rejects.toMatchObject({
-        response: { status: 401 }
+        response: { status: 401 },
       });
-      
+
       // Should only have one request in history (no retry)
       expect(mock.history.get).toHaveLength(1);
     });
@@ -178,12 +191,12 @@ describe("API Client", () => {
     it("redirects to login when refresh token is missing", async () => {
       (Cookies.get as jest.Mock)
         .mockReturnValueOnce("access-token") // Initial request
-        .mockReturnValueOnce(undefined);     // No refresh token
+        .mockReturnValueOnce(undefined); // No refresh token
 
       mock.onGet("/test").reply(401);
 
       await expect(api.get("/test")).rejects.toThrow("No refresh token");
-      
+
       expect(Cookies.remove).toHaveBeenCalledWith("accessToken");
       expect(Cookies.remove).toHaveBeenCalledWith("refreshToken");
       // Can't test window.location.assign due to jsdom limitations
@@ -201,9 +214,9 @@ describe("API Client", () => {
       refreshMock.onPost(`${API_URL}/auth/refresh`).reply(401);
 
       await expect(api.get("/test")).rejects.toMatchObject({
-        response: { status: 401 }
+        response: { status: 401 },
       });
-      
+
       expect(Cookies.remove).toHaveBeenCalledWith("accessToken");
       expect(Cookies.remove).toHaveBeenCalledWith("refreshToken");
       // Can't test window.location.assign due to jsdom limitations
@@ -223,7 +236,7 @@ describe("API Client", () => {
       refreshMock.onPost(`${API_URL}/auth/refresh`).networkError();
 
       await expect(api.get("/test")).rejects.toThrow("Network Error");
-      
+
       expect(Cookies.remove).toHaveBeenCalledWith("accessToken");
       expect(Cookies.remove).toHaveBeenCalledWith("refreshToken");
       // Can't test window.location.assign due to jsdom limitations
@@ -268,7 +281,7 @@ describe("API Client", () => {
     it("handles request interceptor errors", async () => {
       // Force an error by making the config invalid
       const invalidConfig = { headers: null };
-      
+
       // Test error handling in request interceptor
       try {
         // Directly call the error handler
@@ -288,10 +301,10 @@ describe("API Client", () => {
       await expect(api.get("/test")).rejects.toMatchObject({
         response: {
           status: 500,
-          data: { error: "Server error" }
-        }
+          data: { error: "Server error" },
+        },
       });
-      
+
       expect(Cookies.remove).not.toHaveBeenCalled();
       // window.location.assign should not be called for non-401 errors
     });
@@ -307,7 +320,7 @@ describe("API Client", () => {
       mock.onGet("/test").timeout();
 
       await expect(api.get("/test")).rejects.toMatchObject({
-        code: "ECONNABORTED"
+        code: "ECONNABORTED",
       });
       expect(Cookies.remove).not.toHaveBeenCalled();
     });
@@ -396,7 +409,9 @@ describe("API Client", () => {
         refreshToken: "new-refresh",
       });
 
-      mock.onGet("/test", { params: { id: 123 } }).replyOnce(200, { success: true });
+      mock
+        .onGet("/test", { params: { id: 123 } })
+        .replyOnce(200, { success: true });
 
       const response = await api.get("/test", { params: { id: 123 } });
       expect(response.data).toEqual({ success: true });

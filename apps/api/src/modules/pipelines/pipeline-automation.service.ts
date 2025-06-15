@@ -103,9 +103,13 @@ export class PipelineAutomationService implements OnModuleInit {
       for (const action of automation.actions) {
         try {
           // Extract action type and config from action object
-          const actionType = typeof action === 'string' ? action : action.type || action;
-          const actionConfig = typeof action === 'object' ? action.config || action : automation.actionConfig;
-          
+          const actionType =
+            typeof action === "string" ? action : action.type || action;
+          const actionConfig =
+            typeof action === "object"
+              ? action.config || action
+              : automation.actionConfig;
+
           const result = await this.executeAction(
             actionType,
             context.deal,
@@ -120,7 +124,7 @@ export class PipelineAutomationService implements OnModuleInit {
             error: error.message,
           });
           this.logger.error(
-            `Failed to execute action ${typeof action === 'object' ? action.type : action} for automation ${automationId}`,
+            `Failed to execute action ${typeof action === "object" ? action.type : action} for automation ${automationId}`,
             error,
           );
         }

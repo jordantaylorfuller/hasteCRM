@@ -196,44 +196,44 @@ export class EmailParserService {
     }
 
     const addresses: EmailAddress[] = [];
-    
+
     // Split by comma to handle multiple addresses, but preserve quoted names
     const addressParts: string[] = [];
-    let current = '';
+    let current = "";
     let inQuotes = false;
-    
+
     for (let i = 0; i < addressString.length; i++) {
       const char = addressString[i];
-      
+
       if (char === '"') {
         inQuotes = !inQuotes;
         current += char;
-      } else if (char === ',' && !inQuotes) {
+      } else if (char === "," && !inQuotes) {
         addressParts.push(current.trim());
-        current = '';
+        current = "";
       } else {
         current += char;
       }
     }
-    
+
     // Don't forget the last part
     if (current.trim()) {
       addressParts.push(current.trim());
     }
-    
+
     for (const part of addressParts) {
       if (!part) continue;
-      
+
       // Match pattern: "Name" <email> or Name <email> or just email
       const quotedNameMatch = part.match(/^"([^"]+)"\s*<([^<>]+)>$/);
       const unquotedNameMatch = part.match(/^([^<>]+?)\s*<([^<>]+)>$/);
       const plainEmailMatch = part.match(/^([^<>@\s]+@[^<>@\s]+\.[^<>@\s]+)$/);
-      
+
       if (quotedNameMatch) {
         // Quoted name with email in brackets: "Name" <email>
         const name = quotedNameMatch[1].trim();
         const email = quotedNameMatch[2].toLowerCase();
-        
+
         addresses.push({
           name: name || undefined,
           email: email,
@@ -242,7 +242,7 @@ export class EmailParserService {
         // Unquoted name with email in brackets: Name <email>
         const name = unquotedNameMatch[1].trim();
         const email = unquotedNameMatch[2].toLowerCase();
-        
+
         addresses.push({
           name: name || undefined,
           email: email,
@@ -250,7 +250,7 @@ export class EmailParserService {
       } else if (plainEmailMatch) {
         // Plain email address without brackets
         const email = plainEmailMatch[1].toLowerCase();
-        
+
         addresses.push({
           email: email,
         });

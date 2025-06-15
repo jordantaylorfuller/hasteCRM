@@ -207,7 +207,7 @@ describe("PrismaService", () => {
       process.env.NODE_ENV = "production";
 
       await expect(service.cleanDatabase()).rejects.toThrow(
-        "cleanDatabase is not allowed in production"
+        "cleanDatabase is not allowed in production",
       );
     });
 
@@ -216,10 +216,19 @@ describe("PrismaService", () => {
 
       // Mock the deleteMany methods
       const mockDeleteMany = jest.fn().mockResolvedValue({ count: 5 });
-      
+
       // Mock Reflect.ownKeys to return only our test models
-      jest.spyOn(Reflect, 'ownKeys').mockReturnValue(['user', 'workspace', 'contact', 'company', '_internal', '$connect']);
-      
+      jest
+        .spyOn(Reflect, "ownKeys")
+        .mockReturnValue([
+          "user",
+          "workspace",
+          "contact",
+          "company",
+          "_internal",
+          "$connect",
+        ]);
+
       // Mock some models
       (service as any).user = { deleteMany: mockDeleteMany };
       (service as any).workspace = { deleteMany: mockDeleteMany };
@@ -237,9 +246,9 @@ describe("PrismaService", () => {
         { count: 5 },
         { count: 5 },
         { count: 5 },
-        { count: 5 }
+        { count: 5 },
       ]);
-      
+
       // Restore Reflect.ownKeys
       jest.restoreAllMocks();
     });
@@ -248,7 +257,9 @@ describe("PrismaService", () => {
       process.env.NODE_ENV = "development";
 
       // Mock Reflect.ownKeys to return only our test models
-      jest.spyOn(Reflect, 'ownKeys').mockReturnValue(['user', 'workspace', 'someModel', 'anotherModel']);
+      jest
+        .spyOn(Reflect, "ownKeys")
+        .mockReturnValue(["user", "workspace", "someModel", "anotherModel"]);
 
       // Mock models with and without deleteMany
       const mockDeleteMany = jest.fn().mockResolvedValue({ count: 3 });
@@ -262,11 +273,8 @@ describe("PrismaService", () => {
       // Should only call deleteMany for models that have it
       expect(mockDeleteMany).toHaveBeenCalledTimes(2);
       expect(result).toHaveLength(2);
-      expect(result).toEqual([
-        { count: 3 },
-        { count: 3 }
-      ]);
-      
+      expect(result).toEqual([{ count: 3 }, { count: 3 }]);
+
       // Restore Reflect.ownKeys
       jest.restoreAllMocks();
     });
@@ -275,14 +283,14 @@ describe("PrismaService", () => {
       process.env.NODE_ENV = "test";
 
       // Mock Reflect.ownKeys to return only our test models
-      jest.spyOn(Reflect, 'ownKeys').mockReturnValue(['user']);
+      jest.spyOn(Reflect, "ownKeys").mockReturnValue(["user"]);
 
       const error = new Error("Database cleanup failed");
       const mockDeleteMany = jest.fn().mockRejectedValue(error);
       (service as any).user = { deleteMany: mockDeleteMany };
 
       await expect(service.cleanDatabase()).rejects.toThrow(error);
-      
+
       // Restore Reflect.ownKeys
       jest.restoreAllMocks();
     });

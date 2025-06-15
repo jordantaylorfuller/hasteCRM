@@ -1,35 +1,35 @@
-import React from 'react';
-import { waitFor, act } from '@testing-library/react';
-import { renderHook } from '@testing-library/react';
-import { AuthProvider, useAuth } from './auth-context';
-import { useRouter } from 'next/navigation';
-import Cookies from 'js-cookie';
-import { api } from './api';
+import React from "react";
+import { waitFor, act } from "@testing-library/react";
+import { renderHook } from "@testing-library/react";
+import { AuthProvider, useAuth } from "./auth-context";
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
+import { api } from "./api";
 
 // Mock dependencies
-jest.mock('next/navigation');
-jest.mock('js-cookie');
-jest.mock('./api');
+jest.mock("next/navigation");
+jest.mock("js-cookie");
+jest.mock("./api");
 
 const mockUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
 const mockCookies = Cookies as jest.Mocked<typeof Cookies>;
 const mockApi = api as jest.Mocked<typeof api>;
 
-describe('AuthContext', () => {
+describe("AuthContext", () => {
   const mockPush = jest.fn();
   const mockRefresh = jest.fn();
 
   const mockUser = {
-    sub: 'user-123',
-    email: 'test@example.com',
-    firstName: 'Test',
-    lastName: 'User',
-    status: 'ACTIVE',
+    sub: "user-123",
+    email: "test@example.com",
+    firstName: "Test",
+    lastName: "User",
+    status: "ACTIVE",
     twoFactorEnabled: false,
-    workspaceId: 'workspace-123',
-    workspaceName: 'Test Workspace',
-    workspaceSlug: 'test-workspace',
-    plan: 'PRO',
+    workspaceId: "workspace-123",
+    workspaceName: "Test Workspace",
+    workspaceSlug: "test-workspace",
+    plan: "PRO",
   };
 
   beforeEach(() => {
@@ -48,25 +48,25 @@ describe('AuthContext', () => {
     <AuthProvider>{children}</AuthProvider>
   );
 
-  describe('useAuth hook', () => {
-    it('throws error when used outside AuthProvider', () => {
-      const consoleError = jest.spyOn(console, 'error').mockImplementation();
-      
+  describe("useAuth hook", () => {
+    it("throws error when used outside AuthProvider", () => {
+      const consoleError = jest.spyOn(console, "error").mockImplementation();
+
       expect(() => {
         renderHook(() => useAuth());
-      }).toThrow('useAuth must be used within an AuthProvider');
-      
+      }).toThrow("useAuth must be used within an AuthProvider");
+
       consoleError.mockRestore();
     });
 
-    it('provides auth context when used within AuthProvider', async () => {
+    it("provides auth context when used within AuthProvider", async () => {
       mockCookies.get.mockReturnValue(null);
       const { result } = renderHook(() => useAuth(), { wrapper });
-      
+
       expect(result.current).toBeDefined();
       expect(result.current.user).toBeNull();
       expect(result.current.workspace).toBeNull();
-      
+
       // Wait for loading to complete
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
@@ -74,9 +74,9 @@ describe('AuthContext', () => {
     });
   });
 
-  describe('initial load', () => {
-    it('loads user from token on mount', async () => {
-      mockCookies.get.mockReturnValue('valid-token');
+  describe("initial load", () => {
+    it("loads user from token on mount", async () => {
+      mockCookies.get.mockReturnValue("valid-token");
       mockApi.post.mockResolvedValue({
         data: mockUser,
       });
@@ -103,10 +103,10 @@ describe('AuthContext', () => {
         });
       });
 
-      expect(mockApi.post).toHaveBeenCalledWith('/auth/me');
+      expect(mockApi.post).toHaveBeenCalledWith("/auth/me");
     });
 
-    it('handles missing token', async () => {
+    it("handles missing token", async () => {
       mockCookies.get.mockReturnValue(undefined);
 
       const { result } = renderHook(() => useAuth(), { wrapper });
@@ -120,11 +120,11 @@ describe('AuthContext', () => {
       expect(mockApi.post).not.toHaveBeenCalled();
     });
 
-    it('handles failed user fetch', async () => {
-      mockCookies.get.mockReturnValue('valid-token');
-      mockApi.post.mockRejectedValue(new Error('Unauthorized'));
+    it("handles failed user fetch", async () => {
+      mockCookies.get.mockReturnValue("valid-token");
+      mockApi.post.mockRejectedValue(new Error("Unauthorized"));
 
-      const consoleError = jest.spyOn(console, 'error').mockImplementation();
+      const consoleError = jest.spyOn(console, "error").mockImplementation();
 
       const { result } = renderHook(() => useAuth(), { wrapper });
 
@@ -134,36 +134,36 @@ describe('AuthContext', () => {
         expect(result.current.workspace).toBeNull();
       });
 
-      expect(mockCookies.remove).toHaveBeenCalledWith('accessToken');
-      expect(mockCookies.remove).toHaveBeenCalledWith('refreshToken');
-      
+      expect(mockCookies.remove).toHaveBeenCalledWith("accessToken");
+      expect(mockCookies.remove).toHaveBeenCalledWith("refreshToken");
+
       consoleError.mockRestore();
     });
   });
 
-  describe('login', () => {
-    it('logs in successfully', async () => {
+  describe("login", () => {
+    it("logs in successfully", async () => {
       mockCookies.get.mockReturnValue(null);
-      
+
       const loginResponse = {
-        accessToken: 'new-token',
-        refreshToken: 'refresh-token',
+        accessToken: "new-token",
+        refreshToken: "refresh-token",
         user: {
-          id: 'user-123',
-          email: 'test@example.com',
-          firstName: 'Test',
-          lastName: 'User',
-          status: 'ACTIVE',
+          id: "user-123",
+          email: "test@example.com",
+          firstName: "Test",
+          lastName: "User",
+          status: "ACTIVE",
           twoFactorEnabled: false,
         },
         workspace: {
-          id: 'workspace-123',
-          name: 'Test Workspace',
-          slug: 'test-workspace',
-          plan: 'PRO',
+          id: "workspace-123",
+          name: "Test Workspace",
+          slug: "test-workspace",
+          plan: "PRO",
         },
       };
-      
+
       mockApi.post.mockResolvedValue({
         data: loginResponse,
       });
@@ -171,38 +171,42 @@ describe('AuthContext', () => {
       const { result } = renderHook(() => useAuth(), { wrapper });
 
       await act(async () => {
-        await result.current.login('test@example.com', 'password123');
+        await result.current.login("test@example.com", "password123");
       });
 
-      expect(mockApi.post).toHaveBeenCalledWith('/auth/login', {
-        email: 'test@example.com',
-        password: 'password123',
+      expect(mockApi.post).toHaveBeenCalledWith("/auth/login", {
+        email: "test@example.com",
+        password: "password123",
       });
 
-      expect(mockCookies.set).toHaveBeenCalledWith('accessToken', 'new-token', {
+      expect(mockCookies.set).toHaveBeenCalledWith("accessToken", "new-token", {
         expires: 1,
       });
 
-      expect(mockCookies.set).toHaveBeenCalledWith('refreshToken', 'refresh-token', {
-        expires: 7,
-      });
+      expect(mockCookies.set).toHaveBeenCalledWith(
+        "refreshToken",
+        "refresh-token",
+        {
+          expires: 7,
+        },
+      );
 
       expect(result.current.user).toEqual(loginResponse.user);
       expect(result.current.workspace).toEqual(loginResponse.workspace);
-      expect(mockPush).toHaveBeenCalledWith('/dashboard');
+      expect(mockPush).toHaveBeenCalledWith("/dashboard");
     });
 
-    it('handles login error properly', async () => {
+    it("handles login error properly", async () => {
       mockCookies.get.mockReturnValue(null);
-      
+
       const errorResponse = {
         response: {
           data: {
-            message: 'Invalid email or password',
+            message: "Invalid email or password",
           },
         },
       };
-      
+
       mockApi.post.mockRejectedValue(errorResponse);
 
       const { result } = renderHook(() => useAuth(), { wrapper });
@@ -214,23 +218,23 @@ describe('AuthContext', () => {
 
       try {
         await act(async () => {
-          await result.current.login('test@example.com', 'wrong-password');
+          await result.current.login("test@example.com", "wrong-password");
         });
         // Should not reach here
         expect(true).toBe(false);
       } catch (error: any) {
-        expect(error).toBe('Invalid email or password');
+        expect(error).toBe("Invalid email or password");
       }
     });
 
-    it('handles login failure', async () => {
+    it("handles login failure", async () => {
       mockCookies.get.mockReturnValue(null);
       mockApi.post.mockRejectedValue({
         response: {
           data: {
-            message: 'Invalid credentials'
-          }
-        }
+            message: "Invalid credentials",
+          },
+        },
       });
 
       const { result } = renderHook(() => useAuth(), { wrapper });
@@ -242,12 +246,12 @@ describe('AuthContext', () => {
 
       try {
         await act(async () => {
-          await result.current.login('test@example.com', 'wrong-password');
+          await result.current.login("test@example.com", "wrong-password");
         });
         // Should not reach here
         expect(true).toBe(false);
       } catch (error: any) {
-        expect(error).toBe('Invalid credentials');
+        expect(error).toBe("Invalid credentials");
       }
 
       expect(result.current.user).toBeNull();
@@ -255,29 +259,29 @@ describe('AuthContext', () => {
     });
   });
 
-  describe('register', () => {
-    it('registers successfully', async () => {
+  describe("register", () => {
+    it("registers successfully", async () => {
       mockCookies.get.mockReturnValue(null);
-      
+
       const registerResponse = {
-        accessToken: 'new-token',
-        refreshToken: 'refresh-token',
+        accessToken: "new-token",
+        refreshToken: "refresh-token",
         user: {
-          id: 'user-123',
-          email: 'test@example.com',
-          firstName: 'Test',
-          lastName: 'User',
-          status: 'ACTIVE',
+          id: "user-123",
+          email: "test@example.com",
+          firstName: "Test",
+          lastName: "User",
+          status: "ACTIVE",
           twoFactorEnabled: false,
         },
         workspace: {
-          id: 'workspace-123',
-          name: 'Test Workspace',
-          slug: 'test-workspace',
-          plan: 'FREE',
+          id: "workspace-123",
+          name: "Test Workspace",
+          slug: "test-workspace",
+          plan: "FREE",
         },
       };
-      
+
       mockApi.post.mockResolvedValue({
         data: registerResponse,
       });
@@ -290,39 +294,39 @@ describe('AuthContext', () => {
       });
 
       const registerData = {
-        email: 'test@example.com',
-        password: 'password123',
-        firstName: 'Test',
-        lastName: 'User',
-        workspaceName: 'Test Workspace',
+        email: "test@example.com",
+        password: "password123",
+        firstName: "Test",
+        lastName: "User",
+        workspaceName: "Test Workspace",
       };
 
       await act(async () => {
         await result.current.register(registerData);
       });
 
-      expect(mockApi.post).toHaveBeenCalledWith('/auth/register', registerData);
+      expect(mockApi.post).toHaveBeenCalledWith("/auth/register", registerData);
 
-      expect(mockCookies.set).toHaveBeenCalledWith('accessToken', 'new-token', {
+      expect(mockCookies.set).toHaveBeenCalledWith("accessToken", "new-token", {
         expires: 1,
       });
 
       expect(result.current.user).toEqual(registerResponse.user);
       expect(result.current.workspace).toEqual(registerResponse.workspace);
-      expect(mockPush).toHaveBeenCalledWith('/verify-email');
+      expect(mockPush).toHaveBeenCalledWith("/verify-email");
     });
 
-    it('handles registration failure', async () => {
+    it("handles registration failure", async () => {
       mockCookies.get.mockReturnValue(null);
-      
+
       const errorResponse = {
         response: {
           data: {
-            message: 'Email already exists',
+            message: "Email already exists",
           },
         },
       };
-      
+
       mockApi.post.mockRejectedValue(errorResponse);
 
       const { result } = renderHook(() => useAuth(), { wrapper });
@@ -335,27 +339,27 @@ describe('AuthContext', () => {
       try {
         await act(async () => {
           await result.current.register({
-            email: 'existing@example.com',
-            password: 'password123',
-            firstName: 'Test',
-            lastName: 'User',
-            workspaceName: 'Test Workspace',
+            email: "existing@example.com",
+            password: "password123",
+            firstName: "Test",
+            lastName: "User",
+            workspaceName: "Test Workspace",
           });
         });
         // Should not reach here
         expect(true).toBe(false);
       } catch (error: any) {
-        expect(error).toBe('Email already exists');
+        expect(error).toBe("Email already exists");
       }
 
       expect(result.current.user).toBeNull();
     });
   });
 
-  describe('logout', () => {
-    it('logs out successfully', async () => {
+  describe("logout", () => {
+    it("logs out successfully", async () => {
       // Set initial user
-      mockCookies.get.mockReturnValue('valid-token');
+      mockCookies.get.mockReturnValue("valid-token");
       mockApi.post.mockResolvedValueOnce({
         data: mockUser,
       });
@@ -368,7 +372,7 @@ describe('AuthContext', () => {
 
       // Clear mocks before logout
       jest.clearAllMocks();
-      
+
       // Logout
       mockApi.post.mockResolvedValueOnce({});
 
@@ -376,17 +380,17 @@ describe('AuthContext', () => {
         await result.current.logout();
       });
 
-      expect(mockApi.post).toHaveBeenCalledWith('/auth/logout');
-      expect(mockCookies.remove).toHaveBeenCalledWith('accessToken');
-      expect(mockCookies.remove).toHaveBeenCalledWith('refreshToken');
+      expect(mockApi.post).toHaveBeenCalledWith("/auth/logout");
+      expect(mockCookies.remove).toHaveBeenCalledWith("accessToken");
+      expect(mockCookies.remove).toHaveBeenCalledWith("refreshToken");
       expect(result.current.user).toBeNull();
       expect(result.current.workspace).toBeNull();
-      expect(mockPush).toHaveBeenCalledWith('/login');
+      expect(mockPush).toHaveBeenCalledWith("/login");
     });
 
-    it('handles logout failure gracefully', async () => {
+    it("handles logout failure gracefully", async () => {
       mockCookies.get.mockReturnValue(null);
-      mockApi.post.mockRejectedValue(new Error('Network error'));
+      mockApi.post.mockRejectedValue(new Error("Network error"));
 
       const { result } = renderHook(() => useAuth(), { wrapper });
 
@@ -395,16 +399,16 @@ describe('AuthContext', () => {
       });
 
       // Should still clear local state even if API call fails
-      expect(mockCookies.remove).toHaveBeenCalledWith('accessToken');
-      expect(mockCookies.remove).toHaveBeenCalledWith('refreshToken');
+      expect(mockCookies.remove).toHaveBeenCalledWith("accessToken");
+      expect(mockCookies.remove).toHaveBeenCalledWith("refreshToken");
       expect(result.current.user).toBeNull();
-      expect(mockPush).toHaveBeenCalledWith('/login');
+      expect(mockPush).toHaveBeenCalledWith("/login");
     });
   });
 
-  describe('refreshUser', () => {
-    it('refreshes user data', async () => {
-      mockCookies.get.mockReturnValue('valid-token');
+  describe("refreshUser", () => {
+    it("refreshes user data", async () => {
+      mockCookies.get.mockReturnValue("valid-token");
       mockApi.post.mockResolvedValue({
         data: mockUser,
       });
@@ -416,7 +420,7 @@ describe('AuthContext', () => {
       });
 
       // Update user data
-      const updatedUser = { ...mockUser, firstName: 'Updated' };
+      const updatedUser = { ...mockUser, firstName: "Updated" };
       mockApi.post.mockResolvedValue({
         data: updatedUser,
       });
@@ -425,16 +429,16 @@ describe('AuthContext', () => {
         await result.current.refreshUser();
       });
 
-      expect(result.current.user?.firstName).toEqual('Updated');
+      expect(result.current.user?.firstName).toEqual("Updated");
     });
 
-    it('handles refresh failure', async () => {
-      mockCookies.get.mockReturnValue('valid-token');
+    it("handles refresh failure", async () => {
+      mockCookies.get.mockReturnValue("valid-token");
       mockApi.post
         .mockResolvedValueOnce({
           data: mockUser,
         })
-        .mockRejectedValueOnce(new Error('Failed to refresh'));
+        .mockRejectedValueOnce(new Error("Failed to refresh"));
 
       const { result } = renderHook(() => useAuth(), { wrapper });
 
@@ -442,25 +446,25 @@ describe('AuthContext', () => {
         expect(result.current.user).toBeTruthy();
       });
 
-      const consoleError = jest.spyOn(console, 'error').mockImplementation();
+      const consoleError = jest.spyOn(console, "error").mockImplementation();
 
       await act(async () => {
         await result.current.refreshUser();
       });
 
       expect(consoleError).toHaveBeenCalledWith(
-        'Failed to refresh user:',
-        expect.any(Error)
+        "Failed to refresh user:",
+        expect.any(Error),
       );
 
       consoleError.mockRestore();
     });
   });
 
-  describe('Error handling edge cases', () => {
-    it('handles login error without response property', async () => {
+  describe("Error handling edge cases", () => {
+    it("handles login error without response property", async () => {
       mockCookies.get.mockReturnValue(null);
-      mockApi.post.mockRejectedValue(new Error('Network error'));
+      mockApi.post.mockRejectedValue(new Error("Network error"));
 
       const { result } = renderHook(() => useAuth(), { wrapper });
 
@@ -470,15 +474,15 @@ describe('AuthContext', () => {
 
       try {
         await act(async () => {
-          await result.current.login('test@example.com', 'password');
+          await result.current.login("test@example.com", "password");
         });
         expect(true).toBe(false);
       } catch (error: any) {
-        expect(error).toBe('Login failed');
+        expect(error).toBe("Login failed");
       }
     });
 
-    it('handles login error with empty response data', async () => {
+    it("handles login error with empty response data", async () => {
       mockCookies.get.mockReturnValue(null);
       mockApi.post.mockRejectedValue({ response: { data: {} } });
 
@@ -490,17 +494,17 @@ describe('AuthContext', () => {
 
       try {
         await act(async () => {
-          await result.current.login('test@example.com', 'password');
+          await result.current.login("test@example.com", "password");
         });
         expect(true).toBe(false);
       } catch (error: any) {
-        expect(error).toBe('Login failed');
+        expect(error).toBe("Login failed");
       }
     });
 
-    it('handles register error without response property', async () => {
+    it("handles register error without response property", async () => {
       mockCookies.get.mockReturnValue(null);
-      mockApi.post.mockRejectedValue(new Error('Network error'));
+      mockApi.post.mockRejectedValue(new Error("Network error"));
 
       const { result } = renderHook(() => useAuth(), { wrapper });
 
@@ -511,20 +515,20 @@ describe('AuthContext', () => {
       try {
         await act(async () => {
           await result.current.register({
-            email: 'test@example.com',
-            password: 'password123',
-            firstName: 'Test',
-            lastName: 'User',
-            workspaceName: 'Test Workspace',
+            email: "test@example.com",
+            password: "password123",
+            firstName: "Test",
+            lastName: "User",
+            workspaceName: "Test Workspace",
           });
         });
         expect(true).toBe(false);
       } catch (error: any) {
-        expect(error).toBe('Registration failed');
+        expect(error).toBe("Registration failed");
       }
     });
 
-    it('handles register error with empty response data', async () => {
+    it("handles register error with empty response data", async () => {
       mockCookies.get.mockReturnValue(null);
       mockApi.post.mockRejectedValue({ response: { data: {} } });
 
@@ -537,16 +541,16 @@ describe('AuthContext', () => {
       try {
         await act(async () => {
           await result.current.register({
-            email: 'test@example.com',
-            password: 'password123',
-            firstName: 'Test',
-            lastName: 'User',
-            workspaceName: 'Test Workspace',
+            email: "test@example.com",
+            password: "password123",
+            firstName: "Test",
+            lastName: "User",
+            workspaceName: "Test Workspace",
           });
         });
         expect(true).toBe(false);
       } catch (error: any) {
-        expect(error).toBe('Registration failed');
+        expect(error).toBe("Registration failed");
       }
     });
   });

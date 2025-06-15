@@ -416,7 +416,13 @@ describe("ContactsService", () => {
       );
       (prismaService.contact.count as jest.Mock).mockResolvedValue(25);
 
-      const result = await service.search(mockWorkspaceId, "test", undefined, 10, 10);
+      const result = await service.search(
+        mockWorkspaceId,
+        "test",
+        undefined,
+        10,
+        10,
+      );
 
       expect(result.hasMore).toBe(true);
       expect(prismaService.contact.findMany).toHaveBeenCalledWith(

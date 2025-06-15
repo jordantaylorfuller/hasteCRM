@@ -16,12 +16,14 @@ This guide covers deploying hasteCRM to production using Docker and Docker Compo
 ## Quick Start
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/yourusername/hasteCRM.git
    cd hasteCRM
    ```
 
 2. **Configure environment**
+
    ```bash
    cp .env.production.example .env.production
    # Edit .env.production with your values
@@ -46,22 +48,26 @@ cp .env.production.example .env.production
 **Required configurations:**
 
 #### Database
+
 ```env
 POSTGRES_PASSWORD=<strong-password>
 ```
 
 #### Redis
+
 ```env
 REDIS_PASSWORD=<strong-password>
 ```
 
 #### Authentication
+
 ```env
 JWT_SECRET=<32+ character secret>
 JWT_REFRESH_SECRET=<different 32+ character secret>
 ```
 
 Generate secrets:
+
 ```bash
 # Generate JWT secret
 openssl rand -base64 32
@@ -71,12 +77,14 @@ openssl rand -base64 24
 ```
 
 #### Google OAuth
+
 1. Go to [Google Cloud Console](https://console.cloud.google.com)
 2. Create OAuth 2.0 credentials
 3. Add authorized redirect URI: `https://api.yourdomain.com/auth/google/callback`
 4. Copy client ID and secret to `.env.production`
 
 #### AI Features
+
 Get API key from [Anthropic](https://www.anthropic.com/api)
 
 ### 2. SSL/TLS Setup
@@ -99,12 +107,14 @@ sudo cp /etc/letsencrypt/live/yourdomain.com/privkey.pem ./nginx/ssl/key.pem
 #### Option B: Custom Certificates
 
 Place your certificates in `./nginx/ssl/`:
+
 - `cert.pem` - Certificate file
 - `key.pem` - Private key file
 
 ### 3. Database Setup
 
 #### Initial Setup
+
 ```bash
 # Start only database service
 docker-compose -f docker-compose.production.yml up -d postgres
@@ -117,13 +127,16 @@ docker-compose -f docker-compose.production.yml run --rm api npm run seed
 ```
 
 #### Backups
+
 Configure automated backups in `.env.production`:
+
 ```env
 BACKUP_ENABLED=true
 BACKUP_SCHEDULE="0 2 * * *"  # 2 AM daily
 ```
 
 Manual backup:
+
 ```bash
 ./scripts/deploy.sh backup
 ```
@@ -131,6 +144,7 @@ Manual backup:
 ### 4. Deployment
 
 #### First Deployment
+
 ```bash
 # Run the deployment script
 ./scripts/deploy.sh
@@ -140,6 +154,7 @@ docker-compose -f docker-compose.production.yml up -d
 ```
 
 #### Update Deployment
+
 ```bash
 # Pull latest code
 git pull origin main
@@ -151,11 +166,13 @@ git pull origin main
 ### 5. Monitoring
 
 #### Health Checks
+
 - API: https://api.yourdomain.com/health
 - Web: https://yourdomain.com/health.json
 - Metrics: https://api.yourdomain.com/metrics
 
 #### Logs
+
 ```bash
 # View all logs
 docker-compose -f docker-compose.production.yml logs -f
@@ -168,7 +185,9 @@ docker-compose -f docker-compose.production.yml logs --tail=100
 ```
 
 #### Metrics
+
 Access Prometheus-formatted metrics:
+
 ```bash
 curl http://localhost:4000/metrics/prometheus
 ```
@@ -176,6 +195,7 @@ curl http://localhost:4000/metrics/prometheus
 ### 6. Scaling
 
 #### Horizontal Scaling
+
 ```yaml
 # docker-compose.production.yml
 api:
@@ -184,21 +204,23 @@ api:
 ```
 
 #### Resource Limits
+
 ```yaml
 api:
   deploy:
     resources:
       limits:
-        cpus: '2'
+        cpus: "2"
         memory: 2G
       reservations:
-        cpus: '1'
+        cpus: "1"
         memory: 1G
 ```
 
 ### 7. Security
 
 #### Firewall Rules
+
 ```bash
 # Allow only necessary ports
 sudo ufw allow 22/tcp   # SSH
@@ -208,7 +230,9 @@ sudo ufw enable
 ```
 
 #### Security Headers
+
 Already configured in nginx.conf:
+
 - X-Frame-Options
 - X-Content-Type-Options
 - X-XSS-Protection
@@ -217,6 +241,7 @@ Already configured in nginx.conf:
 ### 8. Troubleshooting
 
 #### Container Issues
+
 ```bash
 # Check status
 docker-compose -f docker-compose.production.yml ps
@@ -229,6 +254,7 @@ docker-compose -f docker-compose.production.yml logs api
 ```
 
 #### Database Connection
+
 ```bash
 # Test connection
 docker-compose -f docker-compose.production.yml exec postgres pg_isready
@@ -238,6 +264,7 @@ docker-compose -f docker-compose.production.yml exec postgres psql -U postgres h
 ```
 
 #### Redis Connection
+
 ```bash
 # Test connection
 docker-compose -f docker-compose.production.yml exec redis redis-cli ping
@@ -246,6 +273,7 @@ docker-compose -f docker-compose.production.yml exec redis redis-cli ping
 ### 9. Maintenance
 
 #### Updates
+
 ```bash
 # Stop services
 docker-compose -f docker-compose.production.yml down
@@ -258,12 +286,14 @@ git pull origin main
 ```
 
 #### Database Migrations
+
 ```bash
 # Run pending migrations
 docker-compose -f docker-compose.production.yml run --rm api npx prisma migrate deploy
 ```
 
 #### Cleanup
+
 ```bash
 # Remove unused images
 docker image prune -f
@@ -291,13 +321,16 @@ docker-compose -f docker-compose.production.yml up -d
 ## Performance Optimization
 
 ### 1. Enable Redis Persistence
+
 ```yaml
 redis:
   command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
 ```
 
 ### 2. PostgreSQL Tuning
+
 Create `postgres/postgresql.conf`:
+
 ```conf
 shared_buffers = 256MB
 effective_cache_size = 1GB
@@ -307,11 +340,13 @@ wal_buffers = 16MB
 ```
 
 ### 3. Nginx Caching
+
 Already configured for static assets in nginx.conf
 
 ## Monitoring Setup
 
 ### Prometheus Integration
+
 ```yaml
 # docker-compose.production.yml
 prometheus:
@@ -323,6 +358,7 @@ prometheus:
 ```
 
 ### Grafana Dashboards
+
 ```yaml
 grafana:
   image: grafana/grafana:latest
@@ -335,6 +371,7 @@ grafana:
 ## Support
 
 For issues or questions:
+
 - Check logs: `docker-compose logs -f`
 - Review [troubleshooting guide](./troubleshooting.md)
 - Open an issue on GitHub

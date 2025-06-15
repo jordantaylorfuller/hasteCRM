@@ -233,10 +233,10 @@ All scans must pass before deployment:
 
 ## Sign-Offs
 
-- [ ] Engineering Lead: ******\_\_\_******
-- [ ] Security Lead: ******\_\_\_******
-- [ ] Operations Lead: ******\_\_\_******
-- [ ] Product Owner: ******\_\_\_******
+- [ ] Engineering Lead: **\*\***\_\_\_**\*\***
+- [ ] Security Lead: **\*\***\_\_\_**\*\***
+- [ ] Operations Lead: **\*\***\_\_\_**\*\***
+- [ ] Product Owner: **\*\***\_\_\_**\*\***
 
 ## Go-Live Checklist
 

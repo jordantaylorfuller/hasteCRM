@@ -49,22 +49,34 @@ describe("PubSubAuthGuard", () => {
     it("should deny request with invalid bearer token", async () => {
       mockRequest.headers.authorization = "Bearer wrong-token";
 
-      await expect(guard.canActivate(mockContext)).rejects.toThrow(UnauthorizedException);
-      await expect(guard.canActivate(mockContext)).rejects.toThrow("Invalid token");
+      await expect(guard.canActivate(mockContext)).rejects.toThrow(
+        UnauthorizedException,
+      );
+      await expect(guard.canActivate(mockContext)).rejects.toThrow(
+        "Invalid token",
+      );
     });
 
     it("should deny request with missing authorization header", async () => {
       // No authorization header set
 
-      await expect(guard.canActivate(mockContext)).rejects.toThrow(UnauthorizedException);
-      await expect(guard.canActivate(mockContext)).rejects.toThrow("Invalid authorization");
+      await expect(guard.canActivate(mockContext)).rejects.toThrow(
+        UnauthorizedException,
+      );
+      await expect(guard.canActivate(mockContext)).rejects.toThrow(
+        "Invalid authorization",
+      );
     });
 
     it("should deny request with invalid authorization format", async () => {
       mockRequest.headers.authorization = "Basic test-token";
 
-      await expect(guard.canActivate(mockContext)).rejects.toThrow(UnauthorizedException);
-      await expect(guard.canActivate(mockContext)).rejects.toThrow("Invalid authorization");
+      await expect(guard.canActivate(mockContext)).rejects.toThrow(
+        UnauthorizedException,
+      );
+      await expect(guard.canActivate(mockContext)).rejects.toThrow(
+        "Invalid authorization",
+      );
     });
 
     it("should deny request when verification token is not configured", async () => {
@@ -78,10 +90,13 @@ describe("PubSubAuthGuard", () => {
 
     it("should verify message authenticity for Google PubSub push messages", async () => {
       mockRequest.headers.authorization = "Bearer test-token";
-      mockRequest.headers["user-agent"] = "APIs-Google; (+https://developers.google.com/webmasters/APIs-Google.html)";
+      mockRequest.headers["user-agent"] =
+        "APIs-Google; (+https://developers.google.com/webmasters/APIs-Google.html)";
       mockRequest.body = {
         message: {
-          data: Buffer.from(JSON.stringify({ test: "data" })).toString("base64"),
+          data: Buffer.from(JSON.stringify({ test: "data" })).toString(
+            "base64",
+          ),
           messageId: "123",
           publishTime: new Date().toISOString(),
         },
@@ -102,7 +117,7 @@ describe("PubSubAuthGuard", () => {
       };
 
       const result = await guard.canActivate(mockContext);
-      
+
       expect(result).toBe(true); // Should still allow through for processing
     });
 
@@ -110,17 +125,17 @@ describe("PubSubAuthGuard", () => {
       mockRequest.headers.AUTHORIZATION = "Bearer test-token";
       // Headers in Express are case-insensitive, but we need to test lowercase
       mockRequest.headers.authorization = mockRequest.headers.AUTHORIZATION;
-      
+
       const result = await guard.canActivate(mockContext);
-      
+
       expect(result).toBe(true);
     });
 
     it("should trim whitespace from token", async () => {
       mockRequest.headers.authorization = "Bearer test-token";
-      
+
       const result = await guard.canActivate(mockContext);
-      
+
       expect(result).toBe(true);
     });
 
@@ -131,25 +146,25 @@ describe("PubSubAuthGuard", () => {
 
       it("should allow request without token in development mode", async () => {
         // No authorization header
-        
+
         const result = await guard.canActivate(mockContext);
-        
+
         expect(result).toBe(true);
       });
 
       it("should allow request with any token in development mode", async () => {
         mockRequest.headers.authorization = "Bearer wrong-token";
-        
+
         const result = await guard.canActivate(mockContext);
-        
+
         expect(result).toBe(true);
       });
 
       it("should allow valid token in development mode", async () => {
         mockRequest.headers.authorization = "Bearer test-token";
-        
+
         const result = await guard.canActivate(mockContext);
-        
+
         expect(result).toBe(true);
       });
     });
@@ -161,9 +176,9 @@ describe("PubSubAuthGuard", () => {
 
       it("should allow request without token in test mode", async () => {
         // No authorization header
-        
+
         const result = await guard.canActivate(mockContext);
-        
+
         expect(result).toBe(true);
       });
     });
@@ -171,22 +186,26 @@ describe("PubSubAuthGuard", () => {
     describe("empty token handling", () => {
       it("should deny request with empty bearer token", async () => {
         mockRequest.headers.authorization = "Bearer ";
-        
-        await expect(guard.canActivate(mockContext)).rejects.toThrow(UnauthorizedException);
+
+        await expect(guard.canActivate(mockContext)).rejects.toThrow(
+          UnauthorizedException,
+        );
       });
 
       it("should deny request with only 'Bearer' keyword", async () => {
         mockRequest.headers.authorization = "Bearer";
-        
-        await expect(guard.canActivate(mockContext)).rejects.toThrow(UnauthorizedException);
+
+        await expect(guard.canActivate(mockContext)).rejects.toThrow(
+          UnauthorizedException,
+        );
       });
 
       it("should handle empty configured token", async () => {
         process.env.PUBSUB_VERIFICATION_TOKEN = "";
         mockRequest.headers.authorization = "Bearer test-token";
-        
+
         const result = await guard.canActivate(mockContext);
-        
+
         expect(result).toBe(true); // No token configured means allow all
       });
     });

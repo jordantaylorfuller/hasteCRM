@@ -148,10 +148,13 @@ describe("EmailService", () => {
       };
 
       await expect(service.sendEmail(options)).rejects.toThrow(
-        "SMTP connection failed"
+        "SMTP connection failed",
       );
 
-      expect(consoleErrorSpy).toHaveBeenCalledWith("Error sending email:", error);
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Error sending email:",
+        error,
+      );
 
       consoleErrorSpy.mockRestore();
     });
@@ -188,8 +191,8 @@ describe("EmailService", () => {
       await expect(
         service.sendVerificationEmail(
           "user@example.com",
-          "https://example.com/verify"
-        )
+          "https://example.com/verify",
+        ),
       ).rejects.toThrow("Failed to send");
     });
   });
@@ -225,8 +228,8 @@ describe("EmailService", () => {
       await expect(
         service.sendPasswordResetEmail(
           "user@example.com",
-          "https://example.com/reset"
-        )
+          "https://example.com/reset",
+        ),
       ).rejects.toThrow("Failed to send");
     });
   });
@@ -251,7 +254,7 @@ describe("EmailService", () => {
             to: `user${i}@example.com`,
             subject: `Subject ${i}`,
             html: `<p>Content ${i}</p>`,
-          })
+          }),
         );
       }
     });
@@ -352,12 +355,12 @@ describe("EmailService", () => {
       expect(mockSendMail).toHaveBeenCalledWith(
         expect.objectContaining({
           subject: "hasteCRM Notification",
-        })
+        }),
       );
     });
 
     it("should strip HTML tags from text version", async () => {
-      const template = '<h1>Hello {{name}}</h1><p>Welcome!</p>';
+      const template = "<h1>Hello {{name}}</h1><p>Welcome!</p>";
       const data = { name: "John" };
 
       await service.sendTemplatedEmail(template, data, "john@example.com");

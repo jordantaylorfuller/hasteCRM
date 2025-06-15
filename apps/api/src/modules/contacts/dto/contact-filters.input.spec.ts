@@ -72,11 +72,11 @@ describe("ContactFiltersInput", () => {
 
   it("should validate all ContactStatus enum values", async () => {
     const statuses = Object.values(ContactStatus);
-    
+
     for (const status of statuses) {
       const filter = new ContactFiltersInput();
       filter.status = status as ContactStatus;
-      
+
       const errors = await validate(filter);
       expect(errors).toHaveLength(0);
     }
@@ -84,11 +84,11 @@ describe("ContactFiltersInput", () => {
 
   it("should validate all ContactSource enum values", async () => {
     const sources = Object.values(ContactSource);
-    
+
     for (const source of sources) {
       const filter = new ContactFiltersInput();
       filter.source = source as ContactSource;
-      
+
       const errors = await validate(filter);
       expect(errors).toHaveLength(0);
     }

@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { Button } from '@/components/ui/button';
-import { AlertCircle, RefreshCw, Home } from 'lucide-react';
-import Link from 'next/link';
+import React, { Component, ErrorInfo, ReactNode } from "react";
+import { Button } from "@/components/ui/button";
+import { AlertCircle, RefreshCw, Home } from "lucide-react";
+import Link from "next/link";
 
 interface Props {
   children: ReactNode;
@@ -36,10 +36,10 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log error to error reporting service
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
-    
+    console.error("ErrorBoundary caught an error:", error, errorInfo);
+
     // In production, send to error tracking service
-    if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === "production") {
       // TODO: Send to Sentry or similar
     }
 
@@ -69,16 +69,17 @@ export class ErrorBoundary extends Component<Props, State> {
             <div className="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full">
               <AlertCircle className="w-6 h-6 text-red-600" />
             </div>
-            
+
             <h1 className="mt-4 text-xl font-semibold text-center text-gray-900">
               Something went wrong
             </h1>
-            
+
             <p className="mt-2 text-sm text-center text-gray-600">
-              We're sorry for the inconvenience. An unexpected error has occurred.
+              We're sorry for the inconvenience. An unexpected error has
+              occurred.
             </p>
 
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {process.env.NODE_ENV === "development" && this.state.error && (
               <details className="mt-4 p-4 bg-gray-100 rounded text-xs">
                 <summary className="cursor-pointer font-medium">
                   Error details (Development only)
@@ -103,7 +104,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Try again
               </Button>
-              
+
               <Link href="/" className="block">
                 <Button className="w-full">
                   <Home className="w-4 h-4 mr-2" />

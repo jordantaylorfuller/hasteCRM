@@ -83,7 +83,9 @@ describe("CustomGqlAuthGuard", () => {
 
       expect(result).toBe(true);
       expect(GqlExecutionContext.create).toHaveBeenCalledWith(mockContext);
-      expect(sessionService.isTokenBlacklisted).toHaveBeenCalledWith("valid-token");
+      expect(sessionService.isTokenBlacklisted).toHaveBeenCalledWith(
+        "valid-token",
+      );
       expect(jwtService.verifyAsync).toHaveBeenCalledWith("valid-token", {
         secret: process.env.JWT_SECRET || "change-me-in-production",
       });
@@ -124,9 +126,9 @@ describe("CustomGqlAuthGuard", () => {
       mockGqlContext.getContext.mockReturnValue({ req: null });
 
       const mockContext = {} as ExecutionContext;
-      
+
       await expect(guard.canActivate(mockContext)).rejects.toThrow(
-        new UnauthorizedException("Request not found in GraphQL context")
+        new UnauthorizedException("Request not found in GraphQL context"),
       );
     });
 
@@ -138,9 +140,9 @@ describe("CustomGqlAuthGuard", () => {
       });
 
       const mockContext = {} as ExecutionContext;
-      
+
       await expect(guard.canActivate(mockContext)).rejects.toThrow(
-        new UnauthorizedException("No token provided")
+        new UnauthorizedException("No token provided"),
       );
     });
 
@@ -154,9 +156,9 @@ describe("CustomGqlAuthGuard", () => {
       });
 
       const mockContext = {} as ExecutionContext;
-      
+
       await expect(guard.canActivate(mockContext)).rejects.toThrow(
-        new UnauthorizedException("No token provided")
+        new UnauthorizedException("No token provided"),
       );
     });
 
@@ -164,20 +166,22 @@ describe("CustomGqlAuthGuard", () => {
       (sessionService.isTokenBlacklisted as jest.Mock).mockResolvedValue(true);
 
       const mockContext = {} as ExecutionContext;
-      
+
       await expect(guard.canActivate(mockContext)).rejects.toThrow(
-        new UnauthorizedException("Token has been invalidated")
+        new UnauthorizedException("Token has been invalidated"),
       );
     });
 
     it("should throw UnauthorizedException when token verification fails", async () => {
       (sessionService.isTokenBlacklisted as jest.Mock).mockResolvedValue(false);
-      (jwtService.verifyAsync as jest.Mock).mockRejectedValue(new Error("Invalid signature"));
+      (jwtService.verifyAsync as jest.Mock).mockRejectedValue(
+        new Error("Invalid signature"),
+      );
 
       const mockContext = {} as ExecutionContext;
-      
+
       await expect(guard.canActivate(mockContext)).rejects.toThrow(
-        new UnauthorizedException("Invalid token")
+        new UnauthorizedException("Invalid token"),
       );
     });
 
@@ -187,9 +191,9 @@ describe("CustomGqlAuthGuard", () => {
       });
 
       const mockContext = {} as ExecutionContext;
-      
+
       await expect(guard.canActivate(mockContext)).rejects.toThrow(
-        new UnauthorizedException("No token provided")
+        new UnauthorizedException("No token provided"),
       );
     });
 

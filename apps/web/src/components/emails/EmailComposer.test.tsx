@@ -40,7 +40,9 @@ describe("EmailComposer", () => {
 
     expect(screen.getByText("New Message")).toBeInTheDocument();
     expect(screen.getByText("To:")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("Add recipients...")).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText("Add recipients..."),
+    ).toBeInTheDocument();
     expect(screen.getByText("Subject:")).toBeInTheDocument();
     expect(
       screen.getByPlaceholderText("Compose your message..."),
@@ -49,7 +51,11 @@ describe("EmailComposer", () => {
 
   it("does not render when closed", () => {
     render(
-      <EmailComposer isOpen={false} onClose={mockOnClose} onSend={mockOnSend} />,
+      <EmailComposer
+        isOpen={false}
+        onClose={mockOnClose}
+        onSend={mockOnSend}
+      />,
     );
 
     expect(screen.queryByText("New Message")).not.toBeInTheDocument();
@@ -127,7 +133,9 @@ describe("EmailComposer", () => {
     await user.click(screen.getByRole("button", { name: "Cc" }));
 
     expect(screen.getByText("Cc:")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("Add Cc recipients...")).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText("Add Cc recipients..."),
+    ).toBeInTheDocument();
   });
 
   it("shows BCC field when BCC button is clicked", async () => {
@@ -141,7 +149,9 @@ describe("EmailComposer", () => {
     await user.click(screen.getByRole("button", { name: "Bcc" }));
 
     expect(screen.getByText("Bcc:")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("Add Bcc recipients...")).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText("Add Bcc recipients..."),
+    ).toBeInTheDocument();
   });
 
   it("handles subject input", async () => {
@@ -180,10 +190,10 @@ describe("EmailComposer", () => {
 
     expect(screen.getByText("Reply")).toBeInTheDocument();
     expect(screen.getByText("john@example.com")).toBeInTheDocument();
-    expect(screen.getByDisplayValue("Re: Original Subject")).toBeInTheDocument();
     expect(
-      screen.getByText(/On.*John Doe wrote:/),
+      screen.getByDisplayValue("Re: Original Subject"),
     ).toBeInTheDocument();
+    expect(screen.getByText(/On.*John Doe wrote:/)).toBeInTheDocument();
   });
 
   it("sets up reply all correctly", () => {
@@ -213,8 +223,12 @@ describe("EmailComposer", () => {
     );
 
     expect(screen.getByText("Forward Email")).toBeInTheDocument();
-    expect(screen.getByDisplayValue("Fwd: Original Subject")).toBeInTheDocument();
-    expect(screen.getByText(/---------- Forwarded message ----------/)).toBeInTheDocument();
+    expect(
+      screen.getByDisplayValue("Fwd: Original Subject"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/---------- Forwarded message ----------/),
+    ).toBeInTheDocument();
   });
 
   it("handles file attachments", async () => {
@@ -227,7 +241,9 @@ describe("EmailComposer", () => {
       <EmailComposer isOpen={true} onClose={mockOnClose} onSend={mockOnSend} />,
     );
 
-    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const fileInput = document.querySelector(
+      'input[type="file"]',
+    ) as HTMLInputElement;
     await user.upload(fileInput, file);
 
     expect(screen.getByText("test.pdf")).toBeInTheDocument();
@@ -244,7 +260,9 @@ describe("EmailComposer", () => {
       <EmailComposer isOpen={true} onClose={mockOnClose} onSend={mockOnSend} />,
     );
 
-    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const fileInput = document.querySelector(
+      'input[type="file"]',
+    ) as HTMLInputElement;
     await user.upload(fileInput, file);
 
     expect(screen.getByText("test.pdf")).toBeInTheDocument();
@@ -264,7 +282,7 @@ describe("EmailComposer", () => {
 
     const bodyTextarea = screen.getByPlaceholderText("Compose your message...");
     await user.type(bodyTextarea, "test");
-    
+
     // Select all text
     bodyTextarea.setSelectionRange(0, 4);
 
@@ -282,7 +300,7 @@ describe("EmailComposer", () => {
 
     const bodyTextarea = screen.getByPlaceholderText("Compose your message...");
     await user.type(bodyTextarea, "test");
-    
+
     // Select all text
     bodyTextarea.setSelectionRange(0, 4);
 
@@ -360,9 +378,12 @@ describe("EmailComposer", () => {
   it("shows sending state", async () => {
     const user = userEvent.setup();
     let resolveSend: () => void;
-    mockOnSend.mockImplementation(() => new Promise((resolve) => {
-      resolveSend = resolve;
-    }));
+    mockOnSend.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveSend = resolve;
+        }),
+    );
 
     render(
       <EmailComposer
@@ -405,7 +426,10 @@ describe("EmailComposer", () => {
     await user.click(screen.getByRole("button", { name: /send/i }));
 
     await waitFor(() => {
-      expect(consoleSpy).toHaveBeenCalledWith("Failed to send email:", expect.any(Error));
+      expect(consoleSpy).toHaveBeenCalledWith(
+        "Failed to send email:",
+        expect.any(Error),
+      );
     });
 
     // Should not close on error
@@ -450,7 +474,7 @@ describe("EmailComposer", () => {
 
     const bodyTextarea = screen.getByPlaceholderText("Compose your message...");
     await user.type(bodyTextarea, "test");
-    
+
     // Select all text
     bodyTextarea.setSelectionRange(0, 4);
 
@@ -497,11 +521,7 @@ describe("EmailComposer", () => {
   it("removes CC recipients correctly", async () => {
     const user = userEvent.setup();
     render(
-      <EmailComposer
-        isOpen={true}
-        onClose={mockOnClose}
-        onSend={mockOnSend}
-      />,
+      <EmailComposer isOpen={true} onClose={mockOnClose} onSend={mockOnSend} />,
     );
 
     // Show CC field
@@ -527,11 +547,7 @@ describe("EmailComposer", () => {
   it("removes BCC recipients correctly", async () => {
     const user = userEvent.setup();
     render(
-      <EmailComposer
-        isOpen={true}
-        onClose={mockOnClose}
-        onSend={mockOnSend}
-      />,
+      <EmailComposer isOpen={true} onClose={mockOnClose} onSend={mockOnSend} />,
     );
 
     // Show BCC field
@@ -561,12 +577,12 @@ describe("EmailComposer", () => {
     );
 
     const toInput = screen.getByPlaceholderText("Add recipients...");
-    
+
     // Type first email and press comma
     await user.type(toInput, "first@example.com");
     await user.keyboard(",");
     expect(screen.getByText("first@example.com")).toBeInTheDocument();
-    
+
     // Type second email and press comma
     await user.type(toInput, "second@example.com");
     await user.keyboard(",");
@@ -661,13 +677,15 @@ describe("EmailComposer", () => {
 
     // Click the attach file button
     const attachButton = screen.getByRole("button", { name: "Attach File" });
-    
+
     // Mock the file input click
-    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-    const clickSpy = jest.spyOn(fileInput, 'click');
-    
+    const fileInput = document.querySelector(
+      'input[type="file"]',
+    ) as HTMLInputElement;
+    const clickSpy = jest.spyOn(fileInput, "click");
+
     await user.click(attachButton);
-    
+
     expect(clickSpy).toHaveBeenCalled();
   });
 
@@ -678,21 +696,21 @@ describe("EmailComposer", () => {
     );
 
     const toInput = screen.getByPlaceholderText("Add recipients...");
-    
+
     // Type first email and press comma
     await user.type(toInput, "valid@example.com");
     await user.keyboard(",");
     expect(screen.getByText("valid@example.com")).toBeInTheDocument();
-    
+
     // Type invalid email and press comma
     await user.type(toInput, "invalid");
     await user.keyboard(",");
     // Invalid email should not be added
     expect(screen.queryByText("invalid")).not.toBeInTheDocument();
-    
+
     // Clear the input manually after invalid email
     await user.clear(toInput);
-    
+
     // Type another valid email and press comma
     await user.type(toInput, "another@example.com");
     await user.keyboard(",");
@@ -701,13 +719,9 @@ describe("EmailComposer", () => {
 
   it("handles empty recipient removal gracefully", async () => {
     const user = userEvent.setup();
-    
+
     render(
-      <EmailComposer
-        isOpen={true}
-        onClose={mockOnClose}
-        onSend={mockOnSend}
-      />,
+      <EmailComposer isOpen={true} onClose={mockOnClose} onSend={mockOnSend} />,
     );
 
     // Show CC and BCC fields
@@ -715,7 +729,7 @@ describe("EmailComposer", () => {
     await user.click(screen.getByRole("button", { name: "Bcc" }));
 
     // No recipient badges should exist yet
-    const badges = screen.queryAllByRole("button").filter(button => {
+    const badges = screen.queryAllByRole("button").filter((button) => {
       const parent = button.parentElement;
       return parent?.tagName === "SPAN" && parent?.textContent?.includes("@");
     });
@@ -729,7 +743,7 @@ describe("EmailComposer", () => {
     );
 
     const bodyTextarea = screen.getByPlaceholderText("Compose your message...");
-    
+
     // Don't select any text
     bodyTextarea.setSelectionRange(0, 0);
 
@@ -762,7 +776,7 @@ describe("EmailComposer", () => {
     // The button should be disabled because body.trim() is empty
     const sendButton = screen.getByRole("button", { name: /send/i });
     expect(sendButton).toBeDisabled();
-    
+
     // Even if we could click it, onSend would not be called
     expect(mockOnSend).not.toHaveBeenCalled();
   });
@@ -784,7 +798,7 @@ describe("EmailComposer", () => {
     // The button should be disabled because there are no recipients
     const sendButton = screen.getByRole("button", { name: /send/i });
     expect(sendButton).toBeDisabled();
-    
+
     expect(mockOnSend).not.toHaveBeenCalled();
   });
 
@@ -808,13 +822,15 @@ describe("EmailComposer", () => {
     // The button should be disabled because subject is empty
     const sendButton = screen.getByRole("button", { name: /send/i });
     expect(sendButton).toBeDisabled();
-    
+
     expect(mockOnSend).not.toHaveBeenCalled();
   });
 
   it("handles send with attachments", async () => {
     const user = userEvent.setup();
-    const file1 = new File(["content1"], "file1.pdf", { type: "application/pdf" });
+    const file1 = new File(["content1"], "file1.pdf", {
+      type: "application/pdf",
+    });
     const file2 = new File(["content2"], "file2.jpg", { type: "image/jpeg" });
 
     render(
@@ -829,7 +845,9 @@ describe("EmailComposer", () => {
     );
 
     // Upload files
-    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const fileInput = document.querySelector(
+      'input[type="file"]',
+    ) as HTMLInputElement;
     await user.upload(fileInput, [file1, file2]);
 
     // Send email

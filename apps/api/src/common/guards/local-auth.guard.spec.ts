@@ -49,8 +49,8 @@ describe("LocalAuthGuard", () => {
       } as unknown as ExecutionContext;
 
       // Mock the canActivate method to prevent actual passport logic
-      jest.spyOn(guard, 'canActivate').mockResolvedValue(true);
-      
+      jest.spyOn(guard, "canActivate").mockResolvedValue(true);
+
       const result = await guard.canActivate(mockContext);
       expect(result).toBe(true);
     });

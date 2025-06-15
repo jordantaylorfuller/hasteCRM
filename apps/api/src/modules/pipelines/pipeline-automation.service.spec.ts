@@ -288,14 +288,16 @@ describe("PipelineAutomationService", () => {
       );
       mockPrismaService.deal.findUnique.mockResolvedValue({
         ...mockDeal,
-        contacts: [{
-          isPrimary: true,
-          contact: {
-            email: "contact@example.com",
-            firstName: "John",
-            lastName: "Doe",
+        contacts: [
+          {
+            isPrimary: true,
+            contact: {
+              email: "contact@example.com",
+              firstName: "John",
+              lastName: "Doe",
+            },
           },
-        }],
+        ],
         owner: {
           email: "owner@example.com",
           firstName: "Jane",
@@ -348,7 +350,7 @@ describe("PipelineAutomationService", () => {
       );
       mockPrismaService.deal.findUnique.mockResolvedValue({
         ...mockDeal,
-        contacts: []  // No contacts will cause error
+        contacts: [], // No contacts will cause error
       });
 
       await service.executeAutomation("automation-123", "deal-123", context);
@@ -473,7 +475,7 @@ describe("PipelineAutomationService", () => {
       const automation = {
         ...mockAutomation,
         conditions: {
-          minValue: 500,  // Deal value is 1000, should pass
+          minValue: 500, // Deal value is 1000, should pass
         },
       };
 
@@ -539,9 +541,9 @@ describe("PipelineAutomationService", () => {
       const automation = {
         ...mockAutomation,
         conditions: {
-          minValue: 500,  // Deal value is 1000, passes
-          ownerIds: ["user-123"],  // Deal owner is user-123, passes
-          hasCompany: false,  // Deal has no company, passes
+          minValue: 500, // Deal value is 1000, passes
+          ownerIds: ["user-123"], // Deal owner is user-123, passes
+          hasCompany: false, // Deal has no company, passes
         },
       };
 
@@ -999,10 +1001,13 @@ describe("PipelineAutomationService", () => {
         const mockTask = { id: "task-123" };
         mockPrismaService.task.create.mockResolvedValue(mockTask);
 
-        const result = await (service as any).createTaskAction({
-          ...mockDeal,
-          title: "Test Deal"
-        }, config);
+        const result = await (service as any).createTaskAction(
+          {
+            ...mockDeal,
+            title: "Test Deal",
+          },
+          config,
+        );
 
         expect(mockPrismaService.task.create).toHaveBeenCalledWith({
           data: {
@@ -1028,7 +1033,10 @@ describe("PipelineAutomationService", () => {
         const mockTask = { id: "task-123" };
         mockPrismaService.task.create.mockResolvedValue(mockTask);
 
-        const result = await (service as any).createTaskAction(mockDeal, config);
+        const result = await (service as any).createTaskAction(
+          mockDeal,
+          config,
+        );
 
         expect(mockPrismaService.task.create).toHaveBeenCalledWith({
           data: {
@@ -1055,10 +1063,13 @@ describe("PipelineAutomationService", () => {
           },
         };
 
-        const result = await (service as any).updateFieldAction({
-          ...mockDeal,
-          title: "Test Deal"
-        }, config);
+        const result = await (service as any).updateFieldAction(
+          {
+            ...mockDeal,
+            title: "Test Deal",
+          },
+          config,
+        );
 
         expect(mockPrismaService.deal.update).toHaveBeenCalledWith({
           where: { id: "deal-123" },
@@ -1068,7 +1079,10 @@ describe("PipelineAutomationService", () => {
             expectedCloseDate: new Date("2024-12-31"),
           },
         });
-        expect(result).toEqual({ updated: true, fields: ["probability", "description", "expectedCloseDate"] });
+        expect(result).toEqual({
+          updated: true,
+          fields: ["probability", "description", "expectedCloseDate"],
+        });
       });
     });
 
@@ -1194,7 +1208,7 @@ describe("PipelineAutomationService", () => {
         const result = await (service as any).createActivityAction(
           {
             ...mockDeal,
-            title: "Test Deal"
+            title: "Test Deal",
           },
           config,
         );
@@ -1395,50 +1409,47 @@ describe("PipelineAutomationService", () => {
       );
 
       // Check first automation (Welcome Email)
-      expect(mockPrismaService.pipelineAutomation.create).toHaveBeenNthCalledWith(
-        1,
-        {
-          data: expect.objectContaining({
-            pipelineId: "pipeline-123",
-            name: "Welcome Email on Deal Creation",
-            trigger: AutomationTrigger.DEAL_CREATED,
-            actions: [AutomationAction.SEND_EMAIL],
-            isActive: false,
-          }),
-        },
-      );
+      expect(
+        mockPrismaService.pipelineAutomation.create,
+      ).toHaveBeenNthCalledWith(1, {
+        data: expect.objectContaining({
+          pipelineId: "pipeline-123",
+          name: "Welcome Email on Deal Creation",
+          trigger: AutomationTrigger.DEAL_CREATED,
+          actions: [AutomationAction.SEND_EMAIL],
+          isActive: false,
+        }),
+      });
 
       // Check second automation (Stalled Deal Alert)
-      expect(mockPrismaService.pipelineAutomation.create).toHaveBeenNthCalledWith(
-        2,
-        {
-          data: expect.objectContaining({
-            pipelineId: "pipeline-123",
-            name: "Stalled Deal Alert",
-            trigger: AutomationTrigger.DEAL_STALLED,
-            actions: [AutomationAction.CREATE_TASK],
-            conditions: { minDaysInStage: 30 },
-            isActive: false,
-          }),
-        },
-      );
+      expect(
+        mockPrismaService.pipelineAutomation.create,
+      ).toHaveBeenNthCalledWith(2, {
+        data: expect.objectContaining({
+          pipelineId: "pipeline-123",
+          name: "Stalled Deal Alert",
+          trigger: AutomationTrigger.DEAL_STALLED,
+          actions: [AutomationAction.CREATE_TASK],
+          conditions: { minDaysInStage: 30 },
+          isActive: false,
+        }),
+      });
 
       // Check third automation (Won Deal Celebration)
-      expect(mockPrismaService.pipelineAutomation.create).toHaveBeenNthCalledWith(
-        3,
-        {
-          data: expect.objectContaining({
-            pipelineId: "pipeline-123",
-            name: "Won Deal Celebration",
-            trigger: AutomationTrigger.DEAL_WON,
-            actions: [
-              AutomationAction.UPDATE_PROBABILITY,
-              AutomationAction.CREATE_ACTIVITY,
-            ],
-            isActive: false,
-          }),
-        },
-      );
+      expect(
+        mockPrismaService.pipelineAutomation.create,
+      ).toHaveBeenNthCalledWith(3, {
+        data: expect.objectContaining({
+          pipelineId: "pipeline-123",
+          name: "Won Deal Celebration",
+          trigger: AutomationTrigger.DEAL_WON,
+          actions: [
+            AutomationAction.UPDATE_PROBABILITY,
+            AutomationAction.CREATE_ACTIVITY,
+          ],
+          isActive: false,
+        }),
+      });
     });
 
     it("should handle missing pipeline gracefully", async () => {
@@ -1446,7 +1457,9 @@ describe("PipelineAutomationService", () => {
 
       await service.createDefaultAutomations("non-existent-pipeline");
 
-      expect(mockPrismaService.pipelineAutomation.create).not.toHaveBeenCalled();
+      expect(
+        mockPrismaService.pipelineAutomation.create,
+      ).not.toHaveBeenCalled();
     });
   });
 
@@ -1534,7 +1547,9 @@ describe("PipelineAutomationService", () => {
         activity: { title: "Test Activity", type: "NOTE_ADDED" },
       };
 
-      mockPrismaService.activity.create.mockResolvedValue({ id: "activity-123" });
+      mockPrismaService.activity.create.mockResolvedValue({
+        id: "activity-123",
+      });
 
       const result = await (service as any).executeAction(
         AutomationAction.CREATE_ACTIVITY,
@@ -1569,14 +1584,22 @@ describe("PipelineAutomationService", () => {
     it("should execute SEND_WEBHOOK action", async () => {
       // SEND_WEBHOOK is defined in the enum but not implemented in executeAction
       await expect(
-        (service as any).executeAction(AutomationAction.SEND_WEBHOOK, mockDeal, {}),
+        (service as any).executeAction(
+          AutomationAction.SEND_WEBHOOK,
+          mockDeal,
+          {},
+        ),
       ).rejects.toThrow("Unknown action: SEND_WEBHOOK");
     });
 
     it("should execute MOVE_STAGE action", async () => {
       // MOVE_STAGE is defined in the enum but not implemented in executeAction
       await expect(
-        (service as any).executeAction(AutomationAction.MOVE_STAGE, mockDeal, {}),
+        (service as any).executeAction(
+          AutomationAction.MOVE_STAGE,
+          mockDeal,
+          {},
+        ),
       ).rejects.toThrow("Unknown action: MOVE_STAGE");
     });
   });
@@ -1655,15 +1678,19 @@ describe("PipelineAutomationService", () => {
         contacts: [{ isPrimary: true, contact: { email: "test@example.com" } }],
       });
       mockEmailService.sendEmail.mockResolvedValue(true);
-      
+
       // Make task creation fail
       if (!mockPrismaService.task) {
         mockPrismaService.task = { create: jest.fn() };
       }
-      mockPrismaService.task.create.mockRejectedValue(new Error("Task creation failed"));
-      
+      mockPrismaService.task.create.mockRejectedValue(
+        new Error("Task creation failed"),
+      );
+
       mockPrismaService.deal.update.mockResolvedValue({});
-      mockPrismaService.pipelineAutomation.update.mockResolvedValue(multiActionAutomation);
+      mockPrismaService.pipelineAutomation.update.mockResolvedValue(
+        multiActionAutomation,
+      );
 
       await service.executeAutomation("automation-123", "deal-123", context);
 
@@ -1673,16 +1700,22 @@ describe("PipelineAutomationService", () => {
           status: "FAILED",
           actions: expect.arrayContaining([
             expect.objectContaining({
-              action: expect.objectContaining({ type: AutomationAction.SEND_EMAIL }),
+              action: expect.objectContaining({
+                type: AutomationAction.SEND_EMAIL,
+              }),
               success: true,
             }),
             expect.objectContaining({
-              action: expect.objectContaining({ type: AutomationAction.CREATE_TASK }),
+              action: expect.objectContaining({
+                type: AutomationAction.CREATE_TASK,
+              }),
               success: false,
               error: "Task creation failed",
             }),
             expect.objectContaining({
-              action: expect.objectContaining({ type: AutomationAction.UPDATE_FIELD }),
+              action: expect.objectContaining({
+                type: AutomationAction.UPDATE_FIELD,
+              }),
               success: true,
             }),
           ]),

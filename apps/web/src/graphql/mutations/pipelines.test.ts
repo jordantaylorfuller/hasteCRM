@@ -33,7 +33,10 @@ describe("Pipeline Mutations", () => {
         const variable = operation.variableDefinitions?.[0];
         if (variable?.kind === "VariableDefinition") {
           expect(variable.variable.name.value).toBe("input");
-          if (variable.type.kind === "NonNullType" && variable.type.type.kind === "NamedType") {
+          if (
+            variable.type.kind === "NonNullType" &&
+            variable.type.type.kind === "NamedType"
+          ) {
             expect(variable.type.type.name.value).toBe("CreatePipelineInput");
           }
         }
@@ -54,15 +57,23 @@ describe("Pipeline Mutations", () => {
 
           // Check stages nested fields
           const stagesField = selection.selectionSet.selections.find(
-            (field) => field.kind === "Field" && field.name.value === "stages"
+            (field) => field.kind === "Field" && field.name.value === "stages",
           );
           if (stagesField?.kind === "Field" && stagesField.selectionSet) {
-            const stageFields = stagesField.selectionSet.selections.map((field) => {
-              if (field.kind === "Field") {
-                return field.name.value;
-              }
-            });
-            expect(stageFields).toEqual(["id", "name", "order", "color", "probability"]);
+            const stageFields = stagesField.selectionSet.selections.map(
+              (field) => {
+                if (field.kind === "Field") {
+                  return field.name.value;
+                }
+              },
+            );
+            expect(stageFields).toEqual([
+              "id",
+              "name",
+              "order",
+              "color",
+              "probability",
+            ]);
           }
         }
       }
@@ -89,11 +100,14 @@ describe("Pipeline Mutations", () => {
       const operation = UPDATE_PIPELINE.definitions[0];
       if (operation.kind === "OperationDefinition") {
         expect(operation.variableDefinitions).toHaveLength(2);
-        
+
         const idVariable = operation.variableDefinitions?.[0];
         if (idVariable?.kind === "VariableDefinition") {
           expect(idVariable.variable.name.value).toBe("id");
-          if (idVariable.type.kind === "NonNullType" && idVariable.type.type.kind === "NamedType") {
+          if (
+            idVariable.type.kind === "NonNullType" &&
+            idVariable.type.type.kind === "NamedType"
+          ) {
             expect(idVariable.type.type.name.value).toBe("ID");
           }
         }
@@ -101,8 +115,13 @@ describe("Pipeline Mutations", () => {
         const inputVariable = operation.variableDefinitions?.[1];
         if (inputVariable?.kind === "VariableDefinition") {
           expect(inputVariable.variable.name.value).toBe("input");
-          if (inputVariable.type.kind === "NonNullType" && inputVariable.type.type.kind === "NamedType") {
-            expect(inputVariable.type.type.name.value).toBe("UpdatePipelineInput");
+          if (
+            inputVariable.type.kind === "NonNullType" &&
+            inputVariable.type.type.kind === "NamedType"
+          ) {
+            expect(inputVariable.type.type.name.value).toBe(
+              "UpdatePipelineInput",
+            );
           }
         }
       }
@@ -132,7 +151,10 @@ describe("Pipeline Mutations", () => {
         const variable = operation.variableDefinitions?.[0];
         if (variable?.kind === "VariableDefinition") {
           expect(variable.variable.name.value).toBe("id");
-          if (variable.type.kind === "NonNullType" && variable.type.type.kind === "NamedType") {
+          if (
+            variable.type.kind === "NonNullType" &&
+            variable.type.type.kind === "NamedType"
+          ) {
             expect(variable.type.type.name.value).toBe("ID");
           }
         }
@@ -178,26 +200,30 @@ describe("Pipeline Mutations", () => {
 
           // Check nested fields
           const stageField = selection.selectionSet.selections.find(
-            (field) => field.kind === "Field" && field.name.value === "stage"
+            (field) => field.kind === "Field" && field.name.value === "stage",
           );
           if (stageField?.kind === "Field" && stageField.selectionSet) {
-            const stageFields = stageField.selectionSet.selections.map((field) => {
-              if (field.kind === "Field") {
-                return field.name.value;
-              }
-            });
+            const stageFields = stageField.selectionSet.selections.map(
+              (field) => {
+                if (field.kind === "Field") {
+                  return field.name.value;
+                }
+              },
+            );
             expect(stageFields).toEqual(["id", "name"]);
           }
 
           const ownerField = selection.selectionSet.selections.find(
-            (field) => field.kind === "Field" && field.name.value === "owner"
+            (field) => field.kind === "Field" && field.name.value === "owner",
           );
           if (ownerField?.kind === "Field" && ownerField.selectionSet) {
-            const ownerFields = ownerField.selectionSet.selections.map((field) => {
-              if (field.kind === "Field") {
-                return field.name.value;
-              }
-            });
+            const ownerFields = ownerField.selectionSet.selections.map(
+              (field) => {
+                if (field.kind === "Field") {
+                  return field.name.value;
+                }
+              },
+            );
             expect(ownerFields).toEqual(["id", "firstName", "lastName"]);
           }
         }
@@ -225,11 +251,14 @@ describe("Pipeline Mutations", () => {
       const operation = UPDATE_DEAL.definitions[0];
       if (operation.kind === "OperationDefinition") {
         expect(operation.variableDefinitions).toHaveLength(2);
-        
+
         const idVariable = operation.variableDefinitions?.[0];
         if (idVariable?.kind === "VariableDefinition") {
           expect(idVariable.variable.name.value).toBe("id");
-          if (idVariable.type.kind === "NonNullType" && idVariable.type.type.kind === "NamedType") {
+          if (
+            idVariable.type.kind === "NonNullType" &&
+            idVariable.type.type.kind === "NamedType"
+          ) {
             expect(idVariable.type.type.name.value).toBe("ID");
           }
         }
@@ -237,7 +266,10 @@ describe("Pipeline Mutations", () => {
         const inputVariable = operation.variableDefinitions?.[1];
         if (inputVariable?.kind === "VariableDefinition") {
           expect(inputVariable.variable.name.value).toBe("input");
-          if (inputVariable.type.kind === "NonNullType" && inputVariable.type.type.kind === "NamedType") {
+          if (
+            inputVariable.type.kind === "NonNullType" &&
+            inputVariable.type.type.kind === "NamedType"
+          ) {
             expect(inputVariable.type.type.name.value).toBe("UpdateDealInput");
           }
         }
@@ -291,7 +323,10 @@ describe("Pipeline Mutations", () => {
         const variable = operation.variableDefinitions?.[0];
         if (variable?.kind === "VariableDefinition") {
           expect(variable.variable.name.value).toBe("input");
-          if (variable.type.kind === "NonNullType" && variable.type.type.kind === "NamedType") {
+          if (
+            variable.type.kind === "NonNullType" &&
+            variable.type.type.kind === "NamedType"
+          ) {
             expect(variable.type.type.name.value).toBe("MoveDealInput");
           }
         }
@@ -312,14 +347,16 @@ describe("Pipeline Mutations", () => {
 
           // Check stage nested fields
           const stageField = selection.selectionSet.selections.find(
-            (field) => field.kind === "Field" && field.name.value === "stage"
+            (field) => field.kind === "Field" && field.name.value === "stage",
           );
           if (stageField?.kind === "Field" && stageField.selectionSet) {
-            const stageFields = stageField.selectionSet.selections.map((field) => {
-              if (field.kind === "Field") {
-                return field.name.value;
-              }
-            });
+            const stageFields = stageField.selectionSet.selections.map(
+              (field) => {
+                if (field.kind === "Field") {
+                  return field.name.value;
+                }
+              },
+            );
             expect(stageFields).toEqual(["id", "name"]);
           }
         }
@@ -347,14 +384,16 @@ describe("Pipeline Mutations", () => {
       const operation = BULK_MOVE_DEALS.definitions[0];
       if (operation.kind === "OperationDefinition") {
         expect(operation.variableDefinitions).toHaveLength(2);
-        
+
         const dealIdsVariable = operation.variableDefinitions?.[0];
         if (dealIdsVariable?.kind === "VariableDefinition") {
           expect(dealIdsVariable.variable.name.value).toBe("dealIds");
-          if (dealIdsVariable.type.kind === "NonNullType" && 
-              dealIdsVariable.type.type.kind === "ListType" &&
-              dealIdsVariable.type.type.type.kind === "NonNullType" &&
-              dealIdsVariable.type.type.type.type.kind === "NamedType") {
+          if (
+            dealIdsVariable.type.kind === "NonNullType" &&
+            dealIdsVariable.type.type.kind === "ListType" &&
+            dealIdsVariable.type.type.type.kind === "NonNullType" &&
+            dealIdsVariable.type.type.type.type.kind === "NamedType"
+          ) {
             expect(dealIdsVariable.type.type.type.type.name.value).toBe("ID");
           }
         }
@@ -362,7 +401,10 @@ describe("Pipeline Mutations", () => {
         const stageIdVariable = operation.variableDefinitions?.[1];
         if (stageIdVariable?.kind === "VariableDefinition") {
           expect(stageIdVariable.variable.name.value).toBe("stageId");
-          if (stageIdVariable.type.kind === "NonNullType" && stageIdVariable.type.type.kind === "NamedType") {
+          if (
+            stageIdVariable.type.kind === "NonNullType" &&
+            stageIdVariable.type.type.kind === "NamedType"
+          ) {
             expect(stageIdVariable.type.type.name.value).toBe("ID");
           }
         }
@@ -403,7 +445,10 @@ describe("Pipeline Mutations", () => {
         const variable = operation.variableDefinitions?.[0];
         if (variable?.kind === "VariableDefinition") {
           expect(variable.variable.name.value).toBe("id");
-          if (variable.type.kind === "NonNullType" && variable.type.type.kind === "NamedType") {
+          if (
+            variable.type.kind === "NonNullType" &&
+            variable.type.type.kind === "NamedType"
+          ) {
             expect(variable.type.type.name.value).toBe("ID");
           }
         }
@@ -426,7 +471,8 @@ describe("Pipeline Mutations", () => {
 
       mutations.forEach((mutation) => {
         expect(() => {
-          const hasValidDefinition = mutation.definitions[0].kind === "OperationDefinition";
+          const hasValidDefinition =
+            mutation.definitions[0].kind === "OperationDefinition";
           expect(hasValidDefinition).toBe(true);
         }).not.toThrow();
       });
@@ -446,7 +492,10 @@ describe("Pipeline Mutations", () => {
 
       mutationFieldMap.forEach(({ mutation, fieldName }) => {
         const operation = mutation.definitions[0];
-        if (operation.kind === "OperationDefinition" && operation.selectionSet) {
+        if (
+          operation.kind === "OperationDefinition" &&
+          operation.selectionSet
+        ) {
           const field = operation.selectionSet.selections[0];
           if (field.kind === "Field") {
             expect(field.name.value).toBe(fieldName);

@@ -228,7 +228,9 @@ describe("GmailWebhookService", () => {
       mockGmailSyncQueue.add.mockRejectedValue(new Error("Queue error"));
 
       // The service will throw the error after recording it
-      await expect(service.processNotification(mockNotification)).rejects.toThrow("Queue error");
+      await expect(
+        service.processNotification(mockNotification),
+      ).rejects.toThrow("Queue error");
 
       // Check error recording
       expect(
@@ -280,13 +282,13 @@ describe("GmailWebhookService", () => {
       mockRedisService.hincrby.mockResolvedValue(1);
       mockRedisService.expire.mockResolvedValue(1);
 
-      const mockDate = new Date('2025-06-14');
-      jest.spyOn(global, 'Date').mockImplementation(() => mockDate);
+      const mockDate = new Date("2025-06-14");
+      jest.spyOn(global, "Date").mockImplementation(() => mockDate);
 
       await (service as any).updateMetrics("account-123", 150);
 
       const expectedKey = "metrics:gmail:webhooks:2025-06-14";
-      
+
       expect(mockRedisService.hincrby).toHaveBeenCalledWith(
         expectedKey,
         "total",

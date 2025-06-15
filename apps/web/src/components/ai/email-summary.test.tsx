@@ -19,7 +19,8 @@ const mockSummarizeEmailSuccess = {
   result: {
     data: {
       summarizeEmail: {
-        summary: "This email discusses the quarterly review meeting scheduled for next week. The sender is requesting feedback on the proposed agenda and asks for confirmation of attendance.",
+        summary:
+          "This email discusses the quarterly review meeting scheduled for next week. The sender is requesting feedback on the proposed agenda and asks for confirmation of attendance.",
         actionItems: [
           "Review the proposed agenda before the meeting",
           "Confirm attendance by Friday",
@@ -103,11 +104,11 @@ describe("EmailSummary", () => {
     render(
       <MockedProvider mocks={[mockSummarizeEmailLoading]}>
         <EmailSummary emailId="loading-email-id" />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     // Check for skeleton loaders - using class names instead of data-testid
-    const skeletons = document.querySelectorAll('.animate-pulse');
+    const skeletons = document.querySelectorAll(".animate-pulse");
     expect(skeletons.length).toBeGreaterThan(0);
   });
 
@@ -115,7 +116,7 @@ describe("EmailSummary", () => {
     render(
       <MockedProvider mocks={[mockSummarizeEmailSuccess]}>
         <EmailSummary emailId="test-email-id" />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     await waitFor(() => {
@@ -124,13 +125,21 @@ describe("EmailSummary", () => {
 
     // Check summary section
     expect(screen.getByText("Summary")).toBeInTheDocument();
-    expect(screen.getByText(/This email discusses the quarterly review meeting/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/This email discusses the quarterly review meeting/),
+    ).toBeInTheDocument();
 
     // Check action items
     expect(screen.getByText("Action Items")).toBeInTheDocument();
-    expect(screen.getByText("Review the proposed agenda before the meeting")).toBeInTheDocument();
-    expect(screen.getByText("Confirm attendance by Friday")).toBeInTheDocument();
-    expect(screen.getByText("Prepare quarterly reports for presentation")).toBeInTheDocument();
+    expect(
+      screen.getByText("Review the proposed agenda before the meeting"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Confirm attendance by Friday"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Prepare quarterly reports for presentation"),
+    ).toBeInTheDocument();
 
     // Check key points
     expect(screen.getByText("Key Points")).toBeInTheDocument();
@@ -144,7 +153,7 @@ describe("EmailSummary", () => {
     render(
       <MockedProvider mocks={[mockSummarizeEmailSuccess]}>
         <EmailSummary emailId="test-email-id" isThread={true} />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     await waitFor(() => {
@@ -156,11 +165,13 @@ describe("EmailSummary", () => {
     render(
       <MockedProvider mocks={[mockSummarizeEmailNoExtras]}>
         <EmailSummary emailId="test-email-id-2" />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Simple email about lunch plans for tomorrow.")).toBeInTheDocument();
+      expect(
+        screen.getByText("Simple email about lunch plans for tomorrow."),
+      ).toBeInTheDocument();
     });
 
     // Should not show action items or key points sections when empty
@@ -172,18 +183,20 @@ describe("EmailSummary", () => {
     render(
       <MockedProvider mocks={[mockSummarizeEmailError]}>
         <EmailSummary emailId="error-email-id" />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Unable to generate summary")).toBeInTheDocument();
+      expect(
+        screen.getByText("Unable to generate summary"),
+      ).toBeInTheDocument();
     });
   });
 
   it("handles refresh button click", async () => {
     const user = userEvent.setup();
     let callCount = 0;
-    
+
     const mockWithRefetch = {
       request: {
         query: SUMMARIZE_EMAIL,
@@ -213,7 +226,7 @@ describe("EmailSummary", () => {
     render(
       <MockedProvider mocks={[mockWithRefetch, mockWithRefetch]}>
         <EmailSummary emailId="refresh-email-id" />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     await waitFor(() => {
@@ -233,7 +246,7 @@ describe("EmailSummary", () => {
     render(
       <MockedProvider mocks={[mockSummarizeEmailSuccess]}>
         <EmailSummary emailId="test-email-id" />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     await waitFor(() => {
@@ -256,7 +269,7 @@ describe("EmailSummary", () => {
     render(
       <MockedProvider mocks={[mockSummarizeEmailSuccess]}>
         <EmailSummary emailId="test-email-id" />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     await waitFor(() => {
@@ -272,7 +285,7 @@ describe("EmailSummary", () => {
     render(
       <MockedProvider mocks={[mockSummarizeEmailSuccess]}>
         <EmailSummary emailId="test-email-id" />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     await waitFor(() => {
@@ -280,7 +293,12 @@ describe("EmailSummary", () => {
     });
 
     // Check that key points are rendered as badges
-    const keyPointBadges = ["Q4 Review", "Budget Planning", "Team Performance", "Strategic Goals"];
+    const keyPointBadges = [
+      "Q4 Review",
+      "Budget Planning",
+      "Team Performance",
+      "Strategic Goals",
+    ];
     keyPointBadges.forEach((badge) => {
       const element = screen.getByText(badge);
       expect(element.closest(".inline-flex")).toHaveClass("border");
@@ -310,11 +328,13 @@ describe("EmailSummary", () => {
     render(
       <MockedProvider mocks={[mockNullSummary]}>
         <EmailSummary emailId="null-email-id" />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Unable to generate summary")).toBeInTheDocument();
+      expect(
+        screen.getByText("Unable to generate summary"),
+      ).toBeInTheDocument();
     });
   });
 
@@ -322,7 +342,7 @@ describe("EmailSummary", () => {
     render(
       <MockedProvider mocks={[mockSummarizeEmailSuccess]}>
         <EmailSummary emailId="test-email-id" />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     await waitFor(() => {
@@ -334,67 +354,105 @@ describe("EmailSummary", () => {
     expect(card).toHaveClass("rounded-lg");
 
     // Check text styling
-    const summaryText = screen.getByText(/This email discusses the quarterly review meeting/);
-    expect(summaryText).toHaveClass("text-sm", "text-muted-foreground", "leading-relaxed");
+    const summaryText = screen.getByText(
+      /This email discusses the quarterly review meeting/,
+    );
+    expect(summaryText).toHaveClass(
+      "text-sm",
+      "text-muted-foreground",
+      "leading-relaxed",
+    );
 
     // Check section headers
     // Check section headers individually
     const summaryHeader = screen.getByText("Summary");
-    expect(summaryHeader.closest("div")).toHaveClass("flex", "items-center", "gap-2", "text-sm", "font-medium");
-    
+    expect(summaryHeader.closest("div")).toHaveClass(
+      "flex",
+      "items-center",
+      "gap-2",
+      "text-sm",
+      "font-medium",
+    );
+
     const actionItemsHeader = screen.getByText("Action Items");
-    expect(actionItemsHeader.closest("div")).toHaveClass("flex", "items-center", "gap-2", "text-sm", "font-medium");
-    
+    expect(actionItemsHeader.closest("div")).toHaveClass(
+      "flex",
+      "items-center",
+      "gap-2",
+      "text-sm",
+      "font-medium",
+    );
+
     const keyPointsHeader = screen.getByText("Key Points");
-    expect(keyPointsHeader.closest("div")).toHaveClass("flex", "items-center", "gap-2", "text-sm", "font-medium");
+    expect(keyPointsHeader.closest("div")).toHaveClass(
+      "flex",
+      "items-center",
+      "gap-2",
+      "text-sm",
+      "font-medium",
+    );
   });
 
   it("maintains state across re-renders", async () => {
     const { rerender } = render(
       <MockedProvider mocks={[mockSummarizeEmailSuccess]}>
         <EmailSummary emailId="test-email-id" />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/This email discusses the quarterly review meeting/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/This email discusses the quarterly review meeting/),
+      ).toBeInTheDocument();
     });
 
     // Re-render with same props
     rerender(
       <MockedProvider mocks={[mockSummarizeEmailSuccess]}>
         <EmailSummary emailId="test-email-id" />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     // Content should still be there (no new loading state)
-    expect(screen.getByText(/This email discusses the quarterly review meeting/)).toBeInTheDocument();
-    expect(document.querySelector('.animate-pulse')).not.toBeInTheDocument();
+    expect(
+      screen.getByText(/This email discusses the quarterly review meeting/),
+    ).toBeInTheDocument();
+    expect(document.querySelector(".animate-pulse")).not.toBeInTheDocument();
   });
 
   it("updates when emailId changes", async () => {
     const { rerender } = render(
-      <MockedProvider mocks={[mockSummarizeEmailSuccess, mockSummarizeEmailNoExtras]}>
+      <MockedProvider
+        mocks={[mockSummarizeEmailSuccess, mockSummarizeEmailNoExtras]}
+      >
         <EmailSummary emailId="test-email-id" />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/This email discusses the quarterly review meeting/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/This email discusses the quarterly review meeting/),
+      ).toBeInTheDocument();
     });
 
     // Change emailId
     rerender(
-      <MockedProvider mocks={[mockSummarizeEmailSuccess, mockSummarizeEmailNoExtras]}>
+      <MockedProvider
+        mocks={[mockSummarizeEmailSuccess, mockSummarizeEmailNoExtras]}
+      >
         <EmailSummary emailId="test-email-id-2" />
-      </MockedProvider>
+      </MockedProvider>,
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Simple email about lunch plans for tomorrow.")).toBeInTheDocument();
+      expect(
+        screen.getByText("Simple email about lunch plans for tomorrow."),
+      ).toBeInTheDocument();
     });
 
     // Original summary should be gone
-    expect(screen.queryByText(/This email discusses the quarterly review meeting/)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/This email discusses the quarterly review meeting/),
+    ).not.toBeInTheDocument();
   });
 });

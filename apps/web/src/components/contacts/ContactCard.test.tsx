@@ -105,7 +105,7 @@ describe("ContactCard", () => {
     render(<ContactCard contact={mockContact} onUpdate={mockOnUpdate} />);
 
     // Find dropdown trigger button
-    const menuButton = screen.getByRole('button', { name: '' });
+    const menuButton = screen.getByRole("button", { name: "" });
     await user.click(menuButton);
 
     // Wait for dropdown to open
@@ -119,7 +119,7 @@ describe("ContactCard", () => {
     const user = userEvent.setup();
     render(<ContactCard contact={mockContact} onUpdate={mockOnUpdate} />);
 
-    const menuButton = screen.getByRole('button', { name: '' });
+    const menuButton = screen.getByRole("button", { name: "" });
     await user.click(menuButton);
 
     await waitFor(async () => {
@@ -138,7 +138,7 @@ describe("ContactCard", () => {
 
     render(<ContactCard contact={mockContact} onUpdate={mockOnUpdate} />);
 
-    const menuButton = screen.getByRole('button', { name: '' });
+    const menuButton = screen.getByRole("button", { name: "" });
     await user.click(menuButton);
 
     await waitFor(async () => {
@@ -165,7 +165,7 @@ describe("ContactCard", () => {
     // This would be tested in E2E tests instead
     const handleDelete = jest.fn();
     mockConfirm.mockReturnValue(false);
-    
+
     // Call the delete handler directly
     await handleDelete();
 

@@ -20,22 +20,30 @@ jest.mock("@radix-ui/react-select", () => ({
   Value: ({ children, placeholder, ...props }: any) => (
     <span {...props}>{children || placeholder}</span>
   ),
-  Trigger: React.forwardRef(({ children, className, ...props }: any, ref: any) => (
-    <button ref={ref} className={className} {...props}>
-      {children}
-    </button>
-  )),
+  Trigger: React.forwardRef(
+    ({ children, className, ...props }: any, ref: any) => (
+      <button ref={ref} className={className} {...props}>
+        {children}
+      </button>
+    ),
+  ),
   Icon: ({ children, className, ...props }: any) => (
-    <span className={className} {...props}>{children}</span>
+    <span className={className} {...props}>
+      {children}
+    </span>
   ),
   Portal: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-  Content: React.forwardRef(({ children, className, position = "popper", ...props }: any, ref: any) => (
-    <div ref={ref} className={className} data-position={position} {...props}>
+  Content: React.forwardRef(
+    ({ children, className, position = "popper", ...props }: any, ref: any) => (
+      <div ref={ref} className={className} data-position={position} {...props}>
+        {children}
+      </div>
+    ),
+  ),
+  Label: ({ children, className, ...props }: any) => (
+    <div className={className} {...props}>
       {children}
     </div>
-  )),
-  Label: ({ children, className, ...props }: any) => (
-    <div className={className} {...props}>{children}</div>
   ),
   Item: React.forwardRef(({ children, className, ...props }: any, ref: any) => (
     <div ref={ref} className={className} {...props}>
@@ -44,19 +52,27 @@ jest.mock("@radix-ui/react-select", () => ({
   )),
   ItemText: ({ children, ...props }: any) => <span {...props}>{children}</span>,
   ItemIndicator: ({ children, className, ...props }: any) => (
-    <span className={className} {...props}>{children}</span>
+    <span className={className} {...props}>
+      {children}
+    </span>
   ),
   ScrollUpButton: ({ children, className, ...props }: any) => (
-    <button className={className} {...props}>{children}</button>
+    <button className={className} {...props}>
+      {children}
+    </button>
   ),
   ScrollDownButton: ({ children, className, ...props }: any) => (
-    <button className={className} {...props}>{children}</button>
+    <button className={className} {...props}>
+      {children}
+    </button>
   ),
   Separator: ({ className, ...props }: any) => (
     <div className={className} {...props} />
   ),
   Viewport: ({ children, className, ...props }: any) => (
-    <div className={className} {...props}>{children}</div>
+    <div className={className} {...props}>
+      {children}
+    </div>
   ),
 }));
 
@@ -75,9 +91,9 @@ describe("Select components", () => {
           <SelectTrigger>
             <SelectValue placeholder="Select an option" />
           </SelectTrigger>
-        </Select>
+        </Select>,
       );
-      
+
       const trigger = screen.getByRole("button");
       expect(trigger).toBeInTheDocument();
       expect(trigger).toHaveClass("flex", "h-10", "w-full", "items-center");
@@ -89,9 +105,9 @@ describe("Select components", () => {
           <SelectTrigger className="custom-trigger">
             <SelectValue />
           </SelectTrigger>
-        </Select>
+        </Select>,
       );
-      
+
       const trigger = screen.getByRole("button");
       expect(trigger).toHaveClass("custom-trigger");
     });
@@ -102,9 +118,9 @@ describe("Select components", () => {
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
-        </Select>
+        </Select>,
       );
-      
+
       expect(screen.getByText("▼")).toBeInTheDocument();
     });
   });
@@ -116,11 +132,11 @@ describe("Select components", () => {
           <SelectContent>
             <SelectItem value="1">Option 1</SelectItem>
           </SelectContent>
-        </Select>
+        </Select>,
       );
-      
+
       // The mock returns a div with the combined classes
-      const content = container.querySelector('[data-position]');
+      const content = container.querySelector("[data-position]");
       expect(content).toBeInTheDocument();
       expect(content).toHaveClass("relative", "z-50", "bg-popover");
     });
@@ -131,10 +147,10 @@ describe("Select components", () => {
           <SelectContent position="popper">
             <SelectItem value="1">Option 1</SelectItem>
           </SelectContent>
-        </Select>
+        </Select>,
       );
-      
-      const content = container.querySelector('[data-position]');
+
+      const content = container.querySelector("[data-position]");
       expect(content).toHaveAttribute("data-position", "popper");
       expect(content).toHaveClass("data-[state=open]:animate-in");
     });
@@ -145,10 +161,10 @@ describe("Select components", () => {
           <SelectContent position="item-aligned">
             <SelectItem value="1">Option 1</SelectItem>
           </SelectContent>
-        </Select>
+        </Select>,
       );
-      
-      const content = container.querySelector('[data-position]');
+
+      const content = container.querySelector("[data-position]");
       expect(content).toHaveAttribute("data-position", "item-aligned");
     });
   });
@@ -158,9 +174,9 @@ describe("Select components", () => {
       render(
         <SelectGroup>
           <SelectLabel>Group Label</SelectLabel>
-        </SelectGroup>
+        </SelectGroup>,
       );
-      
+
       const label = screen.getByText("Group Label");
       expect(label).toBeInTheDocument();
       expect(label).toHaveClass("py-1.5", "pl-8", "text-sm", "font-semibold");
@@ -170,9 +186,9 @@ describe("Select components", () => {
       render(
         <SelectGroup>
           <SelectLabel className="custom-label">Label</SelectLabel>
-        </SelectGroup>
+        </SelectGroup>,
       );
-      
+
       const label = screen.getByText("Label");
       expect(label).toHaveClass("custom-label");
     });
@@ -185,9 +201,9 @@ describe("Select components", () => {
           <SelectContent>
             <SelectItem value="1">Option 1</SelectItem>
           </SelectContent>
-        </Select>
+        </Select>,
       );
-      
+
       const item = screen.getByText("Option 1").parentElement;
       expect(item).toHaveClass("relative", "flex", "w-full", "cursor-default");
     });
@@ -198,9 +214,9 @@ describe("Select components", () => {
           <SelectContent>
             <SelectItem value="1">Option 1</SelectItem>
           </SelectContent>
-        </Select>
+        </Select>,
       );
-      
+
       expect(screen.getByText("✓")).toBeInTheDocument();
     });
 
@@ -212,9 +228,9 @@ describe("Select components", () => {
               Option 1
             </SelectItem>
           </SelectContent>
-        </Select>
+        </Select>,
       );
-      
+
       const item = screen.getByText("Option 1").parentElement;
       expect(item).toHaveClass("custom-item");
     });
@@ -227,10 +243,10 @@ describe("Select components", () => {
           <SelectContent>
             <SelectSeparator />
           </SelectContent>
-        </Select>
+        </Select>,
       );
-      
-      const separator = container.querySelector('.-mx-1.my-1.h-px.bg-muted');
+
+      const separator = container.querySelector(".-mx-1.my-1.h-px.bg-muted");
       expect(separator).toBeInTheDocument();
     });
 
@@ -240,46 +256,42 @@ describe("Select components", () => {
           <SelectContent>
             <SelectSeparator className="custom-separator" />
           </SelectContent>
-        </Select>
+        </Select>,
       );
-      
-      const separator = container.querySelector('.custom-separator');
+
+      const separator = container.querySelector(".custom-separator");
       expect(separator).toBeInTheDocument();
     });
   });
 
   describe("ScrollButtons", () => {
     it("renders scroll up button", () => {
-      const { container } = render(
-        <SelectScrollUpButton />
-      );
-      
-      const button = container.querySelector('button');
+      const { container } = render(<SelectScrollUpButton />);
+
+      const button = container.querySelector("button");
       expect(button).toBeInTheDocument();
       expect(button).toHaveTextContent("▲");
     });
 
     it("renders scroll down button", () => {
-      const { container } = render(
-        <SelectScrollDownButton />
-      );
-      
-      const button = container.querySelector('button');
+      const { container } = render(<SelectScrollDownButton />);
+
+      const button = container.querySelector("button");
       expect(button).toBeInTheDocument();
       expect(button).toHaveTextContent("▼");
     });
 
     it("applies custom className to scroll buttons", () => {
       const { container: upContainer } = render(
-        <SelectScrollUpButton className="custom-up" />
+        <SelectScrollUpButton className="custom-up" />,
       );
-      
+
       const { container: downContainer } = render(
-        <SelectScrollDownButton className="custom-down" />
+        <SelectScrollDownButton className="custom-down" />,
       );
-      
-      expect(upContainer.querySelector('button')).toHaveClass("custom-up");
-      expect(downContainer.querySelector('button')).toHaveClass("custom-down");
+
+      expect(upContainer.querySelector("button")).toHaveClass("custom-up");
+      expect(downContainer.querySelector("button")).toHaveClass("custom-down");
     });
   });
 
@@ -302,9 +314,9 @@ describe("Select components", () => {
               <SelectItem value="carrot">Carrot</SelectItem>
             </SelectGroup>
           </SelectContent>
-        </Select>
+        </Select>,
       );
-      
+
       expect(screen.getByText("Select a fruit")).toBeInTheDocument();
       expect(screen.getByText("Fruits")).toBeInTheDocument();
       expect(screen.getByText("Apple")).toBeInTheDocument();

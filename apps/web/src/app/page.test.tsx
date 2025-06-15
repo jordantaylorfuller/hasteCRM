@@ -1,19 +1,19 @@
-import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/lib/auth-context';
-import Home from './page';
+import React from "react";
+import { render, screen, waitFor } from "@testing-library/react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/auth-context";
+import Home from "./page";
 
 // Mock dependencies
-jest.mock('next/navigation', () => ({
+jest.mock("next/navigation", () => ({
   useRouter: jest.fn(),
 }));
 
-jest.mock('@/lib/auth-context', () => ({
+jest.mock("@/lib/auth-context", () => ({
   useAuth: jest.fn(),
 }));
 
-describe('Home Page', () => {
+describe("Home Page", () => {
   const mockPush = jest.fn();
   const mockRouter = { push: mockPush };
 
@@ -22,7 +22,7 @@ describe('Home Page', () => {
     (useRouter as jest.Mock).mockReturnValue(mockRouter);
   });
 
-  it('renders loading state correctly', () => {
+  it("renders loading state correctly", () => {
     (useAuth as jest.Mock).mockReturnValue({
       user: null,
       loading: true,
@@ -30,24 +30,24 @@ describe('Home Page', () => {
 
     render(<Home />);
 
-    expect(screen.getByText('hasteCRM')).toBeInTheDocument();
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByText("hasteCRM")).toBeInTheDocument();
+    expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
-  it('redirects to dashboard when user is authenticated', async () => {
+  it("redirects to dashboard when user is authenticated", async () => {
     (useAuth as jest.Mock).mockReturnValue({
-      user: { id: '1', email: 'test@example.com' },
+      user: { id: "1", email: "test@example.com" },
       loading: false,
     });
 
     render(<Home />);
 
     await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith('/dashboard');
+      expect(mockPush).toHaveBeenCalledWith("/dashboard");
     });
   });
 
-  it('redirects to login when user is not authenticated', async () => {
+  it("redirects to login when user is not authenticated", async () => {
     (useAuth as jest.Mock).mockReturnValue({
       user: null,
       loading: false,
@@ -56,11 +56,11 @@ describe('Home Page', () => {
     render(<Home />);
 
     await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith('/login');
+      expect(mockPush).toHaveBeenCalledWith("/login");
     });
   });
 
-  it('does not redirect while loading', () => {
+  it("does not redirect while loading", () => {
     (useAuth as jest.Mock).mockReturnValue({
       user: null,
       loading: true,
@@ -71,7 +71,7 @@ describe('Home Page', () => {
     expect(mockPush).not.toHaveBeenCalled();
   });
 
-  it('updates redirect when auth state changes', async () => {
+  it("updates redirect when auth state changes", async () => {
     const { rerender } = render(<Home />);
 
     // Initial loading state
@@ -84,13 +84,13 @@ describe('Home Page', () => {
 
     // User authenticated
     (useAuth as jest.Mock).mockReturnValue({
-      user: { id: '1', email: 'test@example.com' },
+      user: { id: "1", email: "test@example.com" },
       loading: false,
     });
     rerender(<Home />);
 
     await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith('/dashboard');
+      expect(mockPush).toHaveBeenCalledWith("/dashboard");
     });
   });
 });

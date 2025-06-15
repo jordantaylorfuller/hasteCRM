@@ -1,4 +1,9 @@
-import { RateLimits, createRateLimit, applyPlanMultiplier, PlanRateLimits } from "./rate-limits";
+import {
+  RateLimits,
+  createRateLimit,
+  applyPlanMultiplier,
+  PlanRateLimits,
+} from "./rate-limits";
 
 describe("Rate Limits Configuration", () => {
   describe("RateLimits", () => {

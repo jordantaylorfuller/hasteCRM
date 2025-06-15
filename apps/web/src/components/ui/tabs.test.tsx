@@ -12,7 +12,9 @@ describe("Tabs", () => {
       <TabsList>
         <TabsTrigger value="tab1">Tab 1</TabsTrigger>
         <TabsTrigger value="tab2">Tab 2</TabsTrigger>
-        <TabsTrigger value="tab3" disabled>Tab 3</TabsTrigger>
+        <TabsTrigger value="tab3" disabled>
+          Tab 3
+        </TabsTrigger>
       </TabsList>
       <TabsContent value="tab1">Content 1</TabsContent>
       <TabsContent value="tab2">Content 2</TabsContent>
@@ -22,7 +24,7 @@ describe("Tabs", () => {
 
   it("renders tabs with default value", () => {
     render(defaultTabs);
-    
+
     expect(screen.getByText("Tab 1")).toBeInTheDocument();
     expect(screen.getByText("Tab 2")).toBeInTheDocument();
     expect(screen.getByText("Tab 3")).toBeInTheDocument();
@@ -32,19 +34,22 @@ describe("Tabs", () => {
 
   it("switches tabs on click", async () => {
     render(defaultTabs);
-    
+
     const tab2 = screen.getByText("Tab 2");
     fireEvent.click(tab2);
-    
+
     await waitFor(() => {
       // Check that content 2 is visible
       const content2 = screen.getByText("Content 2");
       expect(content2).toBeInTheDocument();
-      
+
       // Content 1 might still be in DOM but hidden
-      const content1Element = content2.parentElement?.parentElement?.querySelector('[aria-labelledby*="tab1"]');
+      const content1Element =
+        content2.parentElement?.parentElement?.querySelector(
+          '[aria-labelledby*="tab1"]',
+        );
       if (content1Element) {
-        expect(content1Element).toHaveAttribute('data-state', 'inactive');
+        expect(content1Element).toHaveAttribute("data-state", "inactive");
       }
     });
   });
@@ -52,7 +57,7 @@ describe("Tabs", () => {
   it("handles controlled value", () => {
     const ControlledTabs = () => {
       const [value, setValue] = React.useState("tab1");
-      
+
       return (
         <Tabs value={value} onValueChange={setValue}>
           <TabsList>
@@ -64,13 +69,13 @@ describe("Tabs", () => {
         </Tabs>
       );
     };
-    
+
     render(<ControlledTabs />);
-    
+
     expect(screen.getByText("Content 1")).toBeInTheDocument();
-    
+
     fireEvent.click(screen.getByText("Tab 2"));
-    
+
     // In controlled mode, the content is actually swapped
     expect(screen.queryByText("Content 1")).not.toBeInTheDocument();
     expect(screen.getByText("Content 2")).toBeInTheDocument();
@@ -78,12 +83,12 @@ describe("Tabs", () => {
 
   it("respects disabled state", () => {
     render(defaultTabs);
-    
+
     const disabledTab = screen.getByText("Tab 3");
     expect(disabledTab).toHaveAttribute("data-disabled");
-    
+
     fireEvent.click(disabledTab);
-    
+
     // Content should not change
     expect(screen.getByText("Content 1")).toBeInTheDocument();
     expect(screen.queryByText("Content 3")).not.toBeInTheDocument();
@@ -96,9 +101,9 @@ describe("Tabs", () => {
           <TabsTrigger value="tab1">Tab 1</TabsTrigger>
         </TabsList>
         <TabsContent value="tab1">Content 1</TabsContent>
-      </Tabs>
+      </Tabs>,
     );
-    
+
     const tabsList = screen.getByRole("tablist");
     expect(tabsList).toHaveClass("custom-list-class");
     expect(tabsList).toHaveClass("inline-flex");
@@ -114,9 +119,9 @@ describe("Tabs", () => {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="tab1">Content 1</TabsContent>
-      </Tabs>
+      </Tabs>,
     );
-    
+
     const trigger = screen.getByRole("tab", { name: "Tab 1" });
     expect(trigger).toHaveClass("custom-trigger-class");
     expect(trigger).toHaveClass("inline-flex");
@@ -131,9 +136,9 @@ describe("Tabs", () => {
         <TabsContent value="tab1" className="custom-content-class">
           Content 1
         </TabsContent>
-      </Tabs>
+      </Tabs>,
     );
-    
+
     const content = screen.getByRole("tabpanel");
     expect(content).toHaveClass("custom-content-class");
     expect(content).toHaveClass("mt-2");
@@ -142,15 +147,15 @@ describe("Tabs", () => {
   it("handles keyboard navigation", async () => {
     const user = userEvent.setup();
     render(defaultTabs);
-    
+
     const tab1 = screen.getByRole("tab", { name: "Tab 1" });
     const tab2 = screen.getByRole("tab", { name: "Tab 2" });
-    
+
     // Focus tab1 and press Enter
     await user.click(tab1);
     await user.keyboard("{Enter}");
     expect(screen.getByText("Content 1")).toBeInTheDocument();
-    
+
     // Click tab2 and verify it activates
     await user.click(tab2);
     await user.keyboard("{Enter}");
@@ -159,15 +164,15 @@ describe("Tabs", () => {
 
   it("shows active state correctly", () => {
     render(defaultTabs);
-    
+
     const tab1 = screen.getByRole("tab", { name: "Tab 1" });
     const tab2 = screen.getByRole("tab", { name: "Tab 2" });
-    
+
     expect(tab1).toHaveAttribute("data-state", "active");
     expect(tab2).toHaveAttribute("data-state", "inactive");
-    
+
     fireEvent.click(tab2);
-    
+
     expect(tab1).toHaveAttribute("data-state", "inactive");
     expect(tab2).toHaveAttribute("data-state", "active");
   });
@@ -175,9 +180,9 @@ describe("Tabs", () => {
   it("handles focus visible state", async () => {
     const user = userEvent.setup();
     render(defaultTabs);
-    
+
     const tab1 = screen.getByRole("tab", { name: "Tab 1" });
-    
+
     // Tab to focus - might need to tab twice if tablist gets focus first
     await user.tab();
     if (document.activeElement !== tab1) {
@@ -196,9 +201,9 @@ describe("Tabs", () => {
         </TabsList>
         <TabsContent value="tab1">Content 1</TabsContent>
         <TabsContent value="tab2">Content 2</TabsContent>
-      </Tabs>
+      </Tabs>,
     );
-    
+
     const tabsList = screen.getByRole("tablist");
     expect(tabsList).toHaveAttribute("aria-orientation", "vertical");
   });
@@ -207,16 +212,20 @@ describe("Tabs", () => {
     const listRef = React.createRef<HTMLDivElement>();
     const triggerRef = React.createRef<HTMLButtonElement>();
     const contentRef = React.createRef<HTMLDivElement>();
-    
+
     render(
       <Tabs defaultValue="tab1">
         <TabsList ref={listRef}>
-          <TabsTrigger ref={triggerRef} value="tab1">Tab 1</TabsTrigger>
+          <TabsTrigger ref={triggerRef} value="tab1">
+            Tab 1
+          </TabsTrigger>
         </TabsList>
-        <TabsContent ref={contentRef} value="tab1">Content 1</TabsContent>
-      </Tabs>
+        <TabsContent ref={contentRef} value="tab1">
+          Content 1
+        </TabsContent>
+      </Tabs>,
     );
-    
+
     expect(listRef.current).toBeInstanceOf(HTMLDivElement);
     expect(triggerRef.current).toBeInstanceOf(HTMLButtonElement);
     expect(contentRef.current).toBeInstanceOf(HTMLDivElement);
@@ -224,18 +233,18 @@ describe("Tabs", () => {
 
   it("maintains proper ARIA attributes", () => {
     render(defaultTabs);
-    
+
     const tabsList = screen.getByRole("tablist");
     const tab1 = screen.getByRole("tab", { name: "Tab 1" });
     const content1 = screen.getByRole("tabpanel");
-    
+
     // TabsList should have proper role
     expect(tabsList).toBeInTheDocument();
-    
+
     // Tabs should have proper attributes
     expect(tab1).toHaveAttribute("aria-selected", "true");
     expect(tab1).toHaveAttribute("aria-controls");
-    
+
     // Content should have proper attributes
     expect(content1).toHaveAttribute("aria-labelledby");
   });
@@ -250,9 +259,9 @@ describe("Tabs", () => {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="tab1">Content 1</TabsContent>
-      </Tabs>
+      </Tabs>,
     );
-    
+
     // Just verify the component renders
     expect(container.querySelector('[href="#tab1"]')).toBeInTheDocument();
   });
@@ -275,15 +284,15 @@ describe("Tabs", () => {
           </Tabs>
         </TabsContent>
         <TabsContent value="outer2">Outer Content 2</TabsContent>
-      </Tabs>
+      </Tabs>,
     );
-    
+
     expect(screen.getByText("Inner Content 1")).toBeInTheDocument();
-    
+
     // Click inner tab
     fireEvent.click(screen.getByText("Inner 2"));
     expect(screen.getByText("Inner Content 2")).toBeInTheDocument();
-    
+
     // Click outer tab
     fireEvent.click(screen.getByText("Outer 2"));
     expect(screen.getByText("Outer Content 2")).toBeInTheDocument();
@@ -292,7 +301,7 @@ describe("Tabs", () => {
   it("handles dynamic tabs", () => {
     const DynamicTabs = () => {
       const [tabs, setTabs] = React.useState(["tab1", "tab2"]);
-      
+
       return (
         <>
           <button onClick={() => setTabs([...tabs, `tab${tabs.length + 1}`])}>
@@ -315,14 +324,14 @@ describe("Tabs", () => {
         </>
       );
     };
-    
+
     render(<DynamicTabs />);
-    
+
     expect(screen.getByText("tab1")).toBeInTheDocument();
     expect(screen.getByText("tab2")).toBeInTheDocument();
-    
+
     fireEvent.click(screen.getByText("Add Tab"));
-    
+
     expect(screen.getByText("tab3")).toBeInTheDocument();
   });
 

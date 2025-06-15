@@ -250,7 +250,7 @@ describe("use-toast", () => {
 
     it("update function updates toast", () => {
       const { result } = renderHook(() => useToast());
-      
+
       let toastInstance: any;
       act(() => {
         toastInstance = toast({ title: "Original" });
@@ -267,7 +267,7 @@ describe("use-toast", () => {
 
     it("dismiss function dismisses toast", () => {
       const { result } = renderHook(() => useToast());
-      
+
       let toastInstance: any;
       act(() => {
         toastInstance = toast({ title: "To Dismiss" });
@@ -284,7 +284,7 @@ describe("use-toast", () => {
 
     it("handles onOpenChange callback", () => {
       const { result } = renderHook(() => useToast());
-      
+
       act(() => {
         toast({ title: "With Callback" });
       });
@@ -463,13 +463,16 @@ describe("use-toast", () => {
 
       // Update the toast
       act(() => {
-        toastInstance.update({ title: "Updated", description: "New description" });
+        toastInstance.update({
+          title: "Updated",
+          description: "New description",
+        });
       });
 
       // Toast should be updated
       expect(result.current.toasts[0].title).toBe("Updated");
       expect(result.current.toasts[0].description).toBe("New description");
-      
+
       // The UPDATE_TOAST action only updates toasts that match the ID
       // Since we only have one toast, the branch where t.id !== action.toast.id
       // is covered when the internal array.map checks other array positions (if any)

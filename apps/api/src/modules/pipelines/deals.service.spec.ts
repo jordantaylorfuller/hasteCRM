@@ -241,7 +241,8 @@ describe("DealsService", () => {
           ...mockDeal,
           status: DealStatus.OPEN,
         })
-        .mockResolvedValueOnce({ // for createActivity
+        .mockResolvedValueOnce({
+          // for createActivity
           workspaceId: mockDeal.workspaceId,
           ownerId: mockDeal.ownerId,
         });
@@ -520,7 +521,7 @@ describe("DealsService", () => {
       const newOwnerId = "user-2";
 
       const deals = dealIds.map((id) => ({ ...mockDeal, id }));
-      
+
       // Mock findOne for each deal
       deals.forEach((deal) => {
         mockPrismaService.deal.findUnique.mockResolvedValueOnce(deal);
@@ -578,15 +579,18 @@ describe("DealsService", () => {
         lastName: "Doe",
       });
       mockPrismaService.deal.updateMany.mockResolvedValue({ count: 1 });
-      
+
       // For createActivity calls
       mockPrismaService.deal.findUnique
-        .mockResolvedValueOnce({ workspaceId: "workspace-1", ownerId: "owner-1" }) // deal-1 exists
+        .mockResolvedValueOnce({
+          workspaceId: "workspace-1",
+          ownerId: "owner-1",
+        }) // deal-1 exists
         .mockResolvedValueOnce(null); // non-existent deal
-      
+
       mockPrismaService.activity.create.mockResolvedValue({});
       mockPrismaService.deal.findMany.mockResolvedValue([
-        { ...mockDeal, id: "deal-1", ownerId: newOwnerId }
+        { ...mockDeal, id: "deal-1", ownerId: newOwnerId },
       ]);
 
       const result = await service.bulkUpdateOwner(dealIds, newOwnerId);
@@ -634,7 +638,9 @@ describe("DealsService", () => {
       };
 
       mockPrismaService.deal.findUnique.mockResolvedValue(mockDeal);
-      mockPrismaService.dealContact.findUnique.mockResolvedValue(existingContact);
+      mockPrismaService.dealContact.findUnique.mockResolvedValue(
+        existingContact,
+      );
 
       const result = await service.addContact(dealId, contactId, true);
 
@@ -665,7 +671,8 @@ describe("DealsService", () => {
         dealId,
         contactId,
       });
-      mockPrismaService.deal.findUnique.mockResolvedValue({ // for createActivity
+      mockPrismaService.deal.findUnique.mockResolvedValue({
+        // for createActivity
         workspaceId: mockDeal.workspaceId,
         ownerId: mockDeal.ownerId,
       });
@@ -689,12 +696,12 @@ describe("DealsService", () => {
       const contactId = "contact-1";
 
       mockPrismaService.dealContact.delete.mockRejectedValue(
-        new Error("Record to delete does not exist.")
+        new Error("Record to delete does not exist."),
       );
 
-      await expect(
-        service.removeContact(dealId, contactId),
-      ).rejects.toThrow("Record to delete does not exist.");
+      await expect(service.removeContact(dealId, contactId)).rejects.toThrow(
+        "Record to delete does not exist.",
+      );
     });
   });
 
@@ -713,7 +720,8 @@ describe("DealsService", () => {
 
       mockPrismaService.deal.findUnique
         .mockResolvedValueOnce(mockDeal) // for update
-        .mockResolvedValueOnce({ // for createActivity
+        .mockResolvedValueOnce({
+          // for createActivity
           workspaceId: mockDeal.workspaceId,
           ownerId: mockDeal.ownerId,
         });
@@ -740,7 +748,8 @@ describe("DealsService", () => {
 
       mockPrismaService.deal.findUnique
         .mockResolvedValueOnce(closedDeal) // for update
-        .mockResolvedValueOnce({ // for createActivity
+        .mockResolvedValueOnce({
+          // for createActivity
           workspaceId: closedDeal.workspaceId,
           ownerId: closedDeal.ownerId,
         });
@@ -794,7 +803,9 @@ describe("DealsService", () => {
 
       await service.update(dealId, updateData);
 
-      expect((service as any).automationService.triggerAutomations).toHaveBeenCalledWith({
+      expect(
+        (service as any).automationService.triggerAutomations,
+      ).toHaveBeenCalledWith({
         deal: expect.objectContaining({
           value: expect.objectContaining({ toNumber: expect.any(Function) }),
         }),
@@ -904,7 +915,7 @@ describe("DealsService", () => {
 
     it("should not update days when they are the same", async () => {
       const dealId = "deal-1";
-      
+
       mockPrismaService.deal.findUnique.mockResolvedValue({
         ...mockDeal,
         daysInStage: 0,
@@ -935,7 +946,8 @@ describe("DealsService", () => {
           ...mockDeal,
           status: DealStatus.OPEN,
         })
-        .mockResolvedValueOnce({ // for createActivity
+        .mockResolvedValueOnce({
+          // for createActivity
           workspaceId: mockDeal.workspaceId,
           ownerId: mockDeal.ownerId,
         });
@@ -988,7 +1000,9 @@ describe("DealsService", () => {
         owner: { id: "user-1", firstName: "John", lastName: "Doe" },
       };
 
-      mockPrismaService.deal.findUnique.mockResolvedValueOnce(dealWithRelations);
+      mockPrismaService.deal.findUnique.mockResolvedValueOnce(
+        dealWithRelations,
+      );
       mockPrismaService.stage.findUnique.mockResolvedValue({
         id: newStageId,
         pipelineId: "pipeline-1",
@@ -1021,7 +1035,9 @@ describe("DealsService", () => {
       };
 
       mockPrismaService.deal.findUnique.mockResolvedValue(mockDeal);
-      mockPrismaService.dealContact.findUnique.mockResolvedValue(existingContact);
+      mockPrismaService.dealContact.findUnique.mockResolvedValue(
+        existingContact,
+      );
 
       const result = await service.addContact(dealId, contactId, false);
 
@@ -1038,20 +1054,23 @@ describe("DealsService", () => {
         id: newOwnerId,
         email: "user2@example.com",
         firstName: "Jane",
-        lastName: "Smith"
+        lastName: "Smith",
       };
 
       mockPrismaService.user.findUnique.mockResolvedValue(owner);
       mockPrismaService.deal.updateMany.mockResolvedValue({ count: 2 });
-      
+
       // First deal exists, second doesn't (for createActivity)
       mockPrismaService.deal.findUnique
-        .mockResolvedValueOnce({ workspaceId: "workspace-1", ownerId: "user-1" }) // for first createActivity
+        .mockResolvedValueOnce({
+          workspaceId: "workspace-1",
+          ownerId: "user-1",
+        }) // for first createActivity
         .mockResolvedValueOnce(null); // for second createActivity - deal not found
-      
+
       mockPrismaService.activity.create.mockResolvedValue({});
       mockPrismaService.deal.findMany.mockResolvedValue([
-        { ...mockDeal, id: "deal-1", ownerId: newOwnerId }
+        { ...mockDeal, id: "deal-1", ownerId: newOwnerId },
       ]);
 
       const result = await service.bulkUpdateOwner(dealIds, newOwnerId);
@@ -1086,7 +1105,7 @@ describe("DealsService", () => {
       const mockAutomationService = {
         triggerAutomations: jest.fn().mockResolvedValue(undefined),
       };
-      
+
       service.setAutomationService(mockAutomationService);
 
       // Test create with automation
@@ -1128,7 +1147,8 @@ describe("DealsService", () => {
           ...mockDeal,
           status: DealStatus.OPEN,
         })
-        .mockResolvedValueOnce({ // for createActivity
+        .mockResolvedValueOnce({
+          // for createActivity
           workspaceId: mockDeal.workspaceId,
           ownerId: mockDeal.ownerId,
         });
@@ -1138,7 +1158,10 @@ describe("DealsService", () => {
         closedAt: new Date(),
       });
 
-      await service.update("deal-1", { status: DealStatus.WON, wonReason: "Great fit" });
+      await service.update("deal-1", {
+        status: DealStatus.WON,
+        wonReason: "Great fit",
+      });
 
       expect(mockAutomationService.triggerAutomations).toHaveBeenCalledWith({
         deal: expect.any(Object),
@@ -1179,7 +1202,9 @@ describe("DealsService", () => {
         owner: { id: "user-1", firstName: "John", lastName: "Doe" },
       };
 
-      mockPrismaService.deal.findUnique.mockResolvedValueOnce(dealWithRelations);
+      mockPrismaService.deal.findUnique.mockResolvedValueOnce(
+        dealWithRelations,
+      );
       mockPrismaService.stage.findUnique.mockResolvedValue({
         id: "stage-2",
         pipelineId: "pipeline-1",

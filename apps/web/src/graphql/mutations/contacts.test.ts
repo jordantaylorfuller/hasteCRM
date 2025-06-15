@@ -32,7 +32,10 @@ describe("Contact Mutations", () => {
         const variable = operation.variableDefinitions?.[0];
         if (variable?.kind === "VariableDefinition") {
           expect(variable.variable.name.value).toBe("input");
-          if (variable.type.kind === "NonNullType" && variable.type.type.kind === "NamedType") {
+          if (
+            variable.type.kind === "NonNullType" &&
+            variable.type.type.kind === "NamedType"
+          ) {
             expect(variable.type.type.name.value).toBe("CreateContactInput");
           }
         }
@@ -86,7 +89,10 @@ describe("Contact Mutations", () => {
         const variable = operation.variableDefinitions?.[0];
         if (variable?.kind === "VariableDefinition") {
           expect(variable.variable.name.value).toBe("input");
-          if (variable.type.kind === "NonNullType" && variable.type.type.kind === "NamedType") {
+          if (
+            variable.type.kind === "NonNullType" &&
+            variable.type.type.kind === "NamedType"
+          ) {
             expect(variable.type.type.name.value).toBe("UpdateContactInput");
           }
         }
@@ -140,7 +146,10 @@ describe("Contact Mutations", () => {
         const variable = operation.variableDefinitions?.[0];
         if (variable?.kind === "VariableDefinition") {
           expect(variable.variable.name.value).toBe("id");
-          if (variable.type.kind === "NonNullType" && variable.type.type.kind === "NamedType") {
+          if (
+            variable.type.kind === "NonNullType" &&
+            variable.type.type.kind === "NamedType"
+          ) {
             expect(variable.type.type.name.value).toBe("String");
           }
         }
@@ -181,7 +190,10 @@ describe("Contact Mutations", () => {
         const variable = operation.variableDefinitions?.[0];
         if (variable?.kind === "VariableDefinition") {
           expect(variable.variable.name.value).toBe("id");
-          if (variable.type.kind === "NonNullType" && variable.type.type.kind === "NamedType") {
+          if (
+            variable.type.kind === "NonNullType" &&
+            variable.type.type.kind === "NamedType"
+          ) {
             expect(variable.type.type.name.value).toBe("String");
           }
         }
@@ -209,11 +221,14 @@ describe("Contact Mutations", () => {
       const operation = UPDATE_CONTACT_SCORE.definitions[0];
       if (operation.kind === "OperationDefinition") {
         expect(operation.variableDefinitions).toHaveLength(2);
-        
+
         const idVariable = operation.variableDefinitions?.[0];
         if (idVariable?.kind === "VariableDefinition") {
           expect(idVariable.variable.name.value).toBe("id");
-          if (idVariable.type.kind === "NonNullType" && idVariable.type.type.kind === "NamedType") {
+          if (
+            idVariable.type.kind === "NonNullType" &&
+            idVariable.type.type.kind === "NamedType"
+          ) {
             expect(idVariable.type.type.name.value).toBe("String");
           }
         }
@@ -221,7 +236,10 @@ describe("Contact Mutations", () => {
         const scoreVariable = operation.variableDefinitions?.[1];
         if (scoreVariable?.kind === "VariableDefinition") {
           expect(scoreVariable.variable.name.value).toBe("score");
-          if (scoreVariable.type.kind === "NonNullType" && scoreVariable.type.type.kind === "NamedType") {
+          if (
+            scoreVariable.type.kind === "NonNullType" &&
+            scoreVariable.type.type.kind === "NamedType"
+          ) {
             expect(scoreVariable.type.type.name.value).toBe("Int");
           }
         }
@@ -264,19 +282,27 @@ describe("Contact Mutations", () => {
       const operation = IMPORT_CONTACTS.definitions[0];
       if (operation.kind === "OperationDefinition") {
         expect(operation.variableDefinitions).toHaveLength(2);
-        
+
         const inputVariable = operation.variableDefinitions?.[0];
         if (inputVariable?.kind === "VariableDefinition") {
           expect(inputVariable.variable.name.value).toBe("input");
-          if (inputVariable.type.kind === "NonNullType" && inputVariable.type.type.kind === "NamedType") {
-            expect(inputVariable.type.type.name.value).toBe("ImportContactsInput");
+          if (
+            inputVariable.type.kind === "NonNullType" &&
+            inputVariable.type.type.kind === "NamedType"
+          ) {
+            expect(inputVariable.type.type.name.value).toBe(
+              "ImportContactsInput",
+            );
           }
         }
 
         const fileVariable = operation.variableDefinitions?.[1];
         if (fileVariable?.kind === "VariableDefinition") {
           expect(fileVariable.variable.name.value).toBe("fileContent");
-          if (fileVariable.type.kind === "NonNullType" && fileVariable.type.type.kind === "NamedType") {
+          if (
+            fileVariable.type.kind === "NonNullType" &&
+            fileVariable.type.type.kind === "NamedType"
+          ) {
             expect(fileVariable.type.type.name.value).toBe("String");
           }
         }
@@ -372,7 +398,8 @@ describe("Contact Mutations", () => {
 
       mutations.forEach((mutation) => {
         expect(() => {
-          const hasValidDefinition = mutation.definitions[0].kind === "OperationDefinition";
+          const hasValidDefinition =
+            mutation.definitions[0].kind === "OperationDefinition";
           expect(hasValidDefinition).toBe(true);
         }).not.toThrow();
       });
@@ -391,7 +418,10 @@ describe("Contact Mutations", () => {
 
       mutationFieldMap.forEach(({ mutation, fieldName }) => {
         const operation = mutation.definitions[0];
-        if (operation.kind === "OperationDefinition" && operation.selectionSet) {
+        if (
+          operation.kind === "OperationDefinition" &&
+          operation.selectionSet
+        ) {
           const field = operation.selectionSet.selections[0];
           if (field.kind === "Field") {
             expect(field.name.value).toBe(fieldName);

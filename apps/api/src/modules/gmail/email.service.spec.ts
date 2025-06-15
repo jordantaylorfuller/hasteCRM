@@ -535,7 +535,7 @@ describe("EmailService", () => {
       mockPrismaService.email.findUnique.mockResolvedValue(null);
 
       await expect(service.toggleStar("non-existent")).rejects.toThrow(
-        "Email not found"
+        "Email not found",
       );
     });
   });
@@ -610,7 +610,7 @@ describe("EmailService", () => {
       mockPrismaService.email.findUnique.mockResolvedValue(null);
 
       await expect(
-        service.addLabels(mockWorkspaceId, "non-existent", ["LABEL"])
+        service.addLabels(mockWorkspaceId, "non-existent", ["LABEL"]),
       ).rejects.toThrow("Email not found");
     });
 
@@ -625,7 +625,7 @@ describe("EmailService", () => {
       mockPrismaService.email.findUnique.mockResolvedValue(mockEmail);
 
       await expect(
-        service.addLabels(mockWorkspaceId, "msg-123", ["LABEL"])
+        service.addLabels(mockWorkspaceId, "msg-123", ["LABEL"]),
       ).rejects.toThrow("Email not found");
     });
   });
@@ -680,7 +680,7 @@ describe("EmailService", () => {
       mockPrismaService.email.findUnique.mockResolvedValue(null);
 
       await expect(
-        service.removeLabels(mockWorkspaceId, "non-existent", ["LABEL"])
+        service.removeLabels(mockWorkspaceId, "non-existent", ["LABEL"]),
       ).rejects.toThrow("Email not found");
     });
   });

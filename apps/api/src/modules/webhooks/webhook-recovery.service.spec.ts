@@ -109,7 +109,9 @@ describe("WebhookRecoveryService", () => {
 
       await service.checkMissedUpdates();
 
-      expect(loggerLogSpy).toHaveBeenCalledWith("Checking for missed email updates...");
+      expect(loggerLogSpy).toHaveBeenCalledWith(
+        "Checking for missed email updates...",
+      );
 
       loggerLogSpy.mockRestore();
     });
@@ -197,8 +199,12 @@ describe("WebhookRecoveryService", () => {
 
       await service.cleanupFailedWebhooks();
 
-      expect(loggerLogSpy).toHaveBeenCalledWith("Cleaning up failed webhook events...");
-      expect(loggerLogSpy).toHaveBeenCalledWith("Retried 0 failed webhook events");
+      expect(loggerLogSpy).toHaveBeenCalledWith(
+        "Cleaning up failed webhook events...",
+      );
+      expect(loggerLogSpy).toHaveBeenCalledWith(
+        "Retried 0 failed webhook events",
+      );
 
       loggerLogSpy.mockRestore();
     });
@@ -286,7 +292,9 @@ describe("WebhookRecoveryService", () => {
         data: { status: "RETRIED" },
       });
 
-      expect(loggerLogSpy).toHaveBeenCalledWith("Retried 2 failed webhook events");
+      expect(loggerLogSpy).toHaveBeenCalledWith(
+        "Retried 2 failed webhook events",
+      );
 
       loggerLogSpy.mockRestore();
     });
@@ -374,15 +382,23 @@ describe("WebhookRecoveryService", () => {
       await service.handleWebhookFailure("account-1", error);
 
       expect(mockEmailAccountService.update).toHaveBeenCalledTimes(2);
-      expect(mockEmailAccountService.update).toHaveBeenNthCalledWith(1, "account-1", {
-        webhookFailureCount: 5,
-        lastWebhookError: "Webhook processing failed",
-        lastWebhookErrorAt: expect.any(Date),
-      });
-      expect(mockEmailAccountService.update).toHaveBeenNthCalledWith(2, "account-1", {
-        syncMode: "POLLING",
-        webhookFailureCount: 0,
-      });
+      expect(mockEmailAccountService.update).toHaveBeenNthCalledWith(
+        1,
+        "account-1",
+        {
+          webhookFailureCount: 5,
+          lastWebhookError: "Webhook processing failed",
+          lastWebhookErrorAt: expect.any(Date),
+        },
+      );
+      expect(mockEmailAccountService.update).toHaveBeenNthCalledWith(
+        2,
+        "account-1",
+        {
+          syncMode: "POLLING",
+          webhookFailureCount: 0,
+        },
+      );
 
       expect(mockGmailSyncQueue.add).toHaveBeenCalledWith(
         "poll-account",
@@ -410,7 +426,9 @@ describe("WebhookRecoveryService", () => {
       const error = new Error("Webhook processing failed");
       await service.handleWebhookFailure("non-existent", error);
 
-      expect(mockEmailAccountService.findOne).toHaveBeenCalledWith("non-existent");
+      expect(mockEmailAccountService.findOne).toHaveBeenCalledWith(
+        "non-existent",
+      );
       expect(mockEmailAccountService.update).not.toHaveBeenCalled();
       expect(mockGmailSyncQueue.add).not.toHaveBeenCalled();
     });
@@ -459,18 +477,20 @@ describe("WebhookRecoveryService", () => {
 
       await service.generateDailyReport();
 
-      expect(mockPrismaService.gmailWebhookEvent.findMany).toHaveBeenCalledWith({
-        where: {
-          createdAt: {
-            gte: new Date(dateStr + "T00:00:00.000Z"),
-            lt: new Date(dateStr + "T23:59:59.999Z"),
+      expect(mockPrismaService.gmailWebhookEvent.findMany).toHaveBeenCalledWith(
+        {
+          where: {
+            createdAt: {
+              gte: new Date(dateStr + "T00:00:00.000Z"),
+              lt: new Date(dateStr + "T23:59:59.999Z"),
+            },
+          },
+          select: {
+            status: true,
+            processingTime: true,
           },
         },
-        select: {
-          status: true,
-          processingTime: true,
-        },
-      });
+      );
 
       expect(loggerLogSpy).toHaveBeenCalledWith(
         "Daily webhook report:",
@@ -544,7 +564,9 @@ describe("WebhookRecoveryService", () => {
 
       await service.generateDailyReport();
 
-      expect(loggerLogSpy).toHaveBeenCalledWith("Generating daily webhook report...");
+      expect(loggerLogSpy).toHaveBeenCalledWith(
+        "Generating daily webhook report...",
+      );
 
       loggerLogSpy.mockRestore();
     });

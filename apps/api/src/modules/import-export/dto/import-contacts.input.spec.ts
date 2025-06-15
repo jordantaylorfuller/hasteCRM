@@ -1,5 +1,8 @@
 import { validate } from "class-validator";
-import { ImportContactsInput, ExportContactsInput } from "./import-contacts.input";
+import {
+  ImportContactsInput,
+  ExportContactsInput,
+} from "./import-contacts.input";
 
 describe("Import/Export DTOs", () => {
   describe("ImportContactsInput", () => {
@@ -48,12 +51,12 @@ describe("Import/Export DTOs", () => {
 
     it("should handle different file formats", async () => {
       const formats = ["csv", "xlsx", "json"];
-      
+
       for (const format of formats) {
         const input = new ImportContactsInput();
         input.fileUrl = `https://example.com/contacts.${format}`;
         input.format = format;
-        input.mapping = { "email": "email" };
+        input.mapping = { email: "email" };
 
         const errors = await validate(input);
         expect(errors).toHaveLength(0);
@@ -151,7 +154,7 @@ describe("Import/Export DTOs", () => {
 
     it("should handle all export formats", async () => {
       const formats = ["csv", "xlsx", "json"];
-      
+
       for (const format of formats) {
         const input = new ExportContactsInput();
         input.format = format;

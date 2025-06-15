@@ -15,9 +15,17 @@ export function formatError(error: any): Record<string, any> {
 }
 
 export function isValidEmail(email: string): boolean {
-  if (!email) return false;
+  if (!email || typeof email !== "string") return false;
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  // More strict email validation regex
+  const emailRegex =
+    /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+
+  // Additional checks
+  if (email.includes("..") || email.includes("@@")) return false;
+  if (email.startsWith(".") || email.endsWith(".")) return false;
+  if (email.includes(" ")) return false;
+
   return emailRegex.test(email);
 }
 

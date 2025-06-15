@@ -160,7 +160,8 @@ describe("Common Utils", () => {
       });
 
       it("should remove complex script tags with attributes", () => {
-        const input = '<script type="text/javascript" src="evil.js"></script><p>Content</p>';
+        const input =
+          '<script type="text/javascript" src="evil.js"></script><p>Content</p>';
         const result = sanitizeHtml(input);
 
         expect(result).not.toContain("<script");
@@ -168,7 +169,8 @@ describe("Common Utils", () => {
       });
 
       it("should remove nested script tags", () => {
-        const input = '<div><script><script>alert("XSS")</script></script></div>';
+        const input =
+          '<div><script><script>alert("XSS")</script></script></div>';
         const result = sanitizeHtml(input);
 
         expect(result).not.toContain("<script>");
@@ -178,13 +180,13 @@ describe("Common Utils", () => {
 
       it("should remove event handlers", () => {
         const inputs = [
-          '<div onclick="alert(\'XSS\')">Click me</div>',
+          "<div onclick=\"alert('XSS')\">Click me</div>",
           '<img onload="malicious()" src="image.jpg">',
           '<button onmouseover="hack()">Hover</button>',
           '<input onfocus="steal()" type="text">',
         ];
 
-        inputs.forEach(input => {
+        inputs.forEach((input) => {
           const result = sanitizeHtml(input);
           expect(result).not.toMatch(/on\w+\s*=/);
         });
@@ -192,19 +194,20 @@ describe("Common Utils", () => {
 
       it("should remove javascript: URLs", () => {
         const inputs = [
-          '<a href="javascript:alert(\'XSS\')">Link</a>',
+          "<a href=\"javascript:alert('XSS')\">Link</a>",
           '<img src="javascript:void(0)">',
           '<iframe src="JAVASCRIPT:malicious()"></iframe>',
         ];
 
-        inputs.forEach(input => {
+        inputs.forEach((input) => {
           const result = sanitizeHtml(input);
           expect(result).not.toMatch(/javascript:/i);
         });
       });
 
       it("should handle multiple malicious patterns", () => {
-        const input = '<div onclick="hack()"><script>alert("XSS")</script><a href="javascript:void(0)">Link</a></div>';
+        const input =
+          '<div onclick="hack()"><script>alert("XSS")</script><a href="javascript:void(0)">Link</a></div>';
         const result = sanitizeHtml(input);
 
         expect(result).not.toContain("<script");

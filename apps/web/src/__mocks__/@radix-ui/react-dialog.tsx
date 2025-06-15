@@ -1,5 +1,5 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React from "react";
+import ReactDOM from "react-dom";
 
 interface DialogProps {
   open?: boolean;
@@ -12,7 +12,7 @@ export const Root = ({ open, onOpenChange, children }: DialogProps) => {
 };
 
 export const Trigger = ({ children, asChild, ...props }: any) => {
-  const Component = asChild ? React.Fragment : 'button';
+  const Component = asChild ? React.Fragment : "button";
   return asChild ? children : <Component {...props}>{children}</Component>;
 };
 
@@ -27,37 +27,65 @@ export const Overlay = ({ className, forceMount, ...props }: any) => {
 };
 
 export const Content = React.forwardRef<HTMLDivElement, any>(
-  ({ children, className, onEscapeKeyDown, onPointerDownOutside, onInteractOutside, ...props }, ref) => {
+  (
+    {
+      children,
+      className,
+      onEscapeKeyDown,
+      onPointerDownOutside,
+      onInteractOutside,
+      ...props
+    },
+    ref,
+  ) => {
     React.useEffect(() => {
       const handleEscape = (e: KeyboardEvent) => {
-        if (e.key === 'Escape' && onEscapeKeyDown) {
+        if (e.key === "Escape" && onEscapeKeyDown) {
           onEscapeKeyDown(e);
         }
       };
-      
-      document.addEventListener('keydown', handleEscape);
-      return () => document.removeEventListener('keydown', handleEscape);
+
+      document.addEventListener("keydown", handleEscape);
+      return () => document.removeEventListener("keydown", handleEscape);
     }, [onEscapeKeyDown]);
-    
+
     return (
-      <div ref={ref} className={className} role="dialog" aria-modal="true" {...props}>
+      <div
+        ref={ref}
+        className={className}
+        role="dialog"
+        aria-modal="true"
+        {...props}
+      >
         {children}
       </div>
     );
-  }
+  },
 );
-Content.displayName = 'Dialog.Content';
+Content.displayName = "Dialog.Content";
 
 export const Header = ({ children, className, ...props }: any) => {
-  return <div className={className} {...props}>{children}</div>;
+  return (
+    <div className={className} {...props}>
+      {children}
+    </div>
+  );
 };
 
 export const Title = ({ children, className, ...props }: any) => {
-  return <h2 className={className} {...props}>{children}</h2>;
+  return (
+    <h2 className={className} {...props}>
+      {children}
+    </h2>
+  );
 };
 
 export const Description = ({ children, className, ...props }: any) => {
-  return <p className={className} {...props}>{children}</p>;
+  return (
+    <p className={className} {...props}>
+      {children}
+    </p>
+  );
 };
 
 export const Close = ({ children, asChild, onClick, ...props }: any) => {
@@ -65,9 +93,15 @@ export const Close = ({ children, asChild, onClick, ...props }: any) => {
     if (onClick) onClick(e);
     // Trigger onOpenChange(false) if available through context
   };
-  
-  const Component = asChild ? React.Fragment : 'button';
-  const componentProps = asChild ? {} : { ...props, onClick: handleClick, type: 'button' };
-  
-  return asChild ? children : <Component {...componentProps}>{children}</Component>;
+
+  const Component = asChild ? React.Fragment : "button";
+  const componentProps = asChild
+    ? {}
+    : { ...props, onClick: handleClick, type: "button" };
+
+  return asChild ? (
+    children
+  ) : (
+    <Component {...componentProps}>{children}</Component>
+  );
 };

@@ -15,20 +15,25 @@ describe("Toast Components", () => {
       render(
         <ToastProvider data-testid="provider">
           <div>Content</div>
-        </ToastProvider>
+        </ToastProvider>,
       );
-      
+
       const provider = screen.getByTestId("provider");
-      expect(provider).toHaveClass("fixed", "inset-0", "z-100", "pointer-events-none");
+      expect(provider).toHaveClass(
+        "fixed",
+        "inset-0",
+        "z-100",
+        "pointer-events-none",
+      );
     });
 
     it("applies custom className", () => {
       render(
         <ToastProvider className="custom-class" data-testid="provider">
           <div>Content</div>
-        </ToastProvider>
+        </ToastProvider>,
       );
-      
+
       const provider = screen.getByTestId("provider");
       expect(provider).toHaveClass("custom-class");
     });
@@ -38,9 +43,9 @@ describe("Toast Components", () => {
       render(
         <ToastProvider ref={ref}>
           <div>Content</div>
-        </ToastProvider>
+        </ToastProvider>,
       );
-      
+
       expect(ref.current).toBeInstanceOf(HTMLDivElement);
     });
 
@@ -48,9 +53,9 @@ describe("Toast Components", () => {
       render(
         <ToastProvider data-custom="value" data-testid="provider">
           <div>Content</div>
-        </ToastProvider>
+        </ToastProvider>,
       );
-      
+
       const provider = screen.getByTestId("provider");
       expect(provider).toHaveAttribute("data-custom", "value");
     });
@@ -59,7 +64,7 @@ describe("Toast Components", () => {
   describe("ToastViewport", () => {
     it("renders with default classes", () => {
       render(<ToastViewport data-testid="viewport" />);
-      
+
       const viewport = screen.getByTestId("viewport");
       expect(viewport).toHaveClass(
         "fixed",
@@ -67,20 +72,22 @@ describe("Toast Components", () => {
         "right-0",
         "z-[100]",
         "flex",
-        "flex-col-reverse"
+        "flex-col-reverse",
       );
     });
 
     it("applies responsive classes", () => {
       render(<ToastViewport data-testid="viewport" />);
-      
+
       const viewport = screen.getByTestId("viewport");
       expect(viewport).toHaveClass("sm:bottom-auto", "sm:top-0", "sm:flex-col");
     });
 
     it("applies custom className", () => {
-      render(<ToastViewport className="custom-viewport" data-testid="viewport" />);
-      
+      render(
+        <ToastViewport className="custom-viewport" data-testid="viewport" />,
+      );
+
       const viewport = screen.getByTestId("viewport");
       expect(viewport).toHaveClass("custom-viewport");
     });
@@ -88,7 +95,7 @@ describe("Toast Components", () => {
     it("forwards ref", () => {
       const ref = React.createRef<HTMLDivElement>();
       render(<ToastViewport ref={ref} />);
-      
+
       expect(ref.current).toBeInstanceOf(HTMLDivElement);
     });
   });
@@ -96,7 +103,7 @@ describe("Toast Components", () => {
   describe("Toast", () => {
     it("renders with default variant", () => {
       render(<Toast data-testid="toast">Toast content</Toast>);
-      
+
       const toast = screen.getByTestId("toast");
       expect(toast).toHaveClass("border", "bg-background");
       expect(toast).not.toHaveClass("border-destructive");
@@ -106,20 +113,20 @@ describe("Toast Components", () => {
       render(
         <Toast variant="destructive" data-testid="toast">
           Error toast
-        </Toast>
+        </Toast>,
       );
-      
+
       const toast = screen.getByTestId("toast");
       expect(toast).toHaveClass(
         "border-destructive",
         "bg-destructive",
-        "text-destructive-foreground"
+        "text-destructive-foreground",
       );
     });
 
     it("applies animation classes", () => {
       render(<Toast data-testid="toast">Animated toast</Toast>);
-      
+
       const toast = screen.getByTestId("toast");
       expect(toast).toHaveClass("transition-all");
       expect(toast.className).toContain("data-[state=open]:animate-in");
@@ -130,9 +137,9 @@ describe("Toast Components", () => {
       render(
         <Toast className="custom-toast" data-testid="toast">
           Custom toast
-        </Toast>
+        </Toast>,
       );
-      
+
       const toast = screen.getByTestId("toast");
       expect(toast).toHaveClass("custom-toast");
     });
@@ -140,13 +147,13 @@ describe("Toast Components", () => {
     it("forwards ref", () => {
       const ref = React.createRef<HTMLDivElement>();
       render(<Toast ref={ref}>Toast content</Toast>);
-      
+
       expect(ref.current).toBeInstanceOf(HTMLDivElement);
     });
 
     it("has pointer-events-auto for interaction", () => {
       render(<Toast data-testid="toast">Interactive toast</Toast>);
-      
+
       const toast = screen.getByTestId("toast");
       expect(toast).toHaveClass("pointer-events-auto");
     });
@@ -155,7 +162,7 @@ describe("Toast Components", () => {
   describe("ToastTitle", () => {
     it("renders with default classes", () => {
       render(<ToastTitle data-testid="title">Toast Title</ToastTitle>);
-      
+
       const title = screen.getByTestId("title");
       expect(title).toHaveClass("text-sm", "font-semibold");
     });
@@ -164,9 +171,9 @@ describe("Toast Components", () => {
       render(
         <ToastTitle className="custom-title" data-testid="title">
           Custom Title
-        </ToastTitle>
+        </ToastTitle>,
       );
-      
+
       const title = screen.getByTestId("title");
       expect(title).toHaveClass("custom-title");
     });
@@ -174,7 +181,7 @@ describe("Toast Components", () => {
     it("forwards ref", () => {
       const ref = React.createRef<HTMLDivElement>();
       render(<ToastTitle ref={ref}>Title</ToastTitle>);
-      
+
       expect(ref.current).toBeInstanceOf(HTMLDivElement);
     });
   });
@@ -184,9 +191,9 @@ describe("Toast Components", () => {
       render(
         <ToastDescription data-testid="description">
           Toast description
-        </ToastDescription>
+        </ToastDescription>,
       );
-      
+
       const description = screen.getByTestId("description");
       expect(description).toHaveClass("text-sm", "opacity-90");
     });
@@ -195,9 +202,9 @@ describe("Toast Components", () => {
       render(
         <ToastDescription className="custom-desc" data-testid="description">
           Custom description
-        </ToastDescription>
+        </ToastDescription>,
       );
-      
+
       const description = screen.getByTestId("description");
       expect(description).toHaveClass("custom-desc");
     });
@@ -205,7 +212,7 @@ describe("Toast Components", () => {
     it("forwards ref", () => {
       const ref = React.createRef<HTMLDivElement>();
       render(<ToastDescription ref={ref}>Description</ToastDescription>);
-      
+
       expect(ref.current).toBeInstanceOf(HTMLDivElement);
     });
   });
@@ -213,10 +220,10 @@ describe("Toast Components", () => {
   describe("ToastClose", () => {
     it("renders as button with close icon", () => {
       render(<ToastClose data-testid="close" />);
-      
+
       const closeButton = screen.getByTestId("close");
       expect(closeButton.tagName).toBe("BUTTON");
-      
+
       // Check for SVG close icon
       const svg = closeButton.querySelector("svg");
       expect(svg).toBeInTheDocument();
@@ -225,13 +232,13 @@ describe("Toast Components", () => {
 
     it("has accessibility classes", () => {
       render(<ToastClose data-testid="close" />);
-      
+
       const closeButton = screen.getByTestId("close");
       expect(closeButton).toHaveClass(
         "absolute",
         "right-2",
         "top-2",
-        "rounded-md"
+        "rounded-md",
       );
       expect(closeButton.className).toContain("focus:outline-none");
       expect(closeButton.className).toContain("focus:ring-2");
@@ -239,7 +246,7 @@ describe("Toast Components", () => {
 
     it("has hover states", () => {
       render(<ToastClose data-testid="close" />);
-      
+
       const closeButton = screen.getByTestId("close");
       expect(closeButton.className).toContain("hover:text-foreground");
       expect(closeButton.className).toContain("group-hover:opacity-100");
@@ -249,17 +256,21 @@ describe("Toast Components", () => {
       render(
         <div className="group destructive">
           <ToastClose data-testid="close" />
-        </div>
+        </div>,
       );
-      
+
       const closeButton = screen.getByTestId("close");
-      expect(closeButton.className).toContain("group-[.destructive]:text-red-300");
-      expect(closeButton.className).toContain("group-[.destructive]:hover:text-red-50");
+      expect(closeButton.className).toContain(
+        "group-[.destructive]:text-red-300",
+      );
+      expect(closeButton.className).toContain(
+        "group-[.destructive]:hover:text-red-50",
+      );
     });
 
     it("applies custom className", () => {
       render(<ToastClose className="custom-close" data-testid="close" />);
-      
+
       const closeButton = screen.getByTestId("close");
       expect(closeButton).toHaveClass("custom-close");
     });
@@ -267,29 +278,29 @@ describe("Toast Components", () => {
     it("forwards ref", () => {
       const ref = React.createRef<HTMLButtonElement>();
       render(<ToastClose ref={ref} />);
-      
+
       expect(ref.current).toBeInstanceOf(HTMLButtonElement);
     });
 
     it("handles click events", () => {
       const handleClick = jest.fn();
       render(<ToastClose onClick={handleClick} data-testid="close" />);
-      
+
       const closeButton = screen.getByTestId("close");
       fireEvent.click(closeButton);
-      
+
       expect(handleClick).toHaveBeenCalledTimes(1);
     });
 
     it("renders SVG with correct attributes", () => {
       render(<ToastClose data-testid="close" />);
-      
+
       const svg = screen.getByTestId("close").querySelector("svg");
       expect(svg).toHaveAttribute("viewBox", "0 0 24 24");
       expect(svg).toHaveAttribute("fill", "none");
       expect(svg).toHaveAttribute("stroke", "currentColor");
       expect(svg).toHaveAttribute("stroke-width", "2");
-      
+
       // Check for X icon lines
       const lines = svg?.querySelectorAll("line");
       expect(lines).toHaveLength(2);
@@ -309,12 +320,12 @@ describe("Toast Components", () => {
               <ToastClose />
             </Toast>
           </ToastViewport>
-        </ToastProvider>
+        </ToastProvider>,
       );
-      
+
       expect(screen.getByText("Success")).toBeInTheDocument();
       expect(screen.getByText("Your action was completed")).toBeInTheDocument();
-      
+
       const closeButton = screen.getByRole("button");
       expect(closeButton).toBeInTheDocument();
     });
@@ -330,9 +341,9 @@ describe("Toast Components", () => {
               <ToastTitle>Toast 2</ToastTitle>
             </Toast>
           </ToastViewport>
-        </ToastProvider>
+        </ToastProvider>,
       );
-      
+
       expect(screen.getByText("Toast 1")).toBeInTheDocument();
       expect(screen.getByText("Toast 2")).toBeInTheDocument();
     });
