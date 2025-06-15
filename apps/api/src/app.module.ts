@@ -17,6 +17,7 @@ import { GmailModule } from "./modules/gmail/gmail.module";
 import { WebhooksModule } from "./modules/webhooks/webhooks.module";
 import { AiModule } from "./modules/ai/ai.module";
 import { PipelinesModule } from "./modules/pipelines/pipelines.module";
+import { LoggerModule } from "./common/logger/logger.module";
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ import { PipelinesModule } from "./modules/pipelines/pipelines.module";
         return { req, res };
       },
     }),
+    LoggerModule,
     PrismaModule,
     RedisModule,
     EmailModule,
